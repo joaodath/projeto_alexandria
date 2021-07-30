@@ -300,8 +300,7 @@ Sidebar
 /* main */
 
 main {
-    background: linear-gradient(rgba(166, 69, 17, 0.856), rgba(37, 36, 36, 0.7)),
-        url('./old.jfif');
+    background: linear-gradient(rgba(166, 69, 17, 0.856), rgba(37, 36, 36, 0.7)), url('./old.jfif');
 }
 
 .content-container {
@@ -314,11 +313,21 @@ main {
 
 .section-center {
     width: 100%;
-    min-height: 95vh;
+    min-height: calc(100vh - 3rem);
     display: flex;
     align-items: center;
     justify-content: center;
 
+}
+
+@media screen and (min-width:992px) {
+    main {
+        max-height: calc(100vh - 108px);
+    }
+
+    .section-center {
+        min-height: calc(100vh - 108px);
+    }
 }
 
 .section-center h1 {
@@ -366,12 +375,13 @@ main {
 footer {
 
     width: 100%;
+    height: 3rem;
     background: #1A231C;
 }
 
 
 .copyright {
-    padding: 1rem;
+    padding: 0.5rem;
     text-align: center;
     font-weight: 700;
     color: var(--beige);
