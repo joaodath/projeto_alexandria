@@ -1,13 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sidebar || Starter</title>
+    <!-- normalize -->
+    <link rel="stylesheet" href="./normalize.css" />
+    <!-- font-awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" />
+    <!-- main css -->
+    <link rel="stylesheet" href="./main.css" />
 </head>
+
 <body>
+    <button class="sidebar-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
     
+    <!-- header -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img class="logo" src="../logo.png" alt="">
+            <button type="button" class="close-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <!-- links -->
+        <ul class="links">
+            <li>
+                <a href="contact.html">Início<i class="fas fa-angle-right"></i></a>
+            </li>
+            <li>
+                <a href="index.html">acervo<i class="fas fa-angle-right"></i></a>
+            </li>
+            <li>
+                <a href="about.html">cadastrar<i class="fas fa-angle-right"></i></a>
+            </li>
+            <li>
+                <a href="projects.html">quem somos<i class="fas fa-angle-right"></i></a>
+            </li>
+
+        </ul>
+
+    </aside>
+    <!-- main -->
+    <main>
+        <!-- section to center items -->
+        <section class="section-center">
+            <article class="content-container">
+                <h1>Bem Vindo</h1>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex totam animi esse iste molestias vero reprehenderit eius maiores dolorum unde. </p>
+                <a href="" class="btn btn-content">Saiba Mais</a>
+                <!-- <img src="foto-home.png" alt=""> -->
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <p class="copyright">&copy; 2021 Alexandria. All rights reserved.</p>
+    </footer>
+    <!-- javascript -->
+    <script src="./app.js"></script>
 </body>
+
 </html>
