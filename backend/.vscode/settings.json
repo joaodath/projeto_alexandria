@@ -1,0 +1,15 @@
+{
+    "python.pythonPath": "c:\\src\\venv\\Scripts\\python.exe",
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "askForPassword": true,
+            "driver": "PostgreSQL",
+            "name": "sense2",
+            "database": "alexandria",
+            "username": "postgres"
+        }
+    ]
+}
