@@ -1,6 +1,14 @@
 <!-- Oi, Thaynar! Insira o código do topo de página aqui -->
 
+<!-- A próxima linha cria o título da página -->
+{% block title %}Alexandria{% endblock %} 
+
+<!-- Aqui o Jinja2 vai automaticamente substituir o conteúdo 
+pelo código nas páginas. -->
 {% block content %}
 {% endblock %}
 
 <!-- Oi, Thaynar! Insira o código de fim de página aqui -->
+
+<!-- Lembrete: usar a tag {{ url_for('url') }} ao invés de links 
+    diretos paras as páginas -->
