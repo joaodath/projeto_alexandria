@@ -6,5 +6,5 @@ from alexandria.run import app, db
 
 
 @app.route('/editar')
-def index(): 
+def edit(): 
     return render_template('edit.html')
