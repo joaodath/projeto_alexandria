@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Página Inicial - Alexandria{% endblock %}</title>
+    <!-- normalize -->
+    <link rel="stylesheet" href="./normalize.css" />
+    <!-- font-awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" />
+    <!-- main css -->
+    <link rel="stylesheet" href="../static/css/main.css" />
+</head>
+
+<body>
+    <button class="sidebar-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- header -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img class="logo" src="../static/img/logo/alexandria_logo.png" alt="" />
+            <button type="button" class="close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <!-- links -->
+        <ul class="links">
+            <li>
+                <a href="contact.html">Início<i class="fas fa-angle-right"></i></a>
+            </li>
+            <li>
+                <a href="index.html">acervo<i class="fas fa-angle-right"></i></a>
+            </li>
+            <li>
+                <a href="about.html">cadastrar<i class="fas fa-angle-right"></i></a>
+            </li>
+            <li>
+                <a href="projects.html">quem somos<i class="fas fa-angle-right"></i></a>
+            </li>
+        </ul>
+    </aside>
+    <!-- Aqui o Jinja2 vai automaticamente substituir o conteúdo 
+pelo código nas páginas. -->
+    {% block content %}
+    {% endblock %}
+
+    <footer>
+        <p class="copyright">&copy; 2021 Alexandria. All rights reserved.</p>
+    </footer>
+    <!-- javascript -->
+    <script src="../static/js/app.js"></script>
+</body>
+
+</html>
+
+<!-- Lembrete: usar a tag {{ url_for('url') }} ao invés de links 
+    diretos paras as páginas -->
