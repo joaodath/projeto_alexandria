@@ -9,7 +9,7 @@
     <!-- font-awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" />
     <!-- main css -->
-    <link href="{{ url_for('../frontend/static/css', filename='main.css') }}" />
+    <link href="{{ url_for('static', filename='./css/main.css') }}" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
@@ -28,16 +28,16 @@
         <!-- links -->
         <ul class="links">
             <li>
-                <a href="{{ url_for('/') }}">Início<i class="fas fa-angle-right"></i></a>
+                <a href="{{ url_for('index') }}">Início<i class="fas fa-angle-right"></i></a>
             </li>
             <li>
                 <a href="{{ url_for('acervo') }}">acervo<i class="fas fa-angle-right"></i></a>
             </li>
             <li>
-                <a href="{{ url_for('registrarlivro') }}">cadastrar<i class="fas fa-angle-right"></i></a>
+                <a href="{{ url_for('register') }}">cadastrar<i class="fas fa-angle-right"></i></a>
             </li>
             <li>
-                <a href="{{ url_for('sobre') }}">quem somos<i class="fas fa-angle-right"></i></a>
+                <a href="{{ url_for('about') }}">quem somos<i class="fas fa-angle-right"></i></a>
             </li>
         </ul>
     </aside>
