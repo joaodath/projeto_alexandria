@@ -32,4 +32,5 @@ from .controllers import book_details
 from .controllers import collection
 from .controllers import edit
 from .controllers import register
+from .controllers import delete
 
