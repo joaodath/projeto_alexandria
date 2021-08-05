@@ -14,13 +14,13 @@ class Author(db.Model):
     book = db.relationship('Book', back_populates='author')
     
     def __init__(self, name_author):
-        self.name = name_author
+        self.name_author = name_author
         
         
     
     # forma bonita de mostrar o nome do registro
     def __repr__(self):
-        return f'<Author {self.name}>'
+        return f'<Author {self.name_author}>'
     
 
 class Book(db.Model):

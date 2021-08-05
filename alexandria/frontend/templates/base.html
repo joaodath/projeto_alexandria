@@ -6,12 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Página Inicial - Alexandria{% endblock %}</title>
-    <!-- normalize -->
-    <link rel="stylesheet" href="./normalize.css" />
     <!-- font-awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" />
     <!-- main css -->
-    <link rel="stylesheet" href="../static/css/main.css" />
+    <link href="{{ url_for('static', filename='./css/main.css') }}" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
@@ -30,16 +28,16 @@
         <!-- links -->
         <ul class="links">
             <li>
-                <a href="contact.html">Início<i class="fas fa-angle-right"></i></a>
+                <a href="{{ url_for('index') }}">Início<i class="fas fa-angle-right"></i></a>
             </li>
             <li>
-                <a href="index.html">acervo<i class="fas fa-angle-right"></i></a>
+                <a href="{{ url_for('acervo') }}">acervo<i class="fas fa-angle-right"></i></a>
             </li>
             <li>
-                <a href="about.html">cadastrar<i class="fas fa-angle-right"></i></a>
+                <a href="{{ url_for('register') }}">cadastrar<i class="fas fa-angle-right"></i></a>
             </li>
             <li>
-                <a href="projects.html">quem somos<i class="fas fa-angle-right"></i></a>
+                <a href="{{ url_for('about') }}">quem somos<i class="fas fa-angle-right"></i></a>
             </li>
         </ul>
     </aside>

@@ -5,7 +5,7 @@ from alexandria.run import app, db
 
 
 
-
+@app.route('/index')
 @app.route('/')
 def index(): 
     return render_template('index.html')
