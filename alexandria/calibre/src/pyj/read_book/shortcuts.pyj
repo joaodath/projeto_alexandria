@@ -1,0 +1,519 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2019, Kovid Goyal <kovid at kovidgoyal.net>
+from __python__ import bound_methods, hash_literals
+
+from gettext import gettext as _
+
+from read_book.globals import runtime
+
+
+def parse_key_repr(sc):
+    parts = sc.split('+')
+    if sc.endsWith('++'):
+        parts = parts[:-2]
+        parts.push('+')
+    key = parts[-1]
+    ans = {'key': key, 'altKey': False, 'ctrlKey': False, 'metaKey': False, 'shiftKey': False}
+    for modifier in parts[:-1]:
+        q = modifier.toLowerCase()
+        if q is 'ctrl':
+            ans.ctrlKey = True
+        elif q is 'alt':
+            ans.altKey = True
+        elif q is 'meta':
+            ans.metaKey = True
+        elif q is 'shift':
+            ans.shiftKey = True
+    return ans
+
+
+def desc(sc, group, short, long):
+    if jstype(sc) is 'string':
+        sc = v'[sc]'
+    pkey = v'[]'
+    for x in sc:
+        pkey.push(parse_key_repr(x))
+    return {'group': group, 'short': short, 'long': long, 'shortcuts': pkey}
+
+
+def keyevent_as_shortcut(evt):
+    key = evt.key
+    if capital_letters[key] and evt.shiftKey:
+        key = key.toLowerCase()
+    return {
+        'key': key, 'altKey': evt.altKey, 'ctrlKey': evt.ctrlKey,
+        'metaKey': evt.metaKey, 'shiftKey': evt.shiftKey
+    }
+
+
+def shortcut_differs(a, b):
+    return not (a.key is b.key and a.altKey is b.altKey and a.ctrlKey is b.ctrlKey and a.metaKey is b.metaKey and a.shiftKey is b.shiftKey)
+
+
+capital_letters = {x: True for x in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'}
+
+
+def get_key_text(evt):
+    key = evt.key
+    if key:
+        # on Windows pressing ctrl+alt+ascii char gives capital letters. On all
+        # platforms shift+key gives capital letters we define shortcuts using
+        # lowercase letters, so lowercase them here.
+        if evt.code and key.toLowerCase() is not key and evt.code.startsWith('Key') and capital_letters[key]:
+            key = key.toLowerCase()
+    return key
+
+
+def keyevent_to_index(evt):
+    parts = v'[]'
+    for mod in v"['altKey', 'ctrlKey', 'metaKey', 'shiftKey']":
+        parts.push('y' if evt[mod] else 'n')
+    return parts.join('') + get_key_text(evt)
+
+
+def key_as_text(evt):
+    mods = v'[]'
+    for x in ('alt', 'ctrl', 'meta', 'shift'):
+        if evt[x + 'Key']:
+            if 'macos' in window.navigator.userAgent:
+                if x is 'alt':
+                    x = 'option'
+                elif x is 'meta':
+                    x = '⌘'
+            mods.push(x.capitalize())
+    mods = '+'.join(mods)
+    if mods:
+        mods += '+'
+    key = get_key_text(evt)
+    if key is ' ':
+        key = 'Space'
+    return mods + key
+
+
+def common_shortcuts():  # {{{
+    return {
+    'start_of_file': desc(
+        v"['Ctrl+ArrowUp', 'Ctrl+ArrowLeft', 'Home']",
+        'scroll',
+        _('Scroll to the beginning of the current file'),
+        _('When the e-book is made of multiple individual files, scroll to the start of the current file'),
+    ),
+
+    'start_of_book': desc(
+        'Ctrl+Home',
+        'scroll',
+        _('Scroll to the beginning of the book'),
+    ),
+
+    'end_of_book': desc(
+        'Ctrl+End',
+        'scroll',
+        _('Scroll to the end of the book'),
+    ),
+
+    'end_of_file': desc(
+        v"['Ctrl+ArrowDown', 'Ctrl+ArrowRight', 'End']",
+        'scroll',
+        _('Scroll to the end of the current file'),
+        _('When the e-book is made of multiple individual files, scroll to the end of the current file'),
+    ),
+
+    'up': desc(
+        'ArrowUp',
+        'scroll',
+        _('Scroll backwards smoothly (by screen-fulls in paged mode)'),
+        _('Scroll backwards, smoothly in flow mode and by screen fulls in paged mode'),
+    ),
+
+    'down': desc(
+        'ArrowDown',
+        'scroll',
+        _('Scroll forwards smoothly (by screen-fulls in paged mode)'),
+        _('Scroll forwards, smoothly in flow mode and by screen fulls in paged mode'),
+    ),
+
+    'left': desc(
+        'ArrowLeft',
+        'scroll',
+        _('Scroll left'),
+        _('Scroll leftwards by a little in flow mode and by a page in paged mode'),
+    ),
+
+    'right': desc(
+        'ArrowRight',
+        'scroll',
+        _('Scroll right'),
+        _('Scroll rightwards by a little in flow mode and by a page in paged mode'),
+    ),
+
+    'pageup': desc(
+        v"['PageUp', 'Shift+ ']",
+        'scroll',
+        _('Scroll backwards by screen-fulls'),
+    ),
+
+    'pagedown': desc(
+        v"[' ', 'PageDown']",
+        'scroll',
+        _('Scroll forwards by screen-fulls'),
+    ),
+
+    'previous_section': desc(
+        'Ctrl+PageUp',
+        'scroll',
+        _('Scroll to the previous section')
+    ),
+
+    'next_section': desc(
+        'Ctrl+PageDown',
+        'scroll',
+        _('Scroll to the next section')
+    ),
+
+    'back': desc(
+        v"['Alt+ArrowLeft']",
+        'scroll',
+        _('Back'),
+    ),
+
+    'forward': desc(
+        v"['Alt+ArrowRight']",
+        'scroll',
+        _('Forward'),
+    ),
+
+    'toggle_toc': desc(
+        'Ctrl+t',
+        'ui',
+        _('Show/hide Table of Contents'),
+    ),
+
+    'read_aloud': desc(
+        'Ctrl+s',
+        'ui',
+        _('Read aloud')
+    ),
+
+    'toggle_hints': desc(
+        'Alt+f',
+        'ui',
+        _('Follow links with the keyboard')
+    ),
+
+    'copy_to_clipboard': desc(
+        v"['Ctrl+c', 'Meta+c']",
+        'ui',
+        _('Copy to clipboard'),
+    ),
+
+    'copy_location_to_clipboard': desc(
+        v"['Alt+c']",
+        'ui',
+        _('Copy current location to clipboard'),
+    ),
+
+    'copy_location_as_url_to_clipboard': desc(
+        v"['Ctrl+Shift+c']",
+        'ui',
+        _('Copy current location as calibre:// URL to clipboard'),
+    ),
+
+    'start_search': desc(
+        v"['/', 'Ctrl+f']",
+        'ui',
+        _('Start search'),
+    ),
+
+    'next_match': desc(
+        v"['F3', 'Enter']",
+        'ui',
+        _('Find next'),
+    ),
+
+    'previous_match': desc(
+        v"['Shift+F3']",
+        'ui',
+        _('Find previous'),
+    ),
+
+    'increase_font_size': desc(
+        v"['Ctrl+=', 'Ctrl++', 'Ctrl+Shift++', 'Ctrl+Shift+=', 'Meta++', 'Meta+Shift++', 'Meta+Shift+=']",
+        'ui',
+        _('Increase font size'),
+    ),
+
+    'decrease_font_size': desc(
+        v"['Ctrl+-', 'Ctrl+_', 'Ctrl+Shift+-', 'Ctrl+Shift+_', 'Meta+-', 'Meta+_']",
+        'ui',
+        _('Decrease font size'),
+    ),
+
+    'default_font_size': desc(
+        "Ctrl+0",
+        'ui',
+        _('Restore default font size'),
+    ),
+
+    'increase_number_of_columns': desc(
+        v"['Ctrl+]']",
+        'ui',
+        _('Increase number of pages per screen'),
+    ),
+
+    'decrease_number_of_columns': desc(
+        v"['Ctrl+[']",
+        'ui',
+        _('Decrease number of pages per screen'),
+    ),
+
+    'reset_number_of_columns': desc(
+        v"['Ctrl+Alt+c']",
+        'ui',
+        _('Make number of pages per screen automatic'),
+    ),
+
+    'toggle_full_screen': desc(
+        v"['F11', 'Ctrl+Shift+f']",
+        'ui',
+        _('Toggle full screen'),
+    ),
+
+    'toggle_paged_mode': desc(
+        'Ctrl+m',
+        'ui',
+        _('Toggle between Paged mode and Flow mode for text layout')
+    ),
+
+    'toggle_scrollbar': desc(
+        'Ctrl+w',
+        'ui',
+        _('Toggle the scrollbar')
+    ),
+
+    'toggle_reference_mode': desc(
+        'Ctrl+x',
+        'ui',
+        _('Toggle the Reference mode')
+    ),
+
+    'toggle_bookmarks': desc(
+        v"['Ctrl+b']",
+        'ui',
+        _('Show/hide bookmarks'),
+    ),
+
+    'new_bookmark': desc(
+        v"['Ctrl+Alt+b']",
+        'ui',
+        _('Create a new bookmark'),
+    ),
+
+    'metadata': desc(
+        v"['Ctrl+n', 'Ctrl+e']",
+        'ui',
+        _('Show the book metadata')
+    ),
+
+    'reload_book': desc(
+        v"['F5', 'Ctrl+r']",
+        'ui',
+        _('Reload book'),
+    ),
+
+    'extend_selection_by_word': desc(
+        v"['Ctrl+Shift+ArrowRight']",
+        'ui',
+        _('Alter the current selection forward by a word'),
+    ),
+
+    'shrink_selection_by_word': desc(
+        v"['Ctrl+Shift+ArrowLeft']",
+        'ui',
+        _('Alter the current selection backwards by a word'),
+    ),
+
+    'extend_selection_by_character': desc(
+        v"['Shift+ArrowRight']",
+        'ui',
+        _('Alter the current selection forward by a character'),
+    ),
+
+    'shrink_selection_by_character': desc(
+        v"['Shift+ArrowLeft']",
+        'ui',
+        _('Alter the current selection backwards by a character'),
+    ),
+
+    'extend_selection_by_line': desc(
+        v"['Shift+ArrowDown']",
+        'ui',
+        _('Alter the current selection forward by a line'),
+    ),
+
+    'extend_selection_to_start_of_line': desc(
+        v"['Shift+Home']",
+        'ui',
+        _('Extend the current selection to the start of the line'),
+    ),
+
+    'extend_selection_to_end_of_line': desc(
+        v"['Shift+End']",
+        'ui',
+        _('Extend the current selection to the end of the line'),
+    ),
+
+    'select_all': desc(
+        v'["Ctrl+a"]',
+        'ui',
+        _('Select all')
+    ),
+
+    'shrink_selection_by_line': desc(
+        v"['Shift+ArrowUp']",
+        'ui',
+        _('Alter the current selection backwards by a line'),
+    ),
+
+    'extend_selection_by_paragraph': desc(
+        v"['Ctrl+Shift+ArrowDown']",
+        'ui',
+        _('Alter the current selection forward by a paragraph'),
+    ),
+
+    'shrink_selection_by_paragraph': desc(
+        v"['Ctrl+Shift+ArrowUp']",
+        'ui',
+        _('Alter the current selection backwards by a paragraph'),
+    ),
+
+
+    'show_chrome': desc(
+        v"['Escape', 'ContextMenu']",
+        'ui',
+        _('Show the E-book viewer controls'),
+    ),
+
+    'preferences': desc(
+        v"['Ctrl+,', 'Ctrl+Escape', 'Meta+Escape', 'Meta+,']",
+        'ui',
+        _('Show E-book viewer preferences'),
+    ),
+
+    'goto_location': desc(
+        v"[';', ':', 'Shift+:', 'Shift+;', 'Ctrl+g']",
+        'ui',
+        _('Go to a specified book location or position'),
+    ),
+
+    'toggle_autoscroll': desc(
+        "Ctrl+ ",
+        'scroll',
+        _('Toggle auto-scroll'),
+    ),
+
+    'scrollspeed_increase': desc(
+        "Alt+ArrowUp",
+        'scroll',
+        _('Auto scroll faster'),
+    ),
+
+    'scrollspeed_decrease': desc(
+        "Alt+ArrowDown",
+        'scroll',
+        _('Auto scroll slower'),
+    ),
+
+    }  # }}}
+
+
+def shortcuts_definition():
+    ans = shortcuts_definition.ans
+    if not ans:
+        ans = shortcuts_definition.ans = common_shortcuts()
+
+        if runtime.is_standalone_viewer:
+            add_standalone_viewer_shortcuts(ans)
+        else:
+            ans['sync_book'] = desc(
+                v"[]",
+                'ui',
+                _('Sync last read position/annotations'),
+            )
+
+    return ans
+
+
+def shortcuts_group_desc():
+    ans = shortcuts_group_desc.ans
+    if not ans:
+        ans = shortcuts_group_desc.ans = {
+            'scroll': _('Navigation'),
+            'ui': _('Interface'),
+        }
+    return ans
+
+
+
+def add_standalone_viewer_shortcuts(sc):
+    ismacos = 'macos' in window.navigator.userAgent
+    sc['toggle_inspector'] = desc(
+        v"['Ctrl+i']",
+        'ui',
+        _('Show/hide Inspector'),
+    )
+
+    sc['toggle_lookup'] = desc(
+        v"['Ctrl+l']",
+        'ui',
+        _('Show/hide the word lookup panel'),
+    )
+
+    quit_shortcut = 'Meta+q' if ismacos else 'Ctrl+q'
+    sc['quit'] = desc(
+        quit_shortcut,
+        'ui',
+        _('Quit the E-book viewer'),
+    )
+
+    sc['print'] = desc(
+        "Ctrl+P",
+        'ui',
+        _('Print book to PDF'),
+    )
+
+    sc['toggle_toolbar'] = desc(
+        "Ctrl+F11",
+        'ui',
+        _('Toggle the toolbar'),
+    )
+
+    sc['toggle_highlights'] = desc(
+        "Ctrl+h",
+        'ui',
+        _('Toggle the highlights panel')
+    )
+
+    sc['edit_book'] = desc(
+        "Ctrl+d",
+        'ui',
+        _('Edit this book')
+    )
+
+
+
+def create_shortcut_map(custom_shortcuts):
+    ans = {}
+    scd = shortcuts_definition()
+    for sc_name in Object.keys(scd):
+        entry = scd[sc_name]
+        shortcuts = entry.shortcuts
+        if custom_shortcuts and custom_shortcuts[sc_name]:
+            shortcuts = custom_shortcuts[sc_name]
+        for sc in shortcuts:
+            ans[keyevent_to_index(sc)] = sc_name
+    return ans
+
+
+def shortcut_for_key_event(evt, shortcut_map):
+    idx = keyevent_to_index(evt)
+    return shortcut_map[idx]

@@ -1,0 +1,112 @@
+# -*- mode: python -*-
+# -*- coding: utf-8 -*-
+# vi: set ft=python :
+
+__license__ = 'GPL v3'
+__copyright__ = '2017, Darko Miletic <darko.miletic at gmail.com>'
+'''
+www.jacobinmag.com
+'''
+
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class Jacobinmag(BasicNewsRecipe):
+    title = 'Jacobin'
+    __author__ = 'Darko Miletic'
+    description = 'Jacobin is a leading voice of the American left, offering socialist perspectives on politics, economics, and culture.'
+    publisher = 'Jacobin'
+    category = 'news, politics, USA'
+    oldest_article = 65
+    no_stylesheets = True
+    encoding = 'utf8'
+    use_embedded_content = False
+    language = 'en'
+    remove_empty_feeds = True
+    publication_type = 'magazine'
+    needs_subscription = 'optional'
+    auto_cleanup = False
+    issue_url = None
+    PREFIX = 'https://www.jacobinmag.com'
+    LOGIN = 'https://auth.jacobinmag.com/mini_profile?redirect=https%3A%2F%2Fwww.jacobinmag.com%2F'
+    extra_css = """
+        body{font-family: Antwerp, 'Times New Roman', Times, serif}
+        img{margin-top:1em; margin-bottom: 1em; display:block}
+        .entry-dek,.entry-author{font-family: Hurme-No3, Futura, sans-serif}
+    """
+
+    conversion_options = {
+        'comment': description,
+        'tags': category,
+        'publisher': publisher,
+        'language': language
+    }
+
+    remove_tags = [
+        dict(id=['post-header-share', 'post-print']),
+        dict(name='form'),
+    ]
+
+    keep_only_tags = [
+        classes('po__article')
+    ]
+
+    def parse_index(self):
+        ans = []
+        articles = []
+        soup = self.index_to_soup('https://www.jacobinmag.com/store/issues')
+        lurl = 'https://jacobinmag.com' + soup.find('a', text='View Issue')['href']
+        feedtitle = 'Articles'
+        self.log('Loading issue from', lurl)
+        soup = self.index_to_soup(lurl)
+
+        # Find cover url
+        di = soup.find('figure', attrs={'class': lambda x: x and '__cover' in x})
+        img = di.find('img')
+        self.cover_url = img['src']
+        # End find cover url
+
+        # Get series title
+        title = soup.find('h1', attrs={'class': lambda x: x and '__heading' in x})
+        feedtitle = self.tag_to_string(title)
+
+        # Scrape article links
+        for section in soup.findAll('div', attrs={'class': lambda x: x and '__content' in x}):
+            for art in section.findAll('article'):
+                h1 = art.find('h1')
+                a = h1.find('a')
+                title = self.tag_to_string(a)
+                url = 'https://jacobinmag.com' + a['href']
+                desc = ''
+                p = art.find('p')
+                if p:
+                    desc = self.tag_to_string(p)
+                articles.append({'title': title, 'url': url, 'description': desc})
+                self.log(title, 'at', url)
+                if desc:
+                    self.log('\t', desc)
+        if articles:
+            ans.append((feedtitle, articles))
+        return ans
+
+    def get_browser(self):
+        br = BasicNewsRecipe.get_browser(self)
+        br.open(self.PREFIX)
+        if self.username is not None and self.password is not None:
+            br.open(self.LOGIN)
+            br.select_form(nr=0)
+            br['login.email'] = self.username
+            br['login.password'] = self.password
+            br.submit()
+            page = br.response().read()
+            soup = self.index_to_soup(page)
+            div = soup.find('div', attrs={'id': 'redirect-target'})
+            if div:
+                br.open(div['data-redirect'])
+        return br

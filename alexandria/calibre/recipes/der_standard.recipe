@@ -1,0 +1,91 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals, division, absolute_import, print_function
+
+__license__ = 'GPL v3'
+__copyright__ = '2009, Gerhard Aigner <gerhard.aigner at gmail.com>'
+
+''' http://www.derstandard.at - Austrian Newspaper '''
+
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class DerStandardRecipe(BasicNewsRecipe):
+    title = u'derStandard'
+    __author__ = 'Gerhard Aigner and Sujata Raman and Marcel Jira and Peter Reschenhofer'
+    description = u'Nachrichten aus Österreich'
+    publisher = 'derStandard.at'
+    category = 'news, politics, nachrichten, Austria'
+    use_embedded_content = False
+    remove_empty_feeds = True
+    no_stylesheets = True
+    encoding = 'utf-8'
+    language = 'de_AT'
+
+    oldest_article = 1
+    max_articles_per_feed = 100
+    ignore_duplicate_articles = {'title', 'url'}
+
+    masthead_url = 'http://images.derstandard.at/2012/06/19/derStandardat_1417x274.gif'
+
+    feeds = [
+        (u'Newsroom', u'https://derStandard.at/?page=rss&ressort=Seite1'),
+        (u'International', u'https://derstandard.at/?page=rss&ressort=International'),
+        (u'Inland', u'https://derstandard.at/?page=rss&ressort=Inland'),
+        (u'Wirtschaft', u'https://derStandard.at/?page=rss&ressort=Wirtschaft'),
+        (u'Web', u'https://derStandard.at/?page=rss&ressort=Web'),
+        (u'Sport', u'https://derStandard.at/?page=rss&ressort=Sport'),
+        (u'Panorama', u'https://derStandard.at/?page=rss&ressort=Panorama'),
+        (u'Etat', u'https://derStandard.at/?page=rss&ressort=Etat'),
+        (u'Kultur', u'https://derStandard.at/?page=rss&ressort=Kultur'),
+        (u'Wissenschaft', u'https://derStandard.at/?page=rss&ressort=Wissenschaft'),
+        (u'Gesundheit', u'https://derStandard.at/?page=rss&ressort=Gesundheit'),
+        (u'Bildung', u'https://derStandard.at/?page=rss&ressort=Bildung'),
+        (u'Meinung', u'https://derStandard.at/?page=rss&ressort=Meinung'),
+        (u'Lifestyle', u'https://derStandard.at/?page=rss&ressort=Lifestyle'),
+        (u'Reisen', u'https://derStandard.at/?page=rss&ressort=Reisen'),
+        (u'Familie', u'https://derstandard.at/?page=rss&ressort=Familie'),
+        (u'Meinung', u'https://derStandard.at/?page=rss&ressort=Meinung'),
+        (u'User', u'https://derStandard.at/?page=rss&ressort=User'),
+        (u'Karriere', u'https://derStandard.at/?page=rss&ressort=Karriere'),
+        (u'Immobilien', u'https://derstandard.at/?page=rss&ressort=Immobilien'),
+        (u'Automobil', u'https://derstandard.at/?page=rss&ressort=Automobil'),
+        (u'dieStandard', u'https://derStandard.at/?page=rss&ressort=diestandard'),
+    ]
+
+    def get_browser(self):
+        br = BasicNewsRecipe.get_browser(self)
+        br.set_simple_cookie('DSGVO_Check', '', '.derstandard.at')
+        headers = {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json; charset=UTF-8',
+            'DNT': '1',
+            'Pragma': 'no-cache',
+            'Cache-Control': 'no-cache'
+        }
+        import mechanize
+        req = mechanize.Request(url='https://apps.derstandard.at/privacyprotection/api/agree', data=None, headers=headers, method='POST')
+        br.open(req)
+        return br
+
+    keep_only_tags = [
+        classes('article-header article-body article-origins article-subtitle article-pubdate'),
+    ]
+
+    remove_tags = [
+        dict(name=['link', 'iframe', 'style', 'hr']),
+        dict(attrs={'class': ['lookup-links', 'media-list']}),
+        dict(name='form', attrs={'name': 'sitesearch'}),
+        dict(name='div', attrs={'class': ['socialsharing', 'block video',
+                                          'blog-browsing section',
+                                          'diashow', 'supplemental']}),
+        dict(name='div', attrs={'id': 'highlighted'})
+    ]
+
+    remove_attributes = ['width', 'height']

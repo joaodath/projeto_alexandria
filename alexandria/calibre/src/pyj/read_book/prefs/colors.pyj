@@ -1,0 +1,306 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2016, Kovid Goyal <kovid at kovidgoyal.net>
+from __python__ import bound_methods, hash_literals
+
+from elementmaker import E
+from gettext import gettext as _
+
+from book_list.globals import get_session_data
+from book_list.theme import cached_color_to_rgba
+from dom import (
+    add_extra_css, build_rule, clear, set_css, set_radio_group_value, svgicon,
+    unique_id
+)
+from modals import error_dialog
+from read_book.globals import default_color_schemes, ui_operations
+from read_book.prefs.utils import create_button_box
+from session import defaults
+from widgets import create_button
+
+CONTAINER = unique_id('reader-color-scheme')
+COLOR_LIST = unique_id()
+ACTION_BUTTONS = unique_id()
+EDIT_SCHEME = unique_id()
+MARGINS = ('left', 'right', 'top', 'bottom')
+
+
+add_extra_css(def():
+    sel = '#' + COLOR_LIST
+    style = build_rule(sel, list_style_type='none', display='flex', flex_wrap='wrap')
+    sel += ' > li'
+    style += build_rule(sel, padding='1ex 1rem', margin='1ex 0.5rem', border_radius='4px', cursor='pointer', border='solid 1px currentColor')
+    style += build_rule(sel + ' svg', visibility='hidden')
+    sel += '.current-color'
+    style += build_rule(sel + ' svg', visibility='visible')
+    style += build_rule('#{} #{} td'.format(CONTAINER, EDIT_SCHEME), padding='1ex 1em')
+    sel = '#' + ACTION_BUTTONS
+    style += sel + '{margin-top:2ex; padding-top:1ex; border-top: solid 1px currentColor; margin-bottom: 2ex; padding-bottom: 1ex; border-bottom: solid 1px currentColor}'
+    style += build_rule(sel + ' > span ', margin='1ex 0.5rem', display='inline-block')
+    return style
+)
+
+def get_container():
+    return document.getElementById(CONTAINER)
+
+
+def resolve_color_scheme(current_color_scheme):
+    sd = get_session_data()
+    cs = current_color_scheme or sd.get('current_color_scheme') or defaults.current_color_scheme
+    ucs = sd.get('user_color_schemes')
+    if default_color_schemes[cs]:
+        ans = default_color_schemes[cs]
+    elif ucs[cs] and ucs[cs].foreground and ucs[cs].background:
+        ans = ucs[cs]
+    else:
+        for sn in default_color_schemes:
+            ans = default_color_schemes[sn]
+            break
+    rgba = cached_color_to_rgba(ans.background)
+    ans.is_dark_theme = max(rgba[0], rgba[1], rgba[2]) < 115
+    return ans
+
+def change_current_color(ev):
+    ul = ev.currentTarget.parentNode
+    for li in ul.childNodes:
+        li.setAttribute('class', 'current-color' if li is ev.currentTarget else '')
+    set_action_button_visibility(ul.parentNode)
+
+def new_color_scheme(ev):
+    container = document.getElementById(EDIT_SCHEME)
+    container.style.display = 'block'
+    for inp in container.querySelectorAll('input'):
+        if inp.name.endswith('_color_type'):
+            inp.checked = inp.value is 'default'
+        elif inp.name.startswith('margin_'):
+            pass
+        else:
+            inp.value = {'name':'', 'bg':'#ffffff', 'fg':'#000000', 'link': '#0000ee'}[inp.name]
+    container.querySelector('input').focus()
+    return container
+
+def edit_color_scheme(ev):
+    container = new_color_scheme(ev)
+    ccs = current_color_scheme(container)
+    all_schemes = all_color_schemes()
+    if all_schemes[ccs]:
+        scheme = all_schemes[ccs]
+        container = document.getElementById(EDIT_SCHEME)
+        container.querySelector('input').value = scheme.name
+        container.querySelector('input[name=bg]').value = scheme.background
+        container.querySelector('input[name=fg]').value = scheme.foreground
+        set_radio_group_value(container, 'link_color_type', 'custom' if scheme.link else 'default')
+        if scheme.link:
+            container.querySelector('input[name=link]').value = scheme.link
+        for which in MARGINS:
+            attr = f'margin_{which}'
+            val = scheme[attr]
+            set_radio_group_value(container, f'{attr}_color_type', 'custom' if val else 'default')
+            if val:
+                bg, fg = val.split(':')
+                container.querySelector(f'input[name={attr}_bg]').value = bg
+                container.querySelector(f'input[name={attr}_fg]').value = fg
+
+def remove_color_scheme(ev):
+    ccs = current_color_scheme()
+    if default_color_schemes[ccs]:
+        return error_dialog(_('Cannot remove'), _('Cannot remove a builtin color scheme'))
+    sd = get_session_data()
+    ucs = sd.get('user_color_schemes')
+    v'delete ucs[ccs]'
+    sd.set('user_color_schemes', ucs)
+    create_color_buttons()
+    set_current_color_scheme()
+
+
+def current_color_scheme():
+    try:
+        return get_container().querySelector('li.current-color').getAttribute('data-name')
+    except Exception:
+        return defaults.current_color_scheme
+
+
+def set_current_color_scheme(value):
+    ul = document.getElementById(COLOR_LIST)
+    done = False
+    for li in ul.childNodes:
+        li.classList.remove('current-color')
+        if li.getAttribute('data-name') is value:
+            li.classList.add('current-color')
+            done = True
+    if not done:
+        for li in ul.childNodes:
+            li.classList.add('current-color')
+            break
+    set_action_button_visibility()
+
+def add_color_scheme(ev):
+    colors = {}
+    def check_color(col):
+        colors[col] = div.querySelector(f'input[name={col}]').value
+        if not /^#[0-9A-F]{6}$/i.test(colors[col]):
+            error_dialog(_('Invalid color'), _(
+                'The color {} is not a valid color').format(colors[col]))
+            return False
+        return True
+
+
+    div = document.getElementById(EDIT_SCHEME)
+    if this is not 'cancel':
+        name = div.querySelector('input[name=name]').value
+        if not name:
+            error_dialog(_('Name not specified'), _(
+                'You must specify a name for the color scheme'))
+            return
+
+
+        for col in ('bg', 'fg', 'link'):
+            if not check_color(col):
+                return
+        for margin in MARGINS:
+            for which in ('fg', 'bg'):
+                if not check_color(f'margin_{margin}_{which}'):
+                    return
+
+        key = '*' + name
+        sd = get_session_data()
+        ucs = Object.assign({}, sd.get('user_color_schemes'))
+        ucs[key] = {'name':name, 'foreground':colors.fg, 'background':colors.bg}
+        if div.querySelector('input[name=link_color_type]:checked').value is 'custom':
+            ucs[key].link = colors.link
+        for margin in MARGINS:
+            if div.querySelector(f'input[name=margin_{margin}_color_type]:checked').value is 'custom':
+                ucs[key][f'margin_{margin}'] = colors[f'margin_{margin}_bg'] + ':' + colors[f'margin_{margin}_fg']
+        sd.set('user_color_schemes', ucs)
+        create_color_buttons()
+        set_current_color_scheme(key)
+    div.style.display = 'none'
+
+
+def all_color_schemes():
+    all_schemes = {}
+    for k in default_color_schemes:
+        all_schemes[k] = default_color_schemes[k]
+    sd = get_session_data()
+    ucs = sd.get('user_color_schemes')
+    for k in ucs:
+        all_schemes[k] = ucs[k]
+    return all_schemes
+
+
+def create_color_buttons():
+    ul = document.getElementById(COLOR_LIST)
+    sd = get_session_data()
+    clear(ul)
+    all_schemes = all_color_schemes()
+    ccs = sd.get('current_color_scheme')
+    if not all_schemes[ccs]:
+        ccs = defaults.current_color_scheme
+    for name in sorted(all_schemes, key=def(k):return all_schemes[k].name.toLowerCase();):
+        scheme = all_schemes[name]
+        is_current = name is ccs
+        item = set_css(E.li(svgicon('check'), '\xa0' + scheme.name, data_name=name, onclick=change_current_color,
+                            class_='current-color' if is_current else ''),
+                       color=scheme.foreground, background_color=scheme.background)
+        ul.appendChild(item)
+
+
+def set_action_button_visibility():
+    container = get_container()
+    ccs = current_color_scheme(container)
+    is_custom = ccs.startswith('*')
+    is_first = True
+    for button in container.querySelectorAll('#' + ACTION_BUTTONS + ' > span'):
+        if is_first:
+            is_first = False
+        else:
+            button.style.display = 'inline-block' if is_custom else 'none'
+
+def create_colors_panel(container, apply_func, cancel_func):
+    container.appendChild(E.div(id=CONTAINER))
+    container = container.lastChild
+    sd = get_session_data()
+    cs = resolve_color_scheme()
+    container.dataset.bg = cs.background
+    container.dataset.fg = cs.foreground
+    container.dataset.link = cs.link or ''
+    container.appendChild(E.p(_('Choose a color scheme below'), style='margin:1ex 1em; padding: 1ex 0'))
+    ul = E.ul(id=COLOR_LIST)
+    container.appendChild(ul)
+    container.appendChild(E.div(
+        E.span(_('Override all book colors:') + '\xa0'),
+        E.label(E.input(type='radio', name='override_book_colors', value='never'), _('Never')),
+        '  ',
+        E.label(E.input(type='radio', name='override_book_colors', value='dark'), _('In dark mode')),
+        '  ',
+        E.label(E.input(type='radio', name='override_book_colors', value='always'), _('Always')),
+        style='margin:1ex 1em; padding: 1ex 0; white-space: pre-wrap'
+    ))
+    try:
+        container.lastChild.querySelector(f'[name=override_book_colors][value={sd.get("override_book_colors")}]').checked = True
+    except:
+        container.lastChild.querySelector('[name=override_book_colors][value=never]').checked = True
+    create_color_buttons()
+
+    container.appendChild(E.div(
+        E.span(create_button(_('New scheme'), 'plus', new_color_scheme)),
+        E.span(create_button(_('Edit scheme'), 'pencil', edit_color_scheme)),
+        E.span(create_button(_('Remove scheme'), 'trash', remove_color_scheme)),
+        id=ACTION_BUTTONS,
+    ))
+
+    def margin_row(title, which):
+        return E.tr(
+            E.td(title), E.td(
+                E.label(E.input(type='radio', name=f'margin_{which}_color_type', value='default'), _('Default')),
+                '\xa0\xa0',
+                E.label(E.input(type='radio', name=f'margin_{which}_color_type', value='custom'), _('Custom')),
+                '\xa0\xa0',
+                E.label(E.input(name=f'margin_{which}_bg', type='color', value='#ffffff', onclick=def (ev):
+                    set_radio_group_value(ev.currentTarget.closest('td'), f'margin_{which}_color_type', 'custom')
+                ), '\xa0' + _('Background')),
+                '\xa0\xa0',
+                E.label(E.input(name=f'margin_{which}_fg', type='color', value='#000000', onclick=def (ev):
+                    set_radio_group_value(ev.currentTarget.closest('td'), f'margin_{which}_color_type', 'custom')
+                ), '\xa0' + _('Foreground')),
+            )
+        )
+    container.appendChild(E.div(id=EDIT_SCHEME, style='display:none',
+        E.table(
+            E.tr(E.td(_('Name:')), E.td(E.input(name='name'))),
+            E.tr(E.td(_('Background:')), E.td(E.input(name='bg', type='color', value='#ffffff'))),
+            E.tr(E.td(_('Foreground:')), E.td(E.input(name='fg', type='color', value='#000000'))),
+            E.tr(E.td(_('Link:')), E.td(
+                E.label(E.input(type='radio', name='link_color_type', value='default'), _('Default')),
+                '\xa0\xa0',
+                E.label(E.input(type='radio', name='link_color_type', value='custom'), _('Custom')),
+                '\xa0',
+                E.input(name='link', type='color', value='#000000', onclick=def (ev):
+                    set_radio_group_value(ev.currentTarget.closest('td'), 'link_color_type', 'custom')
+                )
+            )),
+            margin_row(_('Top margin:'), 'top'),
+            margin_row(_('Bottom margin:'), 'bottom'),
+            margin_row(_('Left margin:'), 'left'),
+            margin_row(_('Right margin:'), 'right'),
+        ),
+        E.div(style="display:flex; justify-content: flex-end; margin: 1ex 1em",
+            create_button(_('Apply'), 'check', add_color_scheme), E.span('\xa0'), create_button(_('Discard'), 'close', add_color_scheme.bind('cancel'))
+    )))
+    set_action_button_visibility()
+    container.appendChild(E.div(style='margin: 1rem', create_button_box(None, apply_func, cancel_func)))
+
+develop = create_colors_panel
+
+def commit_colors(onchange):
+    ccs = current_color_scheme()
+    rcs = resolve_color_scheme(ccs)
+    c = get_container()
+    sd = get_session_data()
+    prev_obc = sd.get('override_book_colors')
+    cur_obc = c.querySelector('[name=override_book_colors]:checked').value
+    sd.set('current_color_scheme', ccs)
+    if cur_obc is not prev_obc:
+        sd.set('override_book_colors', cur_obc)
+    if rcs.foreground is not c.dataset.fg or rcs.background is not c.dataset.bg or c.dataset.link is not rcs.link or cur_obc is not prev_obc:
+        ui_operations.update_color_scheme()
+        onchange()

@@ -1,0 +1,85 @@
+#!/usr/bin/env python
+__copyright__ = '2008, Kovid Goyal <kovid at kovidgoyal.net>'
+
+__license__ = 'GPL v3'
+
+'''
+calibre recipe for slate.com
+'''
+
+from calibre.web.feeds.recipes import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class Slate(BasicNewsRecipe):
+    title = 'Slate'
+    description = 'A general-interest publication offering analysis and commentary about politics, news and culture.'
+    __author__ = 'Kovid Goyal'
+    timefmt = ''
+    no_stylesheets = True
+    language = 'en'
+    encoding = 'utf-8'
+    remove_attributes = ['style']
+    INDEX = 'https://slate.com'
+    compress_news_images = True
+
+    keep_only_tags = [
+        classes('article__header article__content'),
+    ]
+    remove_tags = [
+        classes('social-share slate-ad newsletter-signup in-article-recirc'),
+    ]
+
+    def preprocess_html(self, soup):
+        for img in soup.findAll('img', attrs={'data-srcset': True}):
+            img['src'] = img['data-srcset'].split()[0]
+        return soup
+
+    def parse_index(self):
+        ans = []
+        for sectitle, url in (
+                ('News & Politics', '/articles/news_and_politics.html'),
+                ('Technology', '/articles/technology.html'),
+                ('Business', '/articles/business.html'),
+                ('Arts', '/articles/arts.html'),
+                ('Life', '/articles/life.html'),
+                ('Health & Science', '/articles/health_and_science.html'),
+                ('Sports', '/articles/sports.html'),
+                ('Double X', '/articles/double_x.html'),
+        ):
+            url = self.INDEX + url
+            self.log('\nFound section:', sectitle, url)
+            articles = self.slate_section_articles(self.index_to_soup(url))
+            if articles:
+                ans.append((sectitle, articles))
+            if self.test and len(ans) > 1:
+                break
+        return ans
+
+    def slate_section_articles(self, soup):
+        ans = []
+        main = soup.find('section', **classes('main'))
+        if main is None:
+            return ans
+        for div in main.findAll(**classes('section-feed__item')):
+            a = div.find('a')
+            url = a['href']
+            if url.endswith('/'):
+                continue
+            h = a.find(['h2', 'h3', 'h4'])
+            title = self.tag_to_string(h)
+            desc = ''
+            for q in ('byline', 'dek'):
+                span = div.find(attrs={'class': lambda x: x and ('-' + q) in x})
+                if span is not None:
+                    desc += self.tag_to_string(span).strip()
+            self.log('\t' + title)
+            self.log('\t\t' + url)
+            ans.append({'title': title, 'description': desc.strip(),
+                        'date': '', 'url': url})
+        return ans

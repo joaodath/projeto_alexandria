@@ -1,0 +1,73 @@
+__license__ = 'GPL v3'
+
+'''
+www.esquire.com
+'''
+from collections import defaultdict
+
+from calibre.web.feeds.news import BasicNewsRecipe
+from css_selectors import Select
+
+
+def absolutize(url):
+    if url.startswith('/'):
+        url = 'https://www.esquire.com' + url
+    return url
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class Esquire(BasicNewsRecipe):
+    title = 'Esquire'
+    __author__ = 'Kovid Goyal'
+    description = 'Esquire: Man at His Best'
+    publisher = 'Hearst Communications, Inc.'
+    no_stylesheets = True
+    encoding = 'utf-8'
+    language = 'en'
+
+    keep_only_tags = [
+        classes('article-header gallery-header listicle-header listicle-body standard-header standard-body article-body gallery-main-view')
+    ]
+
+    remove_tags = [
+        classes('article-body--share-container tags--top image-share share-gallery embedded-image--expand embedded-image--close')
+    ]
+
+    def preprocess_html(self, soup):
+        for img in soup.findAll('img', attrs={'data-src': True}):
+            img['src'] = img['data-src']
+        return soup
+
+    def parse_index(self):
+        url = 'https://www.esquire.com'
+        root = self.index_to_soup(url, as_tree=True)
+        select = Select(root)
+        feeds = defaultdict(list)
+
+        for a in select('.cover-story-marquee a[href]'):
+            title = self.tag_to_string(a).strip() or 'Cover Story'
+            url = absolutize(a.get('href'))
+            self.log('Cover story:', title, url)
+            feeds['Cover Story'] = [{'title': title, 'url': url}]
+            break
+
+        for a in select('a[data-vars-cta]'):
+            title = self.tag_to_string(a).strip()
+            if not title:
+                continue
+            url = absolutize(a.get('href'))
+            section = a.get('data-vars-cta')
+            feeds[section].append({'title': title, 'url': url})
+            self.log(title, url)
+
+        ans = []
+        for sec in sorted(feeds, key=lambda x: (x != 'Cover Story', x)):
+            articles = feeds[sec]
+            if articles:
+                ans.append((sec, articles))
+        return ans

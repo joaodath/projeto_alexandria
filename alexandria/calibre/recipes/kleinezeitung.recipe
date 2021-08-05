@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+# vim:fileencoding=utf-8
+from __future__ import unicode_literals, division, absolute_import, print_function
+
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+class KleineZeitungRecipe(BasicNewsRecipe):
+    __license__ = 'GPL v3'
+    __author__ = 'kwetal'
+    language = 'de_AT'
+    version = 1
+
+    title = u'Kleine Zeitung'
+    publisher = u'Kleine Zeitung GmbH & Co KG'
+    category = u'News, Newspaper'
+    description = u'Nachrichten aus \u00D6sterreich'
+
+    use_embedded_content = False
+    remove_empty_feeds = True
+    oldest_article = 2
+    max_articles_per_feed = 100
+
+    no_stylesheets = True
+    remove_javascript = True
+
+    masthead_url = 'https://cdn-kl.niceshops.com/images/logos/logo_kleine_invoice.jpg'
+
+    feeds = [
+        ('Nachrichten', 'http://www.kleinezeitung.at/rss/nachrichten'),
+        ('Politik', 'http://www.kleinezeitung.at/rss/politik'),
+        ('Wirtschaft', 'http://www.kleinezeitung.at/rss/wirtschaft'),
+        ('Österreich und die Welt', 'http://www.kleinezeitung.at/rss/chronik'),
+        ('Leben', 'http://www.kleinezeitung.at/rss/leben'),
+        ('Sport', 'http://www.kleinezeitung.at/rss/sport'),
+        #        ('Ennstal', 'http://www.kleinezeitung.at/rss/rss_ennstal'),
+        #        ('Graz & Umgebung', 'http://www.kleinezeitung.at/rss/rss_graz'),
+        #        ('Leoben', 'http://www.kleinezeitung.at/rss/rss_leoben'),
+        #        ('Murtal', 'http://www.kleinezeitung.at/rss/rss_murtal'),
+        #        ('Mürztal', 'http://www.kleinezeitung.at/rss/rss_muerztal'),
+        #        ('Oststeier', 'http://www.kleinezeitung.at/rss/rss_oststeier'),
+        #        ('Süd & Südwest', 'http://www.kleinezeitung.at/rss/rss_suedsuedwest'),
+        #        ('Südost & Süd', 'http://www.kleinezeitung.at/rss/rss_sueostsued'),
+        #        ('Weiz', 'http://www.kleinezeitung.at/rss/rss_weiz'),
+        #        ('Weststeier', 'http://www.kleinezeitung.at/rss/rss_weststeier'),
+        #        ('Feldkirchen', 'http://www.kleinezeitung.at/rss/rss_feldkirchen'),
+        #        ('Klagenfurt', 'http://www.kleinezeitung.at/rss/rss_klagenfurt'),
+        #        ('Lavanttal', 'http://www.kleinezeitung.at/rss/rss_lavanttal'),
+        #        ('Oberkärnten', 'http://www.kleinezeitung.at/rss/rss_oberkaernten'),
+        #        ('Osttirol', 'http://www.kleinezeitung.at/rss/rss_osttirol'),
+        #        ('St. Veit', 'http://www.kleinezeitung.at/rss/rss_stveit'),
+        #        ('Villach', 'http://www.kleinezeitung.at/rss/rss_villach'),
+        #        ('Völkermarkt', 'http://www.kleinezeitung.at/rss/rss_voelkermarkt')
+    ]
+
+    remove_tags_before = dict(attrs={'class': 'hline'})
+    remove_tags_after = [dict(name='div', attrs={'class': 'articletext'})]
+    remove_tags = [dict(name='hr')]
+
+    extra_css = '''
+                h1 {text-align: left;}
+                '''
+
+    def print_version(self, url):
+        main, sep, id = url.rpartition('/')
+        return main + '/print.do'
+
+    def preprocess_html(self, soup):
+        if soup.find('div', {'class': 'articletext'}) is None:
+            self.abort_article()
+        return soup

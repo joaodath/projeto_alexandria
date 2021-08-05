@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+# vim:fileencoding=utf-8
+# License: GPLv3 Copyright: 2016, Kovid Goyal <kovid at kovidgoyal.net>
+
+
+from calibre.web.feeds.recipes import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class NationalPost(BasicNewsRecipe):
+
+    title = 'National Post'
+    __author__ = 'Kovid Goyal'
+    description = 'Canadian national newspaper'
+    timefmt = ' [%d %b, %Y]'
+    language = 'en_CA'
+    no_stylesheets = True
+    oldest_article = 1.5
+    use_embedded_content = False
+
+    keep_only_tags = [
+        dict(itemprop='headline'),
+        classes('featured-image'),
+        dict(itemprop='articleBody'),
+    ]
+
+    feeds = ['http://nationalpost.com/rss']

@@ -1,0 +1,97 @@
+__license__ = 'GPL v3'
+__copyright__ = '2014, Darko Miletic <darko.miletic at gmail.com>'
+'''
+www.wired.com
+'''
+
+from calibre import browser
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class WiredDailyNews(BasicNewsRecipe):
+    title = 'Wired Magazine, Monthly Edition'
+    __author__ = 'Darko Miletic, update by Zach Lapidus, Michael Marotta'
+    description = ('Wired is a full-color monthly American magazine, '
+                   'published in both print and online editions, that '
+                   'reports on how emerging technologies affect culture, '
+                   'the economy and politics. '
+                   'Monthly edition, best run at the start of every month.')
+    publisher = 'Conde Nast'
+    category = 'news, IT, computers, technology'
+    oldest_article = 45
+    max_articles_per_feed = 200
+    no_stylesheets = True
+    encoding = 'utf-8'
+    use_embedded_content = False
+    language = 'en'
+    ignore_duplicate_articles = {'url'}
+    remove_empty_feeds = True
+    extra_css             = """
+                            .entry-header{
+                                          text-transform: uppercase;
+                                          vertical-align: baseline;
+                                          display: inline;
+                                         }
+                            ul li{display: inline}
+                            """
+
+    keep_only_tags = [
+        classes('content-header lead-asset article__body'),
+    ]
+    remove_tags = [
+        classes(
+            'related-cne-video-component tags-component callout--related-list iframe-embed podcast_storyboard'
+            ' inset-left-component ad consumer-marketing-component social-icons'
+        ),
+        dict(name=['meta', 'link']),
+        dict(id=['sharing', 'social', 'article-tags', 'sidebar']),
+    ]
+
+    def parse_wired_index_page(self, currenturl, seen):
+        self.log('Parsing index page', currenturl)
+        soup = self.index_to_soup(currenturl)
+        baseurl = 'https://www.wired.com'
+        for a in soup.find("ul", {"class" : 'archive-list-component__items'}).findAll('a', href=True):
+            url = a['href']
+            if url.startswith('/story') and url.endswith('/'):
+                title = self.tag_to_string(a.parent.find('h2'))
+                dateloc = a.parent.find('time')
+                date = self.tag_to_string(dateloc)
+                if title.lower() != 'read more' and title and url not in seen:
+                    seen.add(url)
+                    self.log('Found article:', title)
+                    yield {
+                        'title': title,
+                        'date': date,
+                        'url': baseurl+url,
+                    }
+
+    def parse_index(self):
+        baseurl = 'https://www.wired.com/magazine/page/{}/'
+        pagenum = 1
+        articles = []
+        seen = set()
+        for pagenum in range(1, 4):
+            articles.extend(self.parse_wired_index_page(baseurl.format(pagenum), seen))
+
+        return [('Magazine Articles', articles)]
+
+    # Wired changes the content it delivers based on cookies, so the
+    # following ensures that we send no cookies
+    def get_browser(self, *args, **kwargs):
+        return self
+
+    def clone_browser(self, *args, **kwargs):
+        return self.get_browser()
+
+    def open_novisit(self, *args, **kwargs):
+        br = browser()
+        return br.open_novisit(*args, **kwargs)
+
+    open = open_novisit

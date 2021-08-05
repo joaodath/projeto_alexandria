@@ -1,0 +1,161 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2016, Kovid Goyal <kovid at kovidgoyal.net>
+from __python__ import bound_methods, hash_literals
+
+from elementmaker import E
+
+from book_list.item_list import build_list, create_item
+from book_list.top_bar import create_top_bar, set_title
+from dom import clear, ensure_id
+from gettext import gettext as _
+from read_book.globals import runtime
+from read_book.prefs.colors import commit_colors, create_colors_panel
+from read_book.prefs.fonts import commit_fonts, create_fonts_panel
+from read_book.prefs.head_foot import commit_head_foot, create_head_foot_panel
+from read_book.prefs.keyboard import commit_keyboard, create_keyboard_panel
+from read_book.prefs.layout import commit_layout, create_layout_panel
+from read_book.prefs.misc import commit_misc, create_misc_panel
+from read_book.prefs.scrolling import commit_scrolling, create_scrolling_panel
+from read_book.prefs.selection import commit_selection, create_selection_panel
+from read_book.prefs.user_stylesheet import (
+    commit_user_stylesheet, create_user_stylesheet_panel
+)
+
+
+class Prefs:
+
+    def __init__(self, container, close_func, on_change):
+        self.close_func = close_func
+        self.on_change = on_change
+        self.main_title = _('Configure book reader')
+        container.appendChild(E.div(
+            style='contain: paint; width: 100%; height: 100%; display: flex; flex-direction: column',
+            E.div(), E.div(style='flex-grow: 100; overflow: auto')
+        ))
+        container = container.firstChild
+        create_top_bar(container.firstChild, title=self.main_title, icon='close', action=self.onclose)
+        self.container_id = ensure_id(container.lastChild)
+        self.stack = v'["top"]'
+        self.display_top(container.lastChild)
+
+    def set_top_title(self, val):
+        set_title(self.container.parentNode, val)
+
+    def onchange(self):
+        self.on_change()
+
+    def cancel(self):
+        if self.stack.length > 1:
+            self.stack.pop()
+            self.display_panel(self.stack[-1])
+
+    def onclose(self):
+        if self.stack.length > 1:
+            which = self.stack.pop()
+            close_func = getattr(self, 'close_' + which, None)
+            if close_func:
+                close_func.bind(self)()
+            self.display_panel(self.stack[-1])
+        else:
+            self.close_func()
+
+    def create_panel(self, container, which, create_func, needs_onchange):
+        self.set_top_title(self.title_map[which] or which)
+        if needs_onchange:
+            create_func(container, self.onclose, self.cancel, self.onchange)
+        else:
+            create_func(container, self.onclose, self.cancel)
+
+    @property
+    def container(self):
+        return document.getElementById(self.container_id)
+
+    def display_panel(self, which):
+        container = self.container
+        clear(container)
+        getattr(self, 'display_' + which)(container)
+
+    def show_panel(self, which):
+        self.stack.push(which)
+        self.display_panel(which)
+
+    def display_top(self, container):
+        self.set_top_title(self.main_title)
+        c = E.div()
+        container.appendChild(c)
+        self.title_map = {}
+        items = []
+
+        def ci(title, which, subtitle):
+            items.push(create_item(title, self.show_panel.bind(None, which), subtitle))
+            self.title_map[which] = title
+
+        ci(_('Colors'), 'colors', _('Colors of the page and text'))
+        ci(_('Page layout'), 'layout', _('Page margins and number of pages per screen'))
+        ci(_('Styles'), 'user_stylesheet', _('Style rules for text and background image'))
+        ci(_('Headers and footers'), 'head_foot', _('Customize the headers and footers'))
+        ci(_('Scrolling behavior'), 'scrolling', _('Control how the viewer scrolls'))
+        ci(_('Selection behavior'), 'selection', _('Control how the viewer selects text'))
+        ci(_('Keyboard shortcuts'), 'keyboard', _('Customize the keyboard shortcuts'))
+        if runtime.is_standalone_viewer:
+            ci(_('Fonts'), 'fonts', _('Font choices'))
+            ci(_('Miscellaneous'), 'misc', _('Window size, last read position, toolbar, etc.'))
+        build_list(c, items)
+
+    def display_fonts(self, container):
+        self.create_panel(container, 'fonts', create_fonts_panel)
+
+    def close_fonts(self):
+        commit_fonts(self.onchange, self.container)
+
+    def display_misc(self, container):
+        self.create_panel(container, 'misc', create_misc_panel)
+
+    def close_misc(self):
+        commit_misc(self.onchange, self.container)
+
+    def display_colors(self, container):
+        self.create_panel(container, 'colors', create_colors_panel)
+
+    def close_colors(self):
+        commit_colors(self.onchange, self.container)
+
+    def display_layout(self, container):
+        self.create_panel(container, 'layout', create_layout_panel)
+
+    def close_layout(self):
+        commit_layout(self.onchange, self.container)
+
+    def display_user_stylesheet(self, container):
+        self.create_panel(container, 'user_stylesheet', create_user_stylesheet_panel)
+
+    def close_user_stylesheet(self):
+        commit_user_stylesheet(self.onchange, self.container)
+
+    def display_head_foot(self, container):
+        self.create_panel(container, 'head_foot', create_head_foot_panel)
+
+    def close_head_foot(self):
+        commit_head_foot(self.onchange, self.container)
+
+    def display_keyboard(self, container):
+        self.create_panel(container, 'keyboard', create_keyboard_panel, True)
+
+    def close_keyboard(self):
+        commit_keyboard(self.onchange, self.container)
+
+    def display_scrolling(self, container):
+        self.create_panel(container, 'scrolling', create_scrolling_panel)
+
+    def close_scrolling(self):
+        commit_scrolling(self.onchange, self.container)
+
+    def display_selection(self, container):
+        self.create_panel(container, 'selection', create_selection_panel)
+
+    def close_selection(self):
+        commit_selection(self.onchange, self.container)
+
+
+def create_prefs_panel(container, close_func, on_change):
+    return Prefs(container, close_func, on_change)
