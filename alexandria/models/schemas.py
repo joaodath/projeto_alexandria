@@ -32,7 +32,7 @@ class Book(db.Model):
     isbn = db.Column(db.String(255))
     synopsis = db.Column(db.Text)
     release_year = db.Column(db.Text)
-    rating = db.Column(db.Float(10, 2))
+    rating = db.Column(db.Float(2, 2)) # rever casas decimais
     genre = db.Column(db.String(100))
     pages = db.Column(db.Integer)
     image = db.Column(db.String)

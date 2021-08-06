@@ -6,7 +6,6 @@ from alexandria.cache_control import cache
 
 
 
-@app.route('/index')
 @app.route('/')
 # @cache(None)
 def index(): 
