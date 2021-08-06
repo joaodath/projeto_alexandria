@@ -31,7 +31,7 @@ html {
   --font-heading: #ebebea;
 
   /* fonts  */
-  --body-font: "Roboto Slab", serif;
+  --body-font: "verdana", serif;
 
   --smallText: 0.7em;
   /* rest of the vars */
@@ -285,7 +285,7 @@ Sidebar
 /* main */
 
 main {
-  background: var(--white);
+  background: #ebebea;
 }
 
 .content-container {
@@ -297,20 +297,40 @@ main {
 
 .section-center {
   width: 100%;
-  min-height: calc(100vh - 3rem);
+  max-width: 1920px;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  margin:0 auto;
+}
+video{
+  display: none;
 }
 
 @media screen and (min-width: 992px) {
   main {
-    max-height: calc(100vh - 108px);
-    overflow: hidden;
+    min-height: calc(100vh - 108px);
+    
   }
 
-  .section-center {
-    min-height: calc(100vh - 108px);
+
+  video{
+    display: block;
+  }
+  .content {
+    position: relative;
+  }
+  
+  .content:before {
+    content: '';
+    position: absolute;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 5px;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
   }
 }
 
@@ -371,6 +391,60 @@ footer {
   margin: 0 auto;
 }
 
-.bg_video {
-  background: linear-gradient(#e66465, #9198e5), url("video.mp4");
+/* about */
+
+.card-center {
+  width: 80vw;
+  max-width: 1170px;
+  margin: 2rem auto;
 }
+
+.card{
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
+  border-radius: 40px;
+}
+
+.card-container{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  -moz-column-gap: 2rem;
+  column-gap: 2rem;
+  row-gap: 2rem;
+  padding: 2rem;
+  align-items: center;
+  text-align: center;
+}
+.card-info{
+  background: var(--beige);
+  padding: 3rem;
+  border-top-right-radius:  40px;
+  border-top-left-radius:  40px;
+  color: var(--black);
+}
+
+.card-info h2{
+  color: var(--black);
+}
+
+.card-info p{
+  color: var(--black);
+}
+.card-info img{
+  border-radius: 50%;
+  width: 50%;
+  height: 50%;
+}
+
+.card-social a{
+  text-decoration: none;
+  color: var(--primary-main);
+
+}
+.card-social{
+  background: var(--beige);
+  font-size: 2rem;
+  border-bottom-right-radius:  40px;
+  border-bottom-left-radius:  40px;
+  
+}
+

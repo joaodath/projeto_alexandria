@@ -8,4 +8,4 @@ from alexandria.run import app, db
 @app.route('/detalhelivro', methods=['GET', 'POST'])
 def book_details():
     # codigo 
-    return render_template('bookdetails.html')
+    return render_template('book_details.html')
