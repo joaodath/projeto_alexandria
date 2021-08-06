@@ -1,0 +1,188 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "CALIBRE-DEBUG" "1" "de juliol 30, 2021" "5.24.0" "calibre"
+.SH NAME
+calibre-debug \- calibre-debug
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+calibre\-debug [opcions]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Various command line interfaces useful for debugging calibre. With no options,
+this command starts an embedded Python interpreter. You can also run the main
+calibre GUI, the calibre E\-book viewer and the calibre editor in debug mode.
+.sp
+It also contains interfaces to various bits of calibre that do not have
+dedicated command line tools, such as font subsetting, the E\-book diff tool and so
+on.
+.sp
+You can also use \fBcalibre\-debug\fP to run standalone scripts. To do that use it like this:
+.INDENT 0.0
+.INDENT 3.5
+\fBcalibre\-debug\fP myscript.py \fB\-\-\fP \fB\-\-option1\fP \fB\-\-option2\fP file1 file2 ...
+.UNINDENT
+.UNINDENT
+.sp
+Everything after the \fB\-\-\fP is passed to the script.
+.sp
+Sempre que passeu arguments a \fBcalibre\-debug\fP i aquests tinguin espais en blanc, delimiteu els arguments amb cometes. Per exemple: "/some path/with spaces"
+.SH [OPCIONS]
+.INDENT 0.0
+.TP
+.B \-\-add\-simple\-plugin
+Afegiu un connector simple (per exemple, un connector que consisteixi de només un fitxer .py) quan especifiqueu el camí al fitxer py que conté el codi del connector.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-command, \-c
+Executa el codi Python.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-debug\-device\-driver, \-d
+Depura la detecció del dispositiu
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-default\-programs
+(Des)registra calibre dels programes predeterminats de Windows. \fI\%\-\-default\-programs\fP = \fB(register|unregister)\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-diff
+Executa l\fB\(aq\fPeina diff de calibre. Per exemple: calibre\-debug \fI\%\-\-diff\fP fitxer1 fitxer2
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-edit\-book, \-t
+Inicia l\fB\(aq\fPeina d\fB\(aq\fPedició de llibres de calibre en mode de depuració.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-exec\-file, \-e
+Executa el codi Python del fitxer.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-explode\-book, \-x
+Explode the book into the specified folder. Usage: \-x file.epub output_dir Exports the book as a collection of HTML files and metadata, which you can edit using standard HTML editing tools. Works with EPUB, AZW3, HTMLZ and DOCX files.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-export\-all\-calibre\-data
+Export all calibre data (books/settings/plugins). Normally, you will be asked for the export folder and the libraries to export. You can also specify them as command line arguments to skip the questions. Use absolute paths for the export folder and libraries. The special keyword \fB"\fPall\fB"\fP can be used to export all libraries.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-fix\-multiprocessing
+Per a ús intern
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-gui, \-g
+Executa la interfície gràfica amb la depuració habilitada. La informació del depurador sortirà per stdout i stderr.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-gui\-debug
+Executa la interfície gràfica amb una consola de depuració i amb enregistrament al camí especificat. Només és per a ús intern, utilitzeu l\fB\(aq\fPopció \-g per a executar la interfície gràfica en mode de depuració
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-help, \-h
+mostra aquest missatge d\fB\(aq\fPajuda i surt
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-implode\-book, \-i
+Contrau un llibre expandit anteriorment. Ús: \-i dir_sortida fitxer.epub Importa el llibre a partir dels fitxers dins del dir_sortida, els quals han estat creats anteriorment amb la crida \fI\%\-\-explode\-book\fP\&. Assegureu\-vos d\fB\(aq\fPespecificar el mateix tipus de fitxer que es va utilitzar amb l\fB\(aq\fPexpansió.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-import\-calibre\-data
+Importa dades de calibre prèviament exportades
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-inspect\-mobi, \-m
+Inspecciona els fitxers MOBI als camins especificats
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-paths
+Sortida dels camins necessaris per configurar l\fB\(aq\fPentorn de calibre
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-reinitialize\-db
+Torna a inicialitzar la base de dades sqlite de calibre al camí especificat. És útil per recuperar\-se de la corrupció de la base de dades.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-run\-plugin, \-r
+Executa un connector que proporciona una interfície de línia d\fB\(aq\fPordres. Per exemple: calibre\-debug \-r \fB"\fPAdd Books\fB"\fP \fB\-\-\fP fitxer1 \fB\-\-opci\(gaó1 Tot el que hi hagi després de \(ga\fP\-\-\(ga\(ga es passarà al connector com a argument.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-shutdown\-running\-calibre, \-s
+Fa que es tanqui qualsevol instància de calibre, si n\fB\(aq\fPhi ha alguna. Vigileu, ja que si hi ha treballs en execució, s\fB\(aq\fPavortaran sense cap confirmació.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-subset\-font, \-f
+Subconjunt de la lletra especificada. Utilitzeu \fB\-\-\fP després d\fB\(aq\fPaquesta opció per a passar l\fB\(aq\fPopció al programa de subconjunts de lletres.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-test\-build
+Prova els mòduls binaris a la construcció
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-version
+mostra el número de versió del programa i surt
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-viewer, \-w
+Executa el visualitzador de llibres en mode de depuració
+.UNINDENT
+.SH AUTHOR
+Kovid Goyal
+.SH COPYRIGHT
+Kovid Goyal
+.\" Generated by docutils manpage writer.
+.

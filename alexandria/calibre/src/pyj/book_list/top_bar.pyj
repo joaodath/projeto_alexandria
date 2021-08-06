@@ -1,0 +1,131 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2015, Kovid Goyal <kovid at kovidgoyal.net>
+from __python__ import hash_literals
+
+from book_list.theme import get_color, get_font_size
+from dom import set_css, clear, create_keyframes, build_rule, svgicon, add_extra_css
+from elementmaker import E
+from gettext import gettext as _
+from session import get_interface_data
+
+bar_counter = 0
+CLASS_NAME = 'main-top-bar'
+SPACING = '0.75em'
+VSPACING = '0.5ex'
+THROBBER_NAME = 'top-bar-throbber'
+
+add_extra_css(def():
+    sel = '.' + CLASS_NAME + ' '
+    style = ''
+    style += create_keyframes(THROBBER_NAME, 'from { transform: scale(1); } 50% { transform: scale(0.5); } to { transform: scale(1); }')
+    style += build_rule(sel + 'a', display='inline-block', vertical_align='middle', overflow='hidden', cursor='pointer', color=get_color('bar-foreground'), background='none', padding_top=VSPACING, padding_bottom=VSPACING)
+    style += build_rule(sel + 'a:hover', transform='scale(1.5)')
+    style += build_rule(sel + 'a:active', transform='scale(2)')
+    style += build_rule(sel + 'a:focus', outline='none')
+    style += build_rule(sel + 'a.top-bar-title:hover', transform='scale(1)', color=get_color('bar-highlight'), font_style='italic')
+    style += build_rule(sel + 'a.top-bar-title:active', transform='scale(1)', color=get_color('bar-highlight'), font_style='italic')
+    return style
+)
+
+def create_markup(container):
+    for i in range(2):
+        bar = E.div(
+            class_=CLASS_NAME,
+            E.div(style="white-space:nowrap; overflow:hidden; text-overflow: ellipsis; padding-left: 0.5em;"),
+            E.div(style="white-space:nowrap; text-align:right; padding-right: 0.5em;")
+        )
+        if i is 0:
+            set_css(bar, position='fixed', left='0', top='0', z_index='1')
+        set_css(bar,
+            width='100%', display='flex', flex_direction='row', flex_wrap='wrap', justify_content='space-between',
+            font_size=get_font_size('title'), user_select='none',
+            color=get_color('bar-foreground'), background_color=get_color('bar-background')
+        )
+        container.appendChild(bar)
+
+def get_bars(container):
+    return container.getElementsByClassName(CLASS_NAME)
+
+def set_left_data(container, title='calibre', icon='heart', action=None, tooltip='', run_animation=False, title_action=None, title_tooltip=None):
+    bars = get_bars(container)
+    if icon is 'heart':
+        if not tooltip:
+            tooltip = _('Donate to support calibre development')
+    interface_data = get_interface_data()
+
+    for i, bar in enumerate(bars):
+        left = bar.firstChild
+        clear(left)
+        title_elem = 'a' if callable(title_action) else 'span'
+        left.appendChild(E.a(title=tooltip, svgicon(icon)))
+        left.appendChild(E(title_elem, title, title=title_tooltip, class_='top-bar-title',
+            style='margin-left: {0}; font-weight: bold; padding-top: {1}; padding-bottom: {1}; vertical-align: middle'.format(SPACING, VSPACING)))
+        if i is 0:
+            a = left.firstChild
+            if icon is 'heart':
+                set_css(a,
+                    animation_name=THROBBER_NAME, animation_duration='1s', animation_timing_function='ease-in-out',
+                    animation_iteration_count='5', animation_play_state='running' if run_animation else 'paused'
+                )
+                set_css(a.firstChild, color=get_color('heart'))
+                a.setAttribute('href', interface_data.donate_link)
+                a.setAttribute('target', 'donate-to-calibre')
+            if action is not None:
+                a.addEventListener('click', def(event):
+                    event.preventDefault()
+                    action.bind(event)()
+                )
+
+            if callable(title_action):
+                a = a.nextSibling
+                a.addEventListener('click', def(event):
+                    event.preventDefault()
+                    title_action.bind(event)()
+                )
+
+def set_title(container, text):
+    bars = get_bars(container)
+    for bar in bars:
+        bar.firstChild.firstChild.nextSibling.textContent = text
+
+
+def set_title_tooltip(container, text):
+    bars = get_bars(container)
+    for bar in bars:
+        bar.firstChild.firstChild.nextSibling.title = text
+
+
+def create_top_bar(container, **kw):
+    create_markup(container)
+    set_left_data(container, **kw)
+
+def add_button(container, icon, action=None, tooltip=''):
+    if not icon:
+        raise ValueError('An icon must be specified')
+    bars = get_bars(container)
+    for i, bar in enumerate(bars):
+        right = bar.firstChild.nextSibling
+        right.appendChild(E.a(
+            style="margin-left: " + SPACING,
+            title=tooltip, svgicon(icon),
+        ))
+        right.lastChild.dataset.buttonIcon = icon
+        if i is 0:
+            if action is not None:
+                right.lastChild.addEventListener('click', def(event):
+                    event.preventDefault(), action()
+                )
+
+def clear_buttons(container):
+    bars = get_bars(container)
+    for i, bar in enumerate(bars):
+        right = bar.firstChild.nextSibling
+        clear(right)
+
+
+def set_button_visibility(container, icon, visible):
+    for bar in get_bars(container):
+        right = bar.firstChild.nextSibling
+        elem = right.querySelector(f'[data-button-icon="{icon}"]')
+        if elem:
+            elem.style.display = 'inline-block' if visible else 'none'

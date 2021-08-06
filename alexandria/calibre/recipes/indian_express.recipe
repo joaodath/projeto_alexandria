@@ -1,0 +1,62 @@
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class IndianExpress(BasicNewsRecipe):
+    title = u'Indian Express'
+    language = 'en_IN'
+    __author__ = 'Krittika Goyal'
+    oldest_article = 1  # days
+    max_articles_per_feed = 25
+    encoding = 'utf-8'
+
+    no_stylesheets = True
+    use_embedded_content = False
+
+    keep_only_tags = [
+        classes('heading-part full-details')
+    ]
+    remove_tags = [
+        classes('share-social appstext story-tags')
+    ]
+    feeds = [
+        ('Front Page',
+         'http://indianexpress.com/print/front-page/feed/'),
+        ('Editorials',
+         'http://indianexpress.com/section/opinion/editorials/feed/'),
+        ('Crime',
+         'http://indianexpress.com/section/india/crime/feed/'),
+        ('Cricket',
+         'http://indianexpress.com/section/sports/cricket/feed/'),
+        ('Health',
+         'http://www.indianexpress.com/lifestyle/health/feed/'),
+        ('Asia',
+         'http://indianexpress.com/section/world/asia/'),
+        ('Politics',
+         'http://indianexpress.com/section/india/politics/feed/'),
+        ('Mumbai',
+         'http://www.indianexpress.com/cities/mumbai/feed/'),
+        ('Op-Ed',
+         'http://indianexpress.com/section/opinion/feed/'),
+        ('Lifestyle',
+         'http://indianexpress.com/section/lifestyle/feed/'),
+        ('Science & Technology',
+         'http://indianexpress.com/section/technology/feed/'),
+        ('Bollywood',
+         'http://indianexpress.com/section/entertainment/bollywood/feed/'),
+    ]
+
+    def preprocess_html(self, soup):
+        for img in soup.findAll('img'):
+            noscript = img.findParent('noscript')
+            if noscript is not None:
+                lazy = noscript.findPreviousSibling('img')
+                if lazy is not None:
+                    lazy.extract()
+                noscript.name = 'div'
+        return soup

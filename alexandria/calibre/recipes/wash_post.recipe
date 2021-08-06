@@ -1,0 +1,62 @@
+__license__ = 'GPL v3'
+__copyright__ = '2011, Darko Miletic <darko.miletic at gmail.com>'
+'''
+www.washingtonpost.com
+'''
+
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class TheWashingtonPost(BasicNewsRecipe):
+    title = 'The Washington Post'
+    __author__ = 'Darko Miletic'
+    description = 'Leading source for news, video and opinion on politics, business, world and national news, science, travel, entertainment and more. Our local coverage includes reporting on education, crime, weather, traffic, real estate, jobs and cars for DC, Maryland and Virginia. Offering award-winning opinion writing, entertainment information and restaurant reviews.'  # noqa
+    publisher = 'The Washington Post Company'
+    category = 'news, politics, USA'
+    oldest_article = 2
+    max_articles_per_feed = 200
+    no_stylesheets = True
+    encoding = 'utf8'
+    use_embedded_content = False
+    language = 'en'
+    remove_empty_feeds = True
+    ignore_duplicate_articles = {'url'}
+    publication_type = 'newspaper'
+    remove_attributes = ['style', 'width', 'height']
+
+    keep_only_tags = [
+        dict(name=['h1', 'figure']),
+        classes('byline article-body'),
+    ]
+    remove_tags = [
+        dict(name=['meta', 'link', 'svg']),
+        classes('inline-video author-tooltip author-image powa-wrapper'),
+        dict(attrs={'data-qa': ['article-body-ad', 'subscribe-promo', 'interstitial-link-wrapper']}),
+    ]
+
+    feeds = [
+        (u'World', u'http://feeds.washingtonpost.com/rss/world'),
+        (u'National', u'http://feeds.washingtonpost.com/rss/national'),
+        (u'White House',
+         u'http://feeds.washingtonpost.com/rss/politics/whitehouse'),
+        (u'Business', u'http://feeds.washingtonpost.com/rss/business'),
+        (u'Opinions', u'http://feeds.washingtonpost.com/rss/opinions'),
+        (u'Local', u'http://feeds.washingtonpost.com/rss/local'),
+        (u'Entertainment',
+         u'http://feeds.washingtonpost.com/rss/entertainment'),
+        (u'Sports', u'http://feeds.washingtonpost.com/rss/sports'),
+        (u'Redskins', u'http://feeds.washingtonpost.com/rss/sports/redskins'),
+    ]
+
+    def preprocess_html(self, soup, *a):
+        for img in soup.findAll('img', src=True):
+            src = img['src']
+            if src.endswith('&w=32'):
+                img['src'] = src[:-2] + '440'
+        return soup

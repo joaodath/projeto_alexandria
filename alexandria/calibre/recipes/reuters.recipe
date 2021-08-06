@@ -1,0 +1,87 @@
+#!/usr/bin/env python
+# vim:fileencoding=utf-8
+# License: GPLv3 Copyright: 2020, Kovid Goyal <kovid at kovidgoyal.net>
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from calibre.web.feeds.news import BasicNewsRecipe, classes
+
+country = 'us'
+country_defs = {
+    'us': ('www.reuters.com', {
+        'Business': 'finance',
+        'Markets': 'finance/markets',
+        'World': 'world',
+        'Politics': 'politics',
+        'Tech': 'news/technology',
+        'Wealth': 'finance/wealth',
+    })
+}
+
+
+def prefixed_classes(classes):
+    q = frozenset(classes.split(' '))
+
+    def matcher(x):
+        if x:
+            for candidate in frozenset(x.split()):
+                for x in q:
+                    if candidate.startswith(x):
+                        return True
+        return False
+    return {'attrs': {'class': matcher}}
+
+
+class Reuters(BasicNewsRecipe):
+    title = 'Reuters'
+    description = 'News from all over'
+    __author__ = 'Kovid Goyal'
+    language = 'en'
+
+    keep_only_tags = [
+        prefixed_classes('ArticlePage-article-header ArticlePage-article-body'),
+    ]
+    remove_tags = [
+        prefixed_classes('ArticleBody-read-time-and-social Slideshow-expand-button- TwoColumnsLayout-footer-'),
+        dict(name=['button', 'link']),
+    ]
+
+    def preprocess_html(self, soup, *a):
+        meta = soup.find(attrs={'name': "sailthru.image.full"})
+        if meta is not None:
+            url = meta['content']
+            body = soup.find(**prefixed_classes('ArticlePage-article-body'))
+            if body is not None:
+                div = soup.new_tag('div')
+                div.append(soup.new_tag('img', src=url))
+                body.insert(0, div)
+        return soup
+
+    def parse_index(self):
+        base, sections = country_defs[country]
+        ans = []
+
+        for section_title in sorted(sections):
+            slug = sections[section_title]
+            self.log(section_title)
+            articles = list(self.parse_reuters_section(base, slug))
+            if articles:
+                ans.append((section_title, articles))
+            if self.test and len(ans) >= self.test[0]:
+                break
+        return ans
+
+    def parse_reuters_section(self, base, slug):
+        url = 'https://' + base + '/' + slug
+        try:
+            soup = self.index_to_soup(url)
+        except Exception:
+            self.log.error('Failed to load Reuters section:', url)
+            return
+        for div in soup.findAll(**classes('news-headline-list')):
+            h3 = div.find(**classes('story-title'))
+            a = h3.parent
+            title = self.tag_to_string(h3)
+            url = 'https://{}{}'.format(base, a['href'])
+            self.log('\t', title, url)
+            yield {'title': title, 'url': url}

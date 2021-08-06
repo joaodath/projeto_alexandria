@@ -1,0 +1,614 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "EBOOK-CONVERT" "1" "jūlijs 30, 2021" "5.24.0" "calibre"
+.SH NAME
+ebook-convert \- ebook-convert
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ebook\-convert input_file output_file [options]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Convert an e\-book from one format to another.
+.sp
+input_file is the input and output_file is the output. Both must be specified as the first two arguments to the command.
+.sp
+The output e\-book format is guessed from the file extension of output_file. output_file can also be of the special format .EXT where EXT is the output file extension. In this case, the name of the output file is derived from the name of the input file. Note that the filenames must not start with a hyphen. Finally, if output_file has no extension, then it is treated as a folder and an "open e\-book" (OEB) consisting of HTML files is written to that folder. These files are the files that would normally have been passed to the output plugin.
+.sp
+After specifying the input and output file you can customize the conversion by specifying various options. The available options depend on the input and output file types. To get help on them specify the input and output file and then use the \-h option.
+.sp
+For full documentation of the conversion system see
+conversion
+.sp
+Katru reizi, kad jūs nododat argumentus \fBebook\-convert\fP, kam ir atstarpes, pievienojiet argumentus pēdiņās. Piemēram: "/some path/with spaces"
+.sp
+Papildiespējas un papildiespēju standartvērtības mainās atkarībā no
+ievades un izvades formāta, tāpēc jums vienmēr vajadzētu pārbaudīt ar:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ebook\-convert myfile.input_format myfile.output_format \-h
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Zemāk ir papildiespējas, kas kopīgas visām pārveidošanām, kam seko
+specifiskas papildiespējas katram ievades un izvades formātam.
+.INDENT 0.0
+.IP \(bu 2
+\fI\%IEVADES IESTATĪJUMI\fP
+.IP \(bu 2
+\fI\%IZVADES IESTATĪJUMI\fP
+.IP \(bu 2
+\fI\%IZSKATS\fP
+.IP \(bu 2
+\fI\%HEURISTISKĀ APSTRĀDE\fP
+.IP \(bu 2
+\fI\%MEKLĒT UN AIZVIETOT\fP
+.IP \(bu 2
+\fI\%STRUKTŪRAS NOTEIKŠANA\fP
+.IP \(bu 2
+\fI\%SATURA RĀDĪITĀJS\fP
+.IP \(bu 2
+\fI\%METADATI\fP
+.IP \(bu 2
+\fI\%ATKĻŪDOŠANA\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-help, \-h
+parādīt šo palīdzības paziņojumu un iziet
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-input\-profile
+Norādiet ievades profilu. Ievades profils nodrošina pārvēršanas sistēmu ar informāciju par dažādas dokumentā esošās informācijas interpretēšanu. Piemēram \- no izšķirtspējas atkarīgs garums (garums pikseļos). Iespējas ir: cybookg3, cybook_opus, default, hanlinv3, hanlinv5, illiad, irexdr1000, irexdr800, kindle, msreader, mobipocket, nook, sony, sony300, sony900
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-list\-recipes
+Saraksts ar iebūvēto recepšu nosaukumiem. Jūs varat izveidot e\-grāmatu no iebūvētas receptes šādā veidā: ebook\-convert \fB"\fPRecipe Name.recipe\fB"\fP output.epub
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-output\-profile
+Norādiet izvades profilu. Izvades profils pastāsta konversijas sistēmai, kā optimizēt izveidoto dokumentu norādītajai ierīcei (piemēram, mainot attēlus ierīces ekrāna izmērā). Dažos gadījumos produkcijas profilu var izmantot, lai optimizētu izeju konkrētai ierīcei, bet tas reti ir nepieciešams. Izvēles ir šādas:cybookg3, cybook_opus, default, hanlinv3, hanlinv5, illiad, ipad, ipad3, irexdr1000, irexdr800, jetbook5, kindle, kindle_dx, kindle_fire, kindle_oasis, kindle_pw, kindle_pw3, kindle_voyage, kobo, msreader, mobipocket, nook, nook_color, nook_hd_plus, generic_eink, generic_eink_hd, generic_eink_large, tablet, pocketbook_inkpad3, pocketbook_lux, pocketbook_hd, pocketbook_900, pocketbook_pro_912, galaxy, sony, sony300, sony900, sony\-landscape, sonyt3
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-version
+parādīt programmas versijas numuru un iziet
+.UNINDENT
+.SH IEVADES IESTATĪJUMI
+.sp
+Papildiestatījumi, kas pārvalda ievaddatnes mobi apstrādi
+.INDENT 0.0
+.TP
+.B \-\-input\-encoding
+Norāda sākotnējā dokumenta rakstzīmju kodējumu. Ja šī papildiespēja ir norādīta, tad dokumentā norādītais kodējums tiks ignorēts. Īpaši noder dokumentiem kuros nav norādīts kodējums, vai arī tas ir norādīts nepareizi.
+.UNINDENT
+.SH IZVADES IESTATĪJUMI
+.sp
+Papildiestatījumi, kas pārvalda izvaddatnes epub apstrādi
+.INDENT 0.0
+.TP
+.B \-\-dont\-split\-on\-page\-breaks
+Izslēdziet lapu pārtraukumu sadalīšanu. Parasti ievades faili tiek automātiski sadalīti katrā lappusē divos failos. Tas nodrošina izvades e\-grāmatu, kuru var analizēt ātrāk un ar mazākiem resursiem. Tomēr sadalīšana ir lēna, un, ja jūsu avota fails satur ļoti lielu lappušu pārtraukumu skaitu, lapas izslēgšana jāizslēdz.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-epub\-flatten
+Šis iestatījums ir nepieciešams tikai tad, ja esat iecerējuši lietot EPUB ar FBReaderJ. Tas izlīdzinās datņu sistēmu EBUB iekšienē, pārvietojot visas datnes uz augšējo līmeni.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-epub\-inline\-toc
+Ievietot iekļautu satura rādītāju, kas parādīsies kā galvenās grāmatas daļa.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-epub\-toc\-at\-end
+Novietot pievienoto iekļauto satura rādītāju grāmatas beigās, nevis sākumā.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-epub\-version
+Ģenerēt EPUB faila versiju. EPUB 2 ir visizplatītākais, izmantojiet EPUB 3 tikai tad, ja zināt, ka jums tas tiešām ir vajadzīgs.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-extract\-to
+Extract the contents of the generated EPUB file to the specified folder. The contents of the folder are first deleted, so be careful.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-flow\-size
+Sadalīt visus HTML failus, kas lielāki par šo lielumu (KB). Tas ir nepieciešams, jo vairums EPUB lasītāju nevar apstrādāt lielus failu izmērus. Noklusējuma izmērs ir 260KB, kas nepieciešams Adobe Digital Editions. Iestatīt 0, lai atspējotu sadalījumu pēc lieluma.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-no\-default\-epub\-cover
+Parasti, ja oriģinālās datne nesatur vāku un Jūs to nenorādāt, noklusētais vāks tiek veidots no nosaukuma, autora utt. Šis iestatījums atslēdz vāka veidošanu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-no\-svg\-cover
+Neizmantot SVG grāmatas vākam. Izmantojiet šo iestatījumu, ja Jūs EPUB datni paredzēts izmantot ierīcē, kas neuztur SVG, piemēram \- iPhone vai JetBook Life. Bez šī iestatījuma šādas ierīces rādīt tukšu lapu vāka vietā.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-preserve\-cover\-aspect\-ratio
+Ja tiek izmantots SVG vāks, šis iestatījums liks vākam ieņemt visu pieejamo ekrāna laukumu, vienlaikus saglabājot attēla malu attiecības. Tas nozīmē, ka ir iespējamas baltas malas attēla sānos vai augšā un apakšā, taču pats attēls netiks kropļots. Bez šī iestatījuma balto malu nebūs, taču attēls var tik nedaudz kropļots.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-pretty\-print
+Ja norādīts, tad izvades spraudnis centīsies izveidot pēc iespējas cilvēkam lasāmāku rezultātu. Var nestrādāt atsevišķiem izvades spraudņiem.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-toc\-title
+Veidojamā iekļautā satura rādītāja nosaukums.
+.UNINDENT
+.SH IZSKATS
+.sp
+Papildiestatījumi, kas pārvalda rezultāta izskatu
+.INDENT 0.0
+.TP
+.B \-\-asciiize
+Transliterate Unicode characters to an ASCII representation. Use with care because this will replace Unicode characters with ASCII. For instance it will replace \fB"\fPPelé\fB"\fP with \fB"\fPPele\fB"\fP\&. Also, note that in cases where there are multiple representations of a character (characters shared by Chinese and Japanese for instance) the representation based on the current calibre interface language will be used.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-base\-font\-size
+Pamata fonta lielums pts. Visi fonta izmēri grāmatā tiks atkārtoti, pamatojoties uz šo lielumu. Izvēloties lielāku izmēru, jūs varat padarīt fontus no izejas lielāku un otrādi. Pēc noklusējuma, ja vērtība ir nulle, pamata fonta lielumu izvēlas, pamatojoties uz izvēlēto izvades profilu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-change\-justification
+Mainīt teksta izlīdzināšanu. Vērtība \fB"\fPpa kreisi\fB"\fP līdzinās visu tekstu pret kreiso malu. Vērtība \fB"\fPizlīdzināt\fB"\fP izlīdzinās visu tekstu pret abām malām. Vērtība \fB"\fPsākotnējā\fB"\fP (noklusētā) nemainīs izejas datnē atrodamo teksta līdzināšanu. Ņemiet vērā, ka tikai daži formāti atbalsta līdzināšanu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-font\-rescaling
+Izslēgt visu fontu izmēru mērogošanu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-embed\-all\-fonts
+Iegult visus oriģinālajā dokumentā izmantotos, taču vēl neiegultos fontus. Jūsu sistēma tiks pārmeklēta un, ja atbilstošie fonti tiks atrasti, tie tiks iegulti. Iegulšanas darbosies tikai gadījumos, ja mērķa formāti atbalsta iegultos fontus, piemēram, EPUB, AZW3, DOCX vai PDF. Pārliecinieties, ka Jums ir atbilstoša licence, kas pieļauj šajā dokumentā izmantoto fontu iegulšanu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-embed\-font\-family
+Iegult norādīto fontu saimi grāmatā, tādējādi nosakot grāmatā izmantoto \fB"\fPpamata\fB"\fP fontu. Ja oriģinālais dokuments norāda pats savu specifisku fontu, pamata fonts var tikt ignorēts. Jūs varat izmantoto stilu filtra informācijas papildiespēju, lai aizvāktu fontus no oriģinālā dokumenta. Ņemiet vērā, ka fontu iegulšanas darbojas tikai ar atsevišķiem izvades formātiem, pamatā EPUB, AZW3 un DOCX.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-expand\-css
+Pēc noklusējuma, calibre izmantos stenogrāfijas formu dažādām CSS īpašībām, piemēram kā margin, padding, border, utt. Šī opcija ļaus tā vietā izmantot pilnu paplašināto formu. Ņemiet vērā, ka CSS vienmēr tiek paplašināts, ģenerējot EPUB failus, kuru izejas profils ir iestatīts uz kādu no Nook profiliem, jo ​​Nooks nevar apstrādāt stenogrāfijas CSS.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-extra\-css
+Ceļš līdz CSS stilu lapai vai vienkāršam CSS. Ar šo CSS tiks papildināti izejas datnē esošie stilu likumi, tādējādi to var izmantot šo likumu aizstāšanai.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-filter\-css
+Ar komatu atdalītas CSS īpašības, kas tiks aizvāktas no CSS stila likumiem. Tas ir noderīgi, ja dažu elementu klātbūtne traucē ierīces darbību. Piemēram \- font\-family,color,margin\-left,margin\-right
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-font\-size\-mapping
+Kartēšana no CSS fonta nosaukumiem uz fonta izmēriem pts. Piemēra uzstādījums ir 10,12,14,16,18,20,22,24. Tie ir samēroti pēc izmēriem no xx\-mazi uz xx\-lieli, ar galīgiem milzīga izmēra fontiem. Fontu pārrēķināšanas algoritms izmanto šos izmērus inteliģenti pārrēķinot fontus. Pēc noklusējuma tiek izmantota samērošana, pamatojoties uz jūsu izvēlēto izejas profilu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-insert\-blank\-line
+Ievietot tukšu rindu starp rindkopām. Nedarbosies, ja sākotnējā datnē netiek izmantotas rindkopas (<p> vai <div> birkas).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-insert\-blank\-line\-size
+Nosakiet pievienoto tukšo rindu augstumu (em vienībās). Rindu augstums starp rindkopām būs divreiz lielāks par šeit norādīto lielumu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-keep\-ligatures
+Saglabāt ievades dokumentā esošās ligatūras. Ligatūra ir īpašs tādu burtu salikumu kā ff, fi, fl utt. renderējums. Vairums iekārtu neuztur ligatūras to iebūvētajos fontos un tādēļ tās var netikt atbilstoši attēlotas. Pēc noklusējuma, Calibre pārvērš ligatūras tām atbilstošos burtu pāros. Iespējojot šo iestatījumu, ligatūras tiks saglabātas.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-line\-height
+Rindas augstums punktos. Nosaka attālumu starp teksta rindām. Attiecas tikai uz elementiem, kuri paši nenosaka rindas augstumu. Vairumā gadījumu lietderīgāk ir izmantot minimālo rindu augstumu. Pēc noklusējuma rindu augstums netiek mainīts.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-linearize\-tables
+Dažos nemākulīgi veidotos dokumentos teksta izkārtošanai tiek izmantotas tabulas. Pēc šādu dokumentu pārvēršanas bieži vien ir novērojams, ka teksts turpinās pāri lapas malai un dažādas citādas problēmas. Ar šo iestatījumu teksts tiks izvilkts no tabulām un parādīts lineārā manierē.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-margin\-bottom
+Iestatīt apakšējās piemales pst. Noklusējums ir 5.0. Ja iestatīsit to mazāk par nulli, netiks iestatīta piemales vērtība (oriģinālā dokumenta piemales iestatījums tiks saglabāts). Piezīme. Orientējošiem formātiem, piemēram, PDF un DOCX, ir savi prioritātes iestatījumi.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-margin\-left
+Iestatīt kreisās piemales pts. Noklusējums ir 5.0. Ja iestatīsit to mazāk par nulli, netiks iestatīta piemales vērtība (oriģinālā dokumenta piemales iestatījums tiks saglabāts). Piezīme. Orientējošiem formātiem, piemēram, PDF un DOCX, ir savi prioritātes iestatījumi.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-margin\-right
+Iestatīt labās piemales pts. Noklusējums ir 5.0. Ja iestatīsit to mazāk par nulli, netiks iestatīta piemales vērtība (oriģinālā dokumenta piemales iestatījums tiks saglabāts). Piezīme. Orientējošiem formātiem, piemēram, PDF un DOCX, ir savi prioritātes iestatījumi.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-margin\-top
+Iestatīt augšējo piemali pts. Noklusējums ir 5.0. Ja iestatīsit to mazāk par nulli, netiks iestatīta piemales vērtība (oriģinālā dokumenta piemales iestatījums tiks saglabāts). Piezīme. Orientējošiem formātiem, piemēram, PDF un DOCX, ir savi prioritātes iestatījumi.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-minimum\-line\-height
+Minimālais rindas augstums procentos no elementa fonta lieluma. Calibre nodrošinās, ka visu elementu rindu augstumi būs vismaz šeit noteiktā lielumā neatkarīgi no iestatījumiem ievades dokumentā. Iestatiet 0, lai atslēgtu. Noklusētā vērtība ir 120%. Izmantojiet šo iestatījumu tieša rindas augstuma norādīšanas vietā, ja nav skaidrības par iespējamo rezultātu. Piemēram, \fB"\fPdubultu\fB"\fP rindu atstarpi var panākt norādot šeit 240.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-paragraph\-spacing
+Aizvāc atstarpes starp rindkopām, vienlaikus pievienojot pirmās rindas atkāpi 1,5em. Atstarpju aizvākšana nedarbosies, ja izejas datnē netiek izmantotas rindkopas  (<p> vai <div> birkas).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-paragraph\-spacing\-indent\-size
+calibre aizvācot tukšās rindas starp rindkopām automātiski pievieno rindkopas pirmās rindas atkāpes, lai nodrošinātu rindkopu atpazīstamību. Šī papildiespēja nosaka atkāpes lielumu (em vienībās). Ja norādīsiet šo lielumu mazāku par 0, tiks izmantota izejas dokumentā norādītā atkāpe, kuru calibre nemainīs.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-smarten\-punctuation
+Convert plain quotes, dashes and ellipsis to their typographically correct equivalents. For details, see \fI\%https://daringfireball.net/projects/smartypants\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-subset\-embedded\-fonts
+Izveidot iegulto fontu apakškopas. Ikviens iegultais fonts tiks samazināts līdz dokumentā izmantoto zīmju kopai. Tas samazina fontu datņu izmēru. Ļoti noder, ja nepieciešams iegult īpaši lielu fontu ar lielu neizmantoto zīmju skaitu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-transform\-css\-rules
+Ceļš uz failu, kurā ir noteikumi, lai pārveidotu CSS stilus šajā grāmatā. Vieglākais veids, kā izveidot šādu failu, ir izmantot vedni, lai izveidotu noteikumus calibre GUI. Piekļūstiet dialogam sadaļā \fB"\fPIzskats\-> Pārveidot stilu\fB"\fP\&. Kad jūs izveidojat noteikumus, varat izmantot pogu \fB"\fPEksportēt\fB"\fP, lai tos saglabātu failā.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-unsmarten\-punctuation
+Pārvērst jocīgās pēdiņas, domuzīmes un daudzpunktus tiem atbilstošajās vienkāršajās zīmēs.
+.UNINDENT
+.SH HEURISTISKĀ APSTRĀDE
+.sp
+Mainīt dokumenta tekstu un struktūru, izmantojot vispārējas pazīmes. Pēc noklusēšanas \- atspējots. Iespējošanai lietojiet \-\-enable\-heuristics.  Atsevišķas darbības var atspējot izmantojot  \-\-disable\-* iestatījumus.
+.INDENT 0.0
+.TP
+.B \-\-disable\-dehyphenate
+Analizēt vārdu pārnesumus dokumentā. Pats dokuments kalpos kā vārdnīca, lai noteiktu, kuras pārnesuma zīmes saglabājamas un kuras \- nē.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-delete\-blank\-paragraphs
+Aizvākt no dokumenta tukšās rindkopas, ja tās ir atrodamas starp rindkopām ar tekstu
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-fix\-indents
+Pārveidot no vairākām tukšām vietām veidotas atkāpes par CSS atkāpēm.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-format\-scene\-breaks
+Līdzinātie pa kreisi ainas pārtraukumu marķieri ir līdzināti uz centru. Nomainiet mīkstos ainas pārtraukumus, kas izmanto vairākas tukšas rindiņas ar horizontāliem noteikumiem.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-italicize\-common\-cases
+Meklēt kopīgos vārdus un pazīmes, kas apzīmē kursīvu, un veikt atbilstošu formatēšanu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-markup\-chapter\-headings
+Noteikt neformatētus nodaļu virsrakstus un apakšvirsrakstus, nomainīt tos ar h2 un h3 birkām. Šis iestatījums neizveidos satura rādītāju, taču ir izmantojams kopā ar struktūras noteicēju, lai tādu radītu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-renumber\-headings
+Meklē secīgas <h1> vai <h2> birkas. Birkas tiek pārnumurētas, lai izvairītos no sadalīšanas nodaļu virsrakstu vidū.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-unwrap\-lines
+Izvērst rindas balstoties un interpunkciju un citām formatēšanas pazīmēm.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-enable\-heuristics
+Iespējot heiristisko apstrādi. Šim iestatījuma jābūt iespējotam, lai būtu veicama jelkāda heiristiskā apstrāde.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-html\-unwrap\-factor
+Mērogs, ko izmanto, lai noteiktu rindas garumu. Derīgās vērtības ir decimāldaļas no 0 līdz 1. Noklusējums ir 0,4, mazliet zem vidējās rindas garuma. Ja dokumentā ir jāievieto tikai dažas rindiņas, šī vērtība ir jāsamazina
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-replace\-scene\-breaks
+Aizvietot ainu beigas ar norādīto tekstu. Pēc noklusējuma tiek izmantots teksts no sākotnējā dokumenta.
+.UNINDENT
+.SH MEKLĒT UN AIZVIETOT
+.sp
+Izmaina dokumenta tekstu un struktūru, izmantojot lietotāja definētus šablonus.
+.INDENT 0.0
+.TP
+.B \-\-search\-replace
+Ceļš uz failu, kas satur meklēšanu, un aizstāj regulāras izteiksmes. Fails satur regulāras izteiksmes maiņas rindas, kam seko rezerves modelis (kas var būt tukša rinda). Regulārajai izteiksmei jābūt Python regex sintaksē, un failam jābūt kodētā UTF\-8 formātā.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr1\-replace
+Nomaiņai atrasto tekstu aizstāt ar pirmo meklēšanas izteiksmi.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr1\-search
+Meklēšanas modeli (regulāra izteiksme) jāaizstāj ar pirmo maiņas tekstu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr2\-replace
+Nomaiņai atrasto tekstu aizstāt ar otro meklēšanas izteiksmi.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr2\-search
+Meklēšanas modeli (regulāra izteiksme) jāaizstāj ar otro maiņas tekstu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr3\-replace
+Nomaiņai atrasto tekstu aizstāt ar trešo meklēšanas izteiksmi.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr3\-search
+Meklēšanas modeli (regulāra izteiksme) jāaizstāj ar trešo maiņas tekstu.
+.UNINDENT
+.SH STRUKTŪRAS NOTEIKŠANA
+.sp
+Pārvalda dokumenta struktūras automātisku noteikšanu.
+.INDENT 0.0
+.TP
+.B \-\-chapter
+XPath izteiksme, lai noteiktu nodaļu virsrakstus. Pēc noklusējuma ir jāņem vērā <h1>vai <h2>birkas, kas satur vārdu \fB"\fPchapter\fB"\fP, \fB"\fPbook\fB"\fP, \fB"\fPsection\fB"\fP, \fB"\fPprologue\fB"\fP, \fB"\fPepilogue\fB"\fP vai \fB"\fPpart\fB"\fP, kā nodaļu virsraksts arī kā visas birkas kas ir klase = \fB"\fPchapter\fB"\fP\&. Izteiksme, ko izmanto, jāizvērtē elementu saraksts. Lai atspējotu nodaļas noteikšanu, izmantojiet izteiksmi \fB"\fP/\fB"\fP\&. Skatiet calibre \fB"\fPXPath Tutorial\fB"\fP lietotāja rokasgrāmatu, par turpmāku palīdzību šīs funkcijas izmantošanai.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-chapter\-mark
+Norādiet, kā izcelt noteiktās nodaļas. Vērtība \fB"\fPpagebreak\fB"\fP ievietos lappuses pārtraukumus pirms nodaļām. Vērtība \fB"\fPrule\fB"\fP ievietos tukšu rindu pirms nodaļām. Vērtība \fB"\fPnone\fB"\fP atslēgs nodaļu izcelšanu, vērtība \fB"\fPboth\fB"\fP nodaļu izcelšanai izmantos gan lappušu pārtraukumus, gan tukšas rindas.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-remove\-fake\-margins
+Dažos dokumentos lapas malu informācija tiek pievienota katrai rindkopai. Calibre mēģinās sameklēt un aizvākt šādas lapu malas. Dažreiz var tikt aizvākta arī nepieciešamā malu informācija; šajā gadījumā aizvākšana ir jāatspējo.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-insert\-metadata
+Grāmatas sākumā ievietot grāmatas metadatus. Tas ir noderīgi, ja jūsu e\-grāmatu lasītājs neatbalsta tiešu metadatu rādīšanu/meklēšanu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-page\-breaks\-before
+XPath izteiksme. Pirms norādītajiem elementiem tiek ievietoti lappušu pārtraukumi. Lai to atslēgtu, izmantojiet izteiksmi: /
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-prefer\-metadata\-cover
+Dot priekšroku izejas datnē atrastam vākam pret norādīto.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-first\-image
+Noņemt pirmo attēlu no ievades e\-grāmatas. Noderīgi, ja ievades dokumentam ir attēls, kas nav identificēts kā vāka attēls. Šajā gadījumā, ja jūs iestatāt vāciņu calibre, izejas dokuments beigsies ar diviem vāka attēliem, ja neesat norādījis šo opciju.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-start\-reading\-at
+XPath izteiksme, lai noteiktu atrašanās vietu dokumentā, no kuras jāsāk lasīt. Dažas e\-grāmatu lasīšanas programmas (pirmkārt Kindle) šo vietu izmanto, lai atvērtu grāmatu. Lai iegūtu papildu palīdzību šīs funkcijas izmantošanai, skatiet calibre lietotāja rokasgrāmatā \fB"\fPXPath\fB"\fP sniegto pamācību.
+.UNINDENT
+.SH SATURA RĀDĪITĀJS
+.sp
+Vadīt satura rādītāja automātisku veidošanu. Pēc noklusēšanas, ja oriģinālā datne jau satur satura rādītāju, tam tiks dota priekšroka pret automātiski izveidoto.
+.INDENT 0.0
+.TP
+.B \-\-duplicate\-links\-in\-toc
+Veidojot satura rādītāju no dokumentā esošajām saitēm atļaut atkārtojošos ierakstus, t.i. \- ierakstus ar vienādiem nosaukumiem, ar nosacījumu, ka tie norāda uz dažādām vietām.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-level1\-toc
+XPath izteiksme, kas nosaka visu birku pievienošanu satura rādītāja pirmajam līmenim. Jā tā ir norādīta, tai ir priekšroka pār visām citām automātiskās noteikšanas metodēm. Piemērus skat. calibre Lietotāja pamācības XPath sadaļā.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-level2\-toc
+XPath izteiksme, kas nosaka visu birku pievienošanu satura rādītāja otrajam līmenim. Katrs ieraksts tiek pievienots zem iepriekšējā pirmā līmeņa ieraksta. Piemērus skat. calibre Lietotāja pamācības XPath sadaļā.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-level3\-toc
+XPath izteiksme, kas nosaka visu birku pievienošanu satura rādītāja trešajam līmenim. Katrs ieraksts tiek pievienots zem iepriekšējā otrā līmeņa ieraksta. Piemērus skat. calibre Lietotāja pamācības XPath sadaļā.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-max\-toc\-links
+Maksimālais satura rādītājam pievienojamo saišu skaits. Norādiet 0, lai atspējotu. Noklusētais: 50. Saites satura rādītājam tiks pievienotas vienīgi tad, ja atrasto nodaļu skaits būs mazāks par norādīto robežu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-no\-chapters\-in\-toc
+Nepievienot automātiski atrastās nodaļas satura rādītājam.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-toc\-filter
+Dzēst satura rādītāja ierakstus, kuru nosaukumi atbilst norādītajai regulārajai izteiksmei. Tiks dzēsti visi atbilstošie ieraksti un to bērni.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-toc\-threshold
+Ja atrasto nodaļu skaits ir mazāks par norādīto, tad saites tiks pievienotas satura rādītājam. Noklusētais: 6
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-use\-auto\-toc
+Parasti, ja sākotnējā dokumentā ir satura rādītājs, tam tiek dota priekšroka pret automātiski veidoto. Ar šo iestatījumu vienmēr tiks lietots automātiski veidotais.
+.UNINDENT
+.SH METADATI
+.sp
+Uzstādījumi metadatu norādīšanai rezultātā
+.INDENT 0.0
+.TP
+.B \-\-author\-sort
+Teksts, kuru izmanto kārtojot pēc autora.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-authors
+Ievadiet autorus. Vairākus autorus atdala ar ampersandiem (&).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-book\-producer
+Ievadiet grāmatas ražotāju.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-comments
+Ievadiet e\-grāmatu aprakstu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-cover
+Iestata vāku no norādītās datnes vai URL
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-isbn
+Ievadiet grāmatas ISBN kodu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-language
+Ievadiet valodu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-pubdate
+Ievadiet publicēšanas datumu (tiek pieņemts, ka tas atrodas vietējā laika joslā, ja vien laika josla nav skaidri norādīta)
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-publisher
+Ievadiet e\-grāmatu izdevēju.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-rating
+Ievadiet vērtējumu. Jābūt skaitlim no 1 līdz 5.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-read\-metadata\-from\-opf, \-\-from\-opf, \-m
+Lasīt metadatus no norādītās OPF datnes. No šīs datnes nolasītajiem metadatiem tiks dota priekšrokā pret izejas datnē esošajiem.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-series
+Ievadiet šīs e\-grāmatas sēriju.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-series\-index
+Ievadiet grāmatas numuru sērijā.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-tags
+Ievadiet grāmatas birkas kā ar komatiem atdalītu sarakstu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-timestamp
+Uzstādīt grāmatas laika zīmogu (virs netiek lietots nekur)
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-title
+Ievadiet nosaukumu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-title\-sort
+Kārtošanai izmantotais nosaukuma variants.
+.UNINDENT
+.SH ATKĻŪDOŠANA
+.sp
+Iestatījumi, kas palīdz atkļūdot pārveidošanu
+.INDENT 0.0
+.TP
+.B \-\-debug\-pipeline, \-d
+Save the output from different stages of the conversion pipeline to the specified folder. Useful if you are unsure at which stage of the conversion process a bug is occurring.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-verbose, \-v
+Detalizācijas līmenis. Norādiet atkārtoti vairākkārt, lai to paaugstinātu. Atkārtojot to divreiz tiks iegūta pilna detalizācija, vienreiz \- vidēja, ne reizi \- viszemākā.
+.UNINDENT
+.SH AUTHOR
+Kovid Goyal
+.SH COPYRIGHT
+Kovid Goyal
+.\" Generated by docutils manpage writer.
+.

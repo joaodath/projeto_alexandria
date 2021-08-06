@@ -1,0 +1,75 @@
+#!/usr/bin/env python
+
+__license__ = 'GPL v3'
+__copyright__ = '2008, Kovid Goyal <kovid at kovidgoyal.net>'
+'''
+theatlantic.com
+'''
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class NewYorkMagazine(BasicNewsRecipe):
+
+    title = 'New York Magazine'
+    __author__ = 'Kovid Goyal'
+    description = 'Food, culture, arts and entertainment in New York'
+    language = 'en'
+    no_stylesheets = True
+    remove_javascript = True
+    encoding = 'utf-8'
+    keep_only_tags = [
+        classes('lede-text headline-primary article-timestamp by-authors'),
+        dict(id='main'),
+        dict(itemprop='articleBody'),
+    ]
+    remove_tags = [
+        classes('related-stories start-discussion'),
+        dict(id=['minibrowserbox', 'article-related', 'article-tools'])
+    ]
+    remove_attributes = ['srcset']
+
+    def nymag_get_index(self):
+        return self.index_to_soup('https://nymag.com/maglinks/nym-home-05')
+
+    def parse_index(self):
+        soup = self.nymag_get_index()
+        cdiv = soup.find(**classes('magazine-toc-cover-image-wrap'))
+        if cdiv is not None:
+            for source in cdiv.findAll('source', srcset=True):
+                self.cover_url = source['srcset'].split()[0]
+                self.log('Cover:', self.cover_url)
+                break
+        feeds = []
+        for div in soup.findAll(attrs={'data-editable': 'settingTitle'}):
+            section = self.tag_to_string(div).strip().capitalize()
+            articles = []
+            self.log(section)
+            ul = div.findNextSibling('ul')
+            for li in ul.findAll('li'):
+                a = li.find(href=True, **classes('article-link'))
+                if a is None:
+                    continue
+                url = a['href']
+                h3 = li.find('h3')
+                title = self.tag_to_string(h3)
+                desc = ''
+                teaser = h3.findNextSibling(**classes('teaser'))
+                if teaser is not None:
+                    desc = self.tag_to_string(teaser)
+                self.log('\t', title, url)
+                articles.append({'title': title, 'url': url, 'description': desc})
+            if articles:
+                feeds.append((section, articles))
+
+        return feeds
+
+    def preprocess_html(self, soup):
+        for img in soup.findAll('img', attrs={'data-src': True}):
+            img['src'] = img['data-src']
+        return soup

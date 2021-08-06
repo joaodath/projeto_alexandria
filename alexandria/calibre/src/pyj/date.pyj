@@ -1,0 +1,152 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2016, Kovid Goyal <kovid at kovidgoyal.net>
+from __python__ import hash_literals
+
+UNDEFINED_DATE_ISO = '0101-01-01T00:00:00+00:00'
+UNDEFINED_DATE = Date(UNDEFINED_DATE_ISO)
+
+def is_date_undefined(date):
+    dy, uy = date.getUTCFullYear(), UNDEFINED_DATE.getUTCFullYear()
+    return dy < uy or (
+            dy is uy and
+            date.getUTCMonth() is UNDEFINED_DATE.getUTCMonth() and
+            date.getUTCDate() <= UNDEFINED_DATE.getUTCDate() + 1)
+
+# format_date() {{{
+
+lcdata = {
+    'abday': ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+    'abmon': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    'day'  : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    'mon'  : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+}
+
+supports_locales = False
+try:
+    Date().toLocaleString('dfkjghdfkgj')
+except RangeError:
+    supports_locales = True
+except:
+    pass
+
+
+def fmt_date_pat():
+    ans = fmt_date_pat.ans
+    if not ans?:
+        ans = fmt_date_pat.ans = /(s{1,2})|(m{1,2})|(h{1,2})|(H{1,2})|(zzz)|(z)|(ap)|(AP)|(a)|(A)|(t)|(d{1,4}|M{1,4}|(?:yyyy|yy))/g
+    return ans
+
+
+def fd_format_hour(dt, ampm, hr, as_utc):
+    h = dt.getUTCHours() if as_utc else dt.getHours()
+    if ampm:
+        h %= 12
+    return h.toString() if hr.length is 1 else str.format('{:02d}', h)
+
+
+def fd_format_hour24(dt, ampm, hr, as_utc):
+    return fd_format_hour(dt, False, hr, as_utc)
+
+
+def fd_format_minute(dt, ampm, min, as_utc):
+    m = dt.getUTCMinutes() if as_utc else dt.getMinutes()
+    return m.toString() if min.length is 1 else str.format('{:02d}', m)
+
+def fd_format_second(dt, ampm, min, as_utc):
+    s = dt.getUTCSeconds() if as_utc else dt.getSeconds()
+    return s.toString() if min.length is 1 else str.format('{:02d}', s)
+
+def fd_format_ms(dt, ampm, min, as_utc):
+    s = dt.getUTCMilliseconds() if as_utc else dt.getSeconds()
+    return s.toString() if min.length is 1 else str.format('{:03d}', s)
+
+
+
+def fd_format_timezone(dt, ampm, t, as_utc):
+    short = dt.toLocaleTimeString()
+    full = dt.toLocaleTimeString(v'[]', {'timeZoneName': 'long'})
+    idx = full.indexOf(short)
+    if idx > -1:
+        return full[idx + short.length:].strip()
+    return window.Intl.DateTimeFormat().resolvedOptions().timeZone
+
+
+def fd_format_ampm(dt, ampm, ap, as_utc):
+    h = dt.getUTCHours() if as_utc else dt.getHours()
+    ans = 'am' if h < 12 else 'pm'
+    return ans if (ap is 'ap' or ap is 'a') else ans.toUpperCase()
+
+
+def fd_format_day(dt, ampm, dy, as_utc):
+    d = dt.getUTCDate() if as_utc else dt.getDate()
+    if dy.length is 1:
+        return d.toString()
+    if dy.length is 2:
+        return str.format('{:02d}', d)
+    if supports_locales:
+        options = {'weekday': ('short' if dy.length is 3 else 'long')}
+        if as_utc:
+            options['timeZone'] = 'UTC'
+        return dt.toLocaleString(window.navigator.language, options)
+    w = dt.getUTCDay() if as_utc else dt.getDay()
+    return lcdata['abday' if dy.length is 3 else 'day'][(w + 1) % 7]
+
+def fd_format_month(dt, ampm, mo, as_utc):
+    m = dt.getUTCMonth() if as_utc else dt.getMonth()
+    if mo.length is 1:
+        return (m + 1).toString()
+    if mo.length is 2:
+        return str.format('{:02d}', m + 1)
+    if supports_locales:
+        options = {'month': {1:'numeric', 2:'2-digit', 3:'short', 4:'long'}[mo.length] or 'long'}
+        if as_utc:
+            options['timeZone'] = 'UTC'
+        return dt.toLocaleString(window.navigator.language, options)
+    return lcdata['abmon' if mo.length is 3 else 'mon'][m]
+
+def fd_format_year(dt, ampm, yr, as_utc):
+    y = dt.getUTCFullYear() if as_utc else dt.getFullYear()
+    if yr.length is 2:
+        return str.format('{:02d}', y % 100)
+    return str.format('{:04d}', y)
+
+fd_function_index = {
+    'd': fd_format_day,
+    'M': fd_format_month,
+    'y': fd_format_year,
+    'h': fd_format_hour,
+    'H': fd_format_hour24,
+    'm': fd_format_minute,
+    's': fd_format_second,
+    'a': fd_format_ampm,
+    'A': fd_format_ampm,
+    'z': fd_format_ms,
+    't': fd_format_timezone,
+}
+
+
+def am_pm_pat():
+    ans = am_pm_pat.ans
+    if not ans?:
+        ans = am_pm_pat.ans = /(ap)|(a)|(AP)|(A)/
+    return ans
+
+
+def format_date(date=None, fmt='dd MMM yyyy', as_utc=False):
+    fmt = fmt or 'dd MMM yyyy'
+    ampm = am_pm_pat().test(fmt)
+    if jstype(date) is 'string':
+        date = Date(date)
+    date = date or Date()
+    if is_date_undefined(date):
+        return ''
+    return fmt.replace(fmt_date_pat(), def(match):
+        if not match:
+            return ''
+        try:
+            return fd_function_index[match[0]](date, ampm, match, as_utc)
+        except Exception:
+            print(str.format('Failed to format date with format: {} and match: {}', fmt, match))
+            return ''
+    )
+# }}}

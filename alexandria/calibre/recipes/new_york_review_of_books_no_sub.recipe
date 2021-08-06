@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+__license__ = 'GPL v3'
+__copyright__ = '2008, Kovid Goyal kovid@kovidgoyal.net'
+__docformat__ = 'restructuredtext en'
+
+'''
+nybooks.com
+'''
+
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+def absurl(url):
+    if url.startswith('//'):
+        url = 'https:' + url
+    elif url.startswith('/'):
+        url = 'https://www.nybooks.com' + url
+    return url
+
+
+class NewYorkReviewOfBooks(BasicNewsRecipe):
+
+    title = u'New York Review of Books (no subscription)'
+    description = u'Book reviews'
+    language = 'en'
+
+    __author__ = 'Kovid Goyal'
+
+    no_stylesheets = True
+    no_javascript = True
+
+    keep_only_tags = [
+        dict(name='h1'),
+        classes('author article-col article-main-content'),
+    ]
+    remove_tags = [
+        classes('inline-ad'),
+    ]
+    remove_tags_after = classes('article-main-content')
+
+    def parse_index(self):
+        soup = self.index_to_soup('https://www.nybooks.com/current-issue')
+        # from calibre.utils.ipython import ipython
+        # ipython({'soup': soup})
+
+        # Find cover
+        cover = soup.find('img', attrs={'class':'border-light-gray'})
+        if cover is not None:
+            self.cover_url = absurl(cover['src'])
+            self.log('Found cover at:', self.cover_url)
+
+        # Find date
+        div = soup.find('p', **classes('h2'))
+        if div is not None:
+            text = self.tag_to_string(div)
+            self.timefmt = text
+            self.log('Issue date:', text)
+
+        # Find TOC
+        articles = []
+        for h4 in soup.findAll('h4'):
+            title = self.tag_to_string(h4).strip()
+            url = absurl(h4.find('a')['href'])
+            author = self.tag_to_string(h4.parent.parent.find('a'))
+            title = title + ' (%s)' % author
+            desc = ''
+            div = h4
+            while div.next_sibling:
+                div = div.next_sibling
+                desc += self.tag_to_string(div).strip()
+            self.log('Found article:', title)
+            self.log('\t', url)
+            self.log('\t', desc)
+            articles.append({'title': title, 'url': url, 'date': '',
+                                'description': desc})
+
+        return [('Current Issue', articles)]

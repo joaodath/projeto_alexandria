@@ -1,0 +1,669 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2016, Kovid Goyal <kovid at kovidgoyal.net>
+from __python__ import bound_methods, hash_literals
+
+# Notes about flow mode scrolling:
+#  All the math in flow mode is based on the block and inline directions.
+#  Inline is "the direction lines of text go."
+#  In horizontal scripts such as English and Hebrew, the inline is horizontal
+#  and the block is vertical.
+#  In vertical languages such as Japanese and Mongolian, the inline is vertical
+#  and block is horizontal.
+#  Regardless of language, flow mode scrolls in the block direction.
+#
+#  In vertical RTL books, the block position scrolls from right to left. |<------|
+#  This means that the viewport positions become negative as you scroll.
+#  This is hidden from flow mode by the viewport, which transparently
+#  negates any inline coordinates sent in to the viewport_to_document* functions
+#  and the various scroll_to/scroll_by functions, as well as the reported X position.
+#
+#  The result of all this is that flow mode's math can safely pretend that
+#  things scroll in the positive block direction.
+
+from dom import set_css
+from range_utils import wrap_range, unwrap
+from read_book.cfi import scroll_to as cfi_scroll_to
+from read_book.globals import current_spine_item, get_boss, rtl_page_progression, ltr_page_progression
+from read_book.settings import opts
+from read_book.viewport import line_height, rem_size, scroll_viewport
+
+
+def flow_to_scroll_fraction(frac, on_initial_load):
+    scroll_viewport.scroll_to_in_block_direction(scroll_viewport.document_block_size() * frac)
+
+
+small_scroll_events = v'[]'
+
+
+def clear_small_scrolls():
+    nonlocal small_scroll_events
+    small_scroll_events = v'[]'
+
+
+def dispatch_small_scrolls():
+    if small_scroll_events.length:
+        now = window.performance.now()
+        if now - small_scroll_events[-1].time <= 2000:
+            window.setTimeout(dispatch_small_scrolls, 100)
+            return
+        amt = 0
+        for x in small_scroll_events:
+            amt += x.amt
+        clear_small_scrolls()
+        get_boss().report_human_scroll(amt / scroll_viewport.document_block_size())
+
+
+def add_small_scroll(amt):
+    small_scroll_events.push({'amt': amt, 'time': window.performance.now()})
+    window.setTimeout(dispatch_small_scrolls, 100)
+
+
+def report_human_scroll(amt):
+    h = scroll_viewport.height()
+    is_large_scroll = (abs(amt) / h) >= 0.5
+    if amt > 0:
+        if is_large_scroll:
+            clear_small_scrolls()
+            get_boss().report_human_scroll(amt / scroll_viewport.document_block_size())
+        else:
+            add_small_scroll(amt)
+    elif amt is 0 or is_large_scroll:
+        clear_small_scrolls()
+
+
+last_change_spine_item_request = {}
+
+
+def _check_for_scroll_end(func, obj, args, report):
+    before = scroll_viewport.block_pos()
+    should_flip_progression_direction = func.apply(obj, args)
+
+    now = window.performance.now()
+    scroll_animator.sync(now)
+
+    if scroll_viewport.block_pos() is before:
+        csi = current_spine_item()
+        if last_change_spine_item_request.name is csi.name and now - last_change_spine_item_request.at < 2000:
+            return False
+        last_change_spine_item_request.name = csi.name
+        last_change_spine_item_request.at = now
+        go_to_previous_page = args[0] < 0
+        if (should_flip_progression_direction):
+            go_to_previous_page = not go_to_previous_page
+        get_boss().send_message('next_spine_item', previous=go_to_previous_page)
+        return False
+    if report:
+        report_human_scroll(scroll_viewport.block_pos() - before)
+    return True
+
+
+def check_for_scroll_end(func):
+    return def ():
+        return _check_for_scroll_end(func, this, arguments, False)
+
+
+def check_for_scroll_end_and_report(func):
+    return def ():
+        return _check_for_scroll_end(func, this, arguments, True)
+
+
+@check_for_scroll_end_and_report
+def scroll_by_and_check_next_page(y):
+    scroll_viewport.scroll_by_in_block_direction(y)
+    # This indicates to check_for_scroll_end_and_report that it should not
+    # flip the page progression direction.
+    return False
+
+def flow_onwheel(evt):
+    di = db = 0
+    WheelEvent = window.WheelEvent
+    # Y deltas always scroll in the previous and next page direction,
+    # regardless of writing direction, since doing otherwise would
+    # make mouse wheels mostly useless for scrolling in books written
+    # vertically.
+    if evt.deltaY:
+        if evt.deltaMode is WheelEvent.DOM_DELTA_PIXEL:
+            db = evt.deltaY
+        elif evt.deltaMode is WheelEvent.DOM_DELTA_LINE:
+            db = line_height() * evt.deltaY
+        if evt.deltaMode is WheelEvent.DOM_DELTA_PAGE:
+            db = (scroll_viewport.block_size() - 30) * evt.deltaY
+    # X deltas scroll horizontally in both horizontal and vertical books.
+    # It's more natural in both cases.
+    if evt.deltaX:
+        if evt.deltaMode is WheelEvent.DOM_DELTA_PIXEL:
+            dx = evt.deltaX
+        elif evt.deltaMode is WheelEvent.DOM_DELTA_LINE:
+            dx = line_height() * evt.deltaX
+        else:
+            dx = (scroll_viewport.block_size() - 30) * evt.deltaX
+
+        if scroll_viewport.horizontal_writing_mode:
+            di = dx
+        else:
+            # Left goes forward, so make sure left is positive and right is negative,
+            # which is the opposite of what the wheel sends.
+            if scroll_viewport.rtl:
+                db = -dx
+            # Right goes forward, so the sign is correct.
+            else:
+                db = dx
+    if Math.abs(di) >= 1:
+        scroll_viewport.scroll_by_in_inline_direction(di)
+    if Math.abs(db) >= 1:
+        scroll_by_and_check_next_page(db)
+
+@check_for_scroll_end
+def goto_boundary(dir):
+    position = 0 if dir is DIRECTION.Up else scroll_viewport.document_block_size()
+    scroll_viewport.scroll_to_in_block_direction(position)
+    get_boss().report_human_scroll()
+    return False
+
+
+@check_for_scroll_end_and_report
+def scroll_by_page(direction, flip_if_rtl_page_progression):
+    b = scroll_viewport.block_size() - 10
+    scroll_viewport.scroll_by_in_block_direction(b * direction)
+
+    # Let check_for_scroll_end_and_report know whether or not it should flip
+    # the progression direction.
+    return flip_if_rtl_page_progression and rtl_page_progression()
+
+
+def scroll_to_extend_annotation(backward, horizontal, by_page):
+    direction = -1 if backward else 1
+    h = line_height()
+    if by_page:
+        h = (window.innerWidth if horizontal else window.innerHeight) - h
+    if horizontal:
+        before = window.pageXOffset
+        window.scrollBy(h * direction, 0)
+        return window.pageXOffset is not before
+    before = window.pageYOffset
+    window.scrollBy(0, h * direction)
+    return window.pageYOffset is not before
+
+def is_auto_scroll_active():
+    return scroll_animator.is_active()
+
+
+def start_autoscroll():
+    scroll_animator.start(DIRECTION.Down, True)
+
+
+def toggle_autoscroll():
+    if is_auto_scroll_active():
+        cancel_scroll()
+        running = False
+    else:
+        start_autoscroll()
+        running = True
+    get_boss().send_message('autoscroll_state_changed', running=running)
+
+
+def handle_shortcut(sc_name, evt):
+    if sc_name is 'down':
+        scroll_animator.start(DIRECTION.Down, False)
+        return True
+    if sc_name is 'up':
+        scroll_animator.start(DIRECTION.Up, False)
+        return True
+    if sc_name is 'start_of_file':
+        goto_boundary(DIRECTION.Up)
+        return True
+    if sc_name is 'end_of_file':
+        goto_boundary(DIRECTION.Down)
+        return True
+    if sc_name is 'left':
+        scroll_by_and_check_next_page(-15 if ltr_page_progression() else 15, 0)
+        return True
+    if sc_name is 'right':
+        scroll_by_and_check_next_page(15 if ltr_page_progression() else -15, 0)
+        return True
+    if sc_name is 'start_of_book':
+        get_boss().send_message('goto_doc_boundary', start=True)
+        return True
+    if sc_name is 'end_of_book':
+        get_boss().send_message('goto_doc_boundary', start=False)
+        return True
+    if sc_name is 'pageup':
+        scroll_by_page(-1, False)
+        return True
+    if sc_name is 'pagedown':
+        scroll_by_page(1, False)
+        return True
+    if sc_name is 'toggle_autoscroll':
+        toggle_autoscroll()
+        return True
+
+    if sc_name.startsWith('scrollspeed_'):
+        scroll_animator.sync()
+
+    return False
+
+
+def layout(is_single_page):
+    add_visibility_listener()
+    line_height(True)
+    rem_size(True)
+    set_css(document.body, margin='0', border_width='0', padding='0')
+    body_style = window.getComputedStyle(document.body)
+    # scroll viewport needs to know if we're in vertical mode,
+    # since that will cause scrolling to happen left and right
+    scroll_viewport.initialize_on_layout(body_style)
+    document.documentElement.style.overflow = 'visible' if scroll_viewport.vertical_writing_mode else 'hidden'
+
+def auto_scroll_resume():
+    scroll_animator.wait = False
+    scroll_animator.sync()
+
+
+def add_visibility_listener():
+    if add_visibility_listener.done:
+        return
+    add_visibility_listener.done = True
+    # Pause auto-scroll while minimized
+    document.addEventListener("visibilitychange", def():
+        if (document.visibilityState is 'visible'):
+            scroll_animator.sync()
+        else:
+            scroll_animator.pause()
+    )
+
+
+def cancel_scroll():
+    scroll_animator.stop()
+
+
+def is_scroll_end(pos):
+    return not (0 <= pos <= scroll_viewport.document_block_size() - scroll_viewport.block_size())
+
+
+DIRECTION = {'Up': -1, 'up': -1, 'Down': 1, 'down': 1, 'UP': -1, 'DOWN': 1}
+
+
+class ScrollAnimator:
+    DURATION = 100 # milliseconds
+
+    def __init__(self):
+        self.animation_id = None
+        self.auto = False
+        self.auto_timer = None
+        self.paused = False
+
+    def is_running(self):
+        return self.animation_id is not None or self.auto_timer is not None
+
+    def is_active(self):
+        return self.is_running() and (self.auto or self.auto_timer is not None)
+
+    def start(self, direction, auto):
+        cancel_drag_scroll()
+        if self.wait:
+            return
+
+        now = window.performance.now()
+        self.end_time = now + self.DURATION
+        self.stop_auto_spine_transition()
+
+        if not self.is_running() or direction is not self.direction or auto is not self.auto:
+            if self.auto and not auto:
+                self.pause()
+            self.stop()
+            self.auto = auto
+            self.direction = direction
+            self.start_time = now
+            self.start_offset = scroll_viewport.block_pos()
+            self.csi_idx = current_spine_item().index
+            self.animation_id = window.requestAnimationFrame(self.auto_scroll if auto else self.smooth_scroll)
+
+    def smooth_scroll(self, ts):
+        duration = self.end_time - self.start_time
+        if duration <= 0:
+            self.animation_id = None
+            return
+        progress = max(0, min(1, (ts - self.start_time) / duration)) # max/min to account for jitter
+        scroll_target = self.start_offset
+        scroll_target += Math.trunc(self.direction * progress * duration * line_height() * opts.lines_per_sec_smooth) / 1000
+
+        scroll_viewport.scroll_to_in_block_direction(scroll_target)
+        amt = scroll_viewport.block_pos() - self.start_offset
+
+        if is_scroll_end(scroll_target) and (not opts.scroll_stop_boundaries or (abs(amt) < 3 and duration is self.DURATION)):
+            # "Turn the page" if stop at boundaries option is false or
+            # this is a new scroll action and we were already at the end
+            self.animation_id = None
+            self.wait = True
+            report_human_scroll(amt)
+            get_boss().send_message('next_spine_item', previous=self.direction is DIRECTION.Up)
+        elif progress < 1:
+            self.animation_id = window.requestAnimationFrame(self.smooth_scroll)
+        elif self.paused:
+            self.resume()
+        else:
+            self.animation_id = None
+            report_human_scroll(amt)
+
+    def auto_scroll(self, ts):
+        elapsed = max(0, ts - self.start_time) # max to account for jitter
+        scroll_target = self.start_offset
+        scroll_target += Math.trunc(self.direction * elapsed * line_height() * opts.lines_per_sec_auto) / 1000
+
+        scroll_viewport.scroll_to_in_block_direction(scroll_target)
+        scroll_finished = is_scroll_end(scroll_target)
+
+        # report every second
+        if elapsed >= 1000:
+            self.sync(ts)
+
+        if scroll_finished:
+            self.pause()
+            if opts.scroll_auto_boundary_delay >= 0:
+                self.auto_timer = setTimeout(self.request_next_spine_item, opts.scroll_auto_boundary_delay * 1000)
+        else:
+            self.animation_id = window.requestAnimationFrame(self.auto_scroll)
+
+    def request_next_spine_item(self):
+        self.auto_timer = None
+        get_boss().send_message('next_spine_item', previous=self.direction is DIRECTION.Up)
+
+    def report(self):
+        amt = scroll_viewport.block_pos() - self.start_offset
+        if abs(amt) > 0 and self.csi_idx is current_spine_item().index:
+            report_human_scroll(amt)
+
+    def sync(self, ts):
+        if self.auto:
+            self.report()
+            self.csi_idx = current_spine_item().index
+            self.start_time = ts or window.performance.now()
+            self.start_offset = scroll_viewport.block_pos()
+        else:
+            self.resume()
+
+    def stop(self):
+        self.auto = False
+        if self.animation_id is not None:
+            window.cancelAnimationFrame(self.animation_id)
+            self.animation_id = None
+            self.report()
+        self.stop_auto_spine_transition()
+
+    def stop_auto_spine_transition(self):
+        if self.auto_timer is not None:
+            clearTimeout(self.auto_timer)
+            self.auto_timer = None
+            self.paused = False
+
+    def pause(self):
+        if self.auto:
+            self.paused = self.direction
+            self.stop()
+        else:
+            self.paused = False
+
+    # Resume auto-scroll
+    def resume(self):
+        if self.paused:
+            self.start(self.paused, True)
+            self.paused = False
+
+scroll_animator = ScrollAnimator()
+
+
+class FlickAnimator:
+
+    SPEED_FACTOR = 0.04
+    DECEL_TIME_CONSTANT = 325  # milliseconds
+    VELOCITY_HISTORY = 300  # milliseconds
+    MIMUMUM_VELOCITY = 100  # pixels/sec
+
+    def __init__(self):
+        self.animation_id = None
+
+    def start(self, gesture):
+        cancel_drag_scroll()
+        self.vertical = gesture.axis is 'vertical'
+        now = window.performance.now()
+        points = times = None
+        for i, t in enumerate(gesture.times):
+            if now - t < self.VELOCITY_HISTORY:
+                points, times = gesture.points[i:], gesture.times[i:]
+                break
+        if times and times.length > 1:
+            elapsed = (times[-1] - times[0]) / 1000
+            if elapsed > 0 and points.length > 1:
+                delta = points[0] - points[-1]
+                velocity = delta / elapsed
+                if abs(velocity) > self.MIMUMUM_VELOCITY:
+                    self.amplitude = self.SPEED_FACTOR * velocity
+                    self.start_time = now
+                    self.animation_id = window.requestAnimationFrame(self.auto_scroll)
+
+    def auto_scroll(self, ts):
+        if self.animation_id is None:
+            return
+        elapsed = window.performance.now() - self.start_time
+        delta = self.amplitude * Math.exp(-elapsed / self.DECEL_TIME_CONSTANT)
+        if abs(delta) >= 1:
+            delta = Math.round(delta)
+            if self.vertical:
+                window.scrollBy(0, delta)
+            else:
+                window.scrollBy(delta, 0)
+            self.animation_id = window.requestAnimationFrame(self.auto_scroll)
+
+    def stop(self):
+        if self.animation_id is not None:
+            window.cancelAnimationFrame(self.animation_id)
+            self.animation_id = None
+
+flick_animator = FlickAnimator()
+
+
+class DragScroller:
+
+    DURATION = 100 # milliseconds
+
+    def __init__(self):
+        self.animation_id = None
+        self.direction = 1
+        self.speed_factor = 1
+        self.start_time = self.end_time = 0
+        self.start_offset = 0
+
+    def is_running(self):
+        return self.animation_id is not None
+
+    def smooth_scroll(self, ts):
+        duration = self.end_time - self.start_time
+        if duration <= 0:
+            self.animation_id = None
+            self.start(self.direction, self.speed_factor)
+            return
+        progress = max(0, min(1, (ts - self.start_time) / duration)) # max/min to account for jitter
+        scroll_target = self.start_offset
+        scroll_target += Math.trunc(self.direction * progress * duration * line_height() * opts.lines_per_sec_smooth * self.speed_factor) / 1000
+        scroll_viewport.scroll_to_in_block_direction(scroll_target)
+
+        if progress < 1:
+            self.animation_id = window.requestAnimationFrame(self.smooth_scroll)
+        else:
+            self.animation_id = None
+            self.start(self.direction, self.speed_factor)
+
+    def start(self, direction, speed_factor):
+        now = window.performance.now()
+        self.end_time = now + self.DURATION
+        if not self.is_running() or direction is not self.direction or speed_factor is not self.speed_factor:
+            self.stop()
+            self.direction = direction
+            self.speed_factor = speed_factor
+            self.start_time = now
+            self.start_offset = scroll_viewport.block_pos()
+            self.animation_id = window.requestAnimationFrame(self.smooth_scroll)
+
+    def stop(self):
+        if self.animation_id is not None:
+            window.cancelAnimationFrame(self.animation_id)
+            self.animation_id = None
+
+
+drag_scroller = DragScroller()
+
+
+def cancel_drag_scroll():
+    drag_scroller.stop()
+
+
+def start_drag_scroll(delta):
+    limit = opts.margin_top if delta < 0 else opts.margin_bottom
+    direction = 1 if delta >= 0 else -1
+    speed_factor = min(abs(delta), limit) / limit
+    speed_factor *= (2 - speed_factor)  # QuadOut Easing curve
+    drag_scroller.start(direction, 2 * speed_factor)
+
+
+def handle_gesture(gesture):
+    flick_animator.stop()
+    if gesture.type is 'swipe':
+        if gesture.points.length > 1 and not gesture.is_held:
+            delta = gesture.points[-2] - gesture.points[-1]
+            if Math.abs(delta) >= 1:
+                if gesture.axis is 'vertical':
+                    # Vertical writing scrolls left and right,
+                    # so doing a vertical flick shouldn't change pages.
+                    if scroll_viewport.vertical_writing_mode:
+                        scroll_viewport.scroll_by(delta, 0)
+                    # However, it might change pages in horizontal writing
+                    else:
+                        scroll_by_and_check_next_page(delta)
+                else:
+                    # A horizontal flick should check for new pages in
+                    # vertical modes, since they flow left and right.
+                    if scroll_viewport.vertical_writing_mode:
+                        scroll_by_and_check_next_page(delta)
+                    # In horizontal modes, just move by the delta.
+                    else:
+                        scroll_viewport.scroll_by(delta, 0)
+        if not gesture.active and not gesture.is_held:
+            flick_animator.start(gesture)
+    elif gesture.type is 'prev-page':
+        # should flip = False - previous is previous whether RTL or LTR.
+        # flipping of this command is handled higher up
+        scroll_by_page(-1, False)
+    elif gesture.type is 'next-page':
+        # should flip = False - next is next whether RTL or LTR.
+        # flipping of this command is handled higher up
+        scroll_by_page(1, False)
+
+
+anchor_funcs = {
+    'pos_for_elem': def pos_for_elem(elem):
+        if not elem:
+            return {'block': 0, 'inline': 0}
+        br = elem.getBoundingClientRect()
+
+        # Start of object in the scrolling direction
+        return {
+            'block': scroll_viewport.viewport_to_document_block(scroll_viewport.rect_block_start(br), elem.ownerDocument),
+            'inline': scroll_viewport.viewport_to_document_inline(scroll_viewport.rect_inline_start(br), elem.ownerDocument)
+        }
+    ,
+    'visibility': def visibility(pos):
+        q = pos.block
+        # Have to negate X if in RTL for the math to be correct,
+        # as the value that the scroll viewport returns is negated
+        if scroll_viewport.vertical_writing_mode and scroll_viewport.rtl:
+            q = -q
+
+        if q + 1 < scroll_viewport.block_pos():
+            # the + 1 is needed for visibility when top aligned, see: https://bugs.launchpad.net/calibre/+bug/1924890
+            return -1
+        if q <= scroll_viewport.block_pos() + scroll_viewport.block_size():
+            return 0
+        return 1
+    ,
+    'cmp': def cmp(a, b):
+        return (a.block - b.block) or (a.inline - b.inline)
+    ,
+}
+
+
+def auto_scroll_action(action):
+    if action is 'toggle':
+        toggle_autoscroll()
+    elif action is 'start':
+        if not is_auto_scroll_active():
+            toggle_autoscroll()
+    elif action is 'stop':
+        if is_auto_scroll_active():
+            toggle_autoscroll()
+    elif action is 'resume':
+        auto_scroll_resume()
+    return is_auto_scroll_active()
+
+
+def closest_preceding_element(p):
+    while p and not p.scrollIntoView:
+        p = p.previousSibling or p.parentNode
+    return p
+
+
+def ensure_selection_visible():
+    s = window.getSelection()
+    p = s.anchorNode
+    if not p:
+        return
+    p = closest_preceding_element(p)
+    if p?.scrollIntoView:
+        p.scrollIntoView()
+    r = s.getRangeAt(0)
+    if not r:
+        return
+    rect = r.getBoundingClientRect()
+    if not rect:
+        return
+    if rect.top < 0 or rect.top >= window.innerHeight or rect.left < 0 or rect.left >= window.innerWidth:
+        wrapper = document.createElement('span')
+        wrap_range(r, wrapper)
+        wrapper.scrollIntoView()
+        unwrap(wrapper)
+
+
+def ensure_selection_boundary_visible(use_end):
+    sel = window.getSelection()
+    try:
+        rr = sel.getRangeAt(0)
+    except:
+        rr = None
+    if rr:
+        r = rr.getBoundingClientRect()
+        if r:
+            node = sel.focusNode if use_end else sel.anchorNode
+            x = scroll_viewport.rect_inline_end(r) if use_end else scroll_viewport.rect_inline_start(r)
+            if x < 0 or x >= window.innerWidth:
+                x = scroll_viewport.viewport_to_document_inline(x, doc=node.ownerDocument)
+                if use_end:
+                    x -= line_height()
+                scroll_viewport.scroll_to_in_inline_direction(x, True)
+            y = scroll_viewport.rect_block_end(r) if use_end else scroll_viewport.rect_block_start(r)
+            if y < 0 or y >= window.innerHeight:
+                y = scroll_viewport.viewport_to_document_block(y, doc=node.ownerDocument)
+                if use_end:
+                    y -= line_height()
+                scroll_viewport.scroll_to_in_block_direction(y, True)
+
+
+def jump_to_cfi(cfi):
+    # Jump to the position indicated by the specified conformal fragment
+    # indicator.
+    cfi_scroll_to(cfi, def(x, y):
+        # block is vertical if text is horizontal
+        if scroll_viewport.horizontal_writing_mode:
+            scroll_viewport.scroll_to_in_block_direction(y)
+        # block is horizontal if text is vertical
+        else:
+            scroll_viewport.scroll_to_in_block_direction(x)
+    )

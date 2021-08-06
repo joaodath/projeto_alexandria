@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Acervo - Alexandria{% endblock %} 
+
+{% block content %}
+<!-- Insira os códigos específicos do acervo.html aqui -->
+<table>
+        
+    <thead>
+        <tr>
+            <th>Nome Autor</th>
+            <th>Nome do Livro</th>
+            <th>Ano da Publicação</th>
+            <th>Release</th>
+            <th>Nota</th>
+            <th>Páginas</th>
+            <th>Imagem</th>
+            <th>Link de Download</th>
+            <th>Link de Compra</th>
+            <th>Ações</th>
+        </tr>
+    
+    </thead>
+    <tbody>
+        <tr>
+            {%for b in book%}
+            <td>{{b.name_author}}</td>
+            <td>{{b.name_book}}</td>
+            <td>{{b.synopsis}}</td>
+            <td>{{b.rating}}</td>
+            <td>{{b.genre}}</td>
+            <td>{{b.pages}}</td>
+            <td>
+                <a href="/deletar/{{b.id_book}}" type="text">Excluir</a>
+            </td>
+            <td>
+                <a href="/editar-livro/{{b.id_book}}" type="text">Editar</a>
+            </td>
+            {%endfor%}
+        </tr>
+    </tbody>
+</table>
+{% endblock %}

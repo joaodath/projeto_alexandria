@@ -1,0 +1,103 @@
+# -*- mode: python; coding: utf-8; -*-
+# vim: set syntax=python fileencoding=utf-8
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+__license__   = 'GPL v3'
+__copyright__ = '2020, Darko Miletic <darko.miletic at gmail.com>'
+
+'''
+www.eldiplo.org
+'''
+
+from calibre.web.feeds.news import BasicNewsRecipe
+from calibre.ptempfile import PersistentTemporaryFile
+
+
+class ElDiplo2020(BasicNewsRecipe):
+    title                = 'Le Monde Diplomatique - cono sur'
+    __author__           = 'Darko Miletic'
+    description          = 'Publicación de Le Monde Diplomatique para el cono sur.'
+    publisher            = 'Le Monde Diplomatique'
+    category             = 'news, politics, Argentina, Uruguay, Paraguay, South America, World'
+    oldest_article       = 31
+    no_stylesheets       = True
+    encoding             = 'utf8'
+    use_embedded_content = False
+    language             = 'es_AR'
+    remove_empty_feeds   = True
+    publication_type     = 'magazine'
+    auto_cleanup         = True
+    delay                  = 1
+    simultaneous_downloads = 1
+    timeout                = 8
+    needs_subscription     = 'optional'
+    ignore_duplicate_articles = {'url'}
+    articles_are_obfuscated = True
+    temp_files              = []
+    fetch_retries           = 10
+    handle_gzip = True
+    compress_news_images = True
+    scale_news_images_to_device = True
+    masthead_url = 'https://www.eldiplo.org/wp-content/themes/eldiplo/img/logo.png'
+    INDEX = 'https://www.eldiplo.org/'
+
+    extra_css            = """
+        body{font-family: Roboto, sans-serif}
+        .entry-title{font-family: Spectral, serif}
+    """
+
+    conversion_options = {
+        'comment': description, 'tags': category, 'publisher': publisher, 'language': language
+    }
+
+    def get_browser(self):
+        br = BasicNewsRecipe.get_browser(self)
+        br.open(self.INDEX)
+        if self.username is not None and self.password is not None:
+            br.select_form(id='loginform')
+            br['log'] = self.username
+            br['pwd'] = self.password
+            br.submit()
+        return br
+
+    def parse_index(self):
+        articles = []
+        soup = self.index_to_soup(self.INDEX)
+        mylink = soup.find('a', {'class':'edicion_cover'})
+        if mylink is None:
+            return None
+        self.cover_url = mylink.img['src']
+        indexurl = mylink['href']
+        self.log(indexurl)
+        parts = indexurl.split('www.eldiplo.org/', 1)
+        series = parts[1].split('-', 1)[0]
+        self.conversion_options.update({'series' : self.title})
+        self.conversion_options.update({'series_index' : series})
+        soupindex = self.index_to_soup(indexurl)
+        totalfeeds = []
+        articles = []
+        for article in soupindex.findAll('a', href=True, attrs={'class':'title'}):
+            url = article['href']
+            title = self.tag_to_string(article)
+            articles.append({'title': title, 'url': url, 'description': '', 'date': ''})
+            self.log('title: ', title, ' url: ', url)
+        totalfeeds.append(('Articles',articles))
+        return totalfeeds
+
+    def get_obfuscated_article(self, url):
+        result = None
+        count = 0
+        while (count < self.fetch_retries):
+            try:
+                response = self.browser.open(url, timeout=self.timeout)
+                html = response.read()
+                count = self.fetch_retries
+                tfile = PersistentTemporaryFile('_fa.html')
+                tfile.write(html)
+                tfile.close()
+                self.temp_files.append(tfile)
+                result = tfile.name
+            except:
+                self.info("Retrying download...")
+            count += 1
+        return result

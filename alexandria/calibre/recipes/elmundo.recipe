@@ -1,0 +1,119 @@
+from __future__ import print_function
+# -*- mode: python -*-
+# -*- coding: utf-8 -*-
+# vim:fileencoding=utf-8
+
+__license__ = 'GPL v3'
+__copyright__ = '2009-2017, Darko Miletic <darko.miletic at gmail.com>'
+'''
+elmundo.es
+'''
+import time
+from calibre.ptempfile import PersistentTemporaryFile
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+class ElMundo(BasicNewsRecipe):
+    title = 'El Mundo'
+    __author__ = 'Darko Miletic'
+    description = u'Lider de informacion en español'
+    publisher = 'Unidad Editorial Informacion General S.L.U.'
+    category = 'news, politics, Spain'
+    oldest_article = 2
+    max_articles_per_feed = 100
+    no_stylesheets = True
+    use_embedded_content = False
+    encoding = 'iso8859_15'
+    remove_javascript = True
+    remove_empty_feeds = True
+    language = 'es'
+    ignore_duplicate_articles = {'url'}
+    masthead_url = 'http://e00-elmundo.uecdn.es/assets/v7/img/svg/elmundo.svg'
+    publication_type = 'newspaper'
+    articles_are_obfuscated = True
+    auto_cleanup = True
+    temp_files = []
+    extra_css                 = """
+                                    body{font-family: "PT serif",Georgia,serif,times}
+                                    .metadata_noticia{font-size: small}
+                                    .pestana_GDP{font-size: small; font-weight:bold}
+                                    h1 {color: #333333; font-family: "Clear Sans Bold",Arial,sans-serif,helvetica}
+                                    .hora{color: red}
+                                    .update{color: gray}
+                                    """
+
+    conversion_options = {
+        'comments': description, 'tags': category, 'language': language, 'publisher': publisher
+    }
+
+    remove_tags = [dict(attrs={'class': lambda x: x and ('aside-tools' or 'publicidad') in x.split()})]
+
+    feeds = [
+
+    (u'Portada', u'http://estaticos.elmundo.es/elmundo/rss/portada.xml'),
+    (u'Deportes', u'http://estaticos.elmundo.es/elmundodeporte/rss/portada.xml'),
+    (u'Economia', u'http://estaticos.elmundo.es/elmundo/rss/economia.xml'),
+    (u'Espa\xf1a', u'http://estaticos.elmundo.es/elmundo/rss/espana.xml'),
+    (u'Internacional', u'http://estaticos.elmundo.es/elmundo/rss/internacional.xml'),
+    (u'Cultura', u'http://estaticos.elmundo.es/elmundo/rss/cultura.xml'),
+    (u'Ciencia/Ecolog\xeda', u'http://estaticos.elmundo.es/elmundo/rss/ciencia.xml'),
+    (u'Comunicaci\xf3n', u'http://estaticos.elmundo.es/elmundo/rss/comunicacion.xml'),
+    (u'Televisi\xf3n', u'http://estaticos.elmundo.es/elmundo/rss/television.xml'),
+    (u'Salud', u'http://estaticos.elmundo.es/elmundosalud/rss/portada.xml'),
+    (u'Solidaridad', u'http://estaticos.elmundo.es/elmundo/rss/solidaridad.xml'),
+    (u'Su vivienda', u'http://estaticos.elmundo.es/elmundo/rss/suvivienda.xml'),
+    (u'Motor', u'http://estaticos.elmundo.es/elmundodeporte/rss/motor.xml'),
+    (u'Madrid', u'http://estaticos.elmundo.es/elmundo/rss/madrid.xml'),
+    (u'Barcelona', u'http://estaticos.elmundo.es/elmundo/rss/barcelona.xml'),
+    (u'Pa\xeds Vasco', u'http://estaticos.elmundo.es/elmundo/rss/paisvasco.xml'),
+    (u'Baleares', u'http://estaticos.elmundo.es/elmundo/rss/baleares.xml'),
+    (u'Castilla y Le\xf3n', u'http://estaticos.elmundo.es/elmundo/rss/castillayleon.xml'),
+    (u'Valladolid', u'http://estaticos.elmundo.es/elmundo/rss/valladolid.xml'),
+    (u'Valencia', u'http://estaticos.elmundo.es/elmundo/rss/valencia.xml'),
+    (u'Alicante', u'http://estaticos.elmundo.es/elmundo/rss/alicante.xml'),
+    (u'Castell\xf3n', u'http://estaticos.elmundo.es/elmundo/rss/castellon.xml'),
+    (u'Andaluc\xeda', u'http://estaticos.elmundo.es/elmundo/rss/andalucia.xml'),
+    (u'Sevilla', u'http://estaticos.elmundo.es/elmundo/rss/andalucia_sevilla.xml'),
+    (u'M\xe1laga', u'http://estaticos.elmundo.es/elmundo/rss/andalucia_malaga.xml')
+    ]
+
+    def get_cover_url(self):
+        cover = self.masthead_url
+        st = time.localtime()
+        year = str(st.tm_year)
+        month = "%.2d" % st.tm_mon
+        day = "%.2d" % st.tm_mday
+        cover = 'http://img.kiosko.net/' + year + '/' + \
+            month + '/' + day + '/es/elmundo.750.jpg'
+        try:
+            self.browser.open(cover)
+        except:
+            self.log("\nPortada no disponible")
+        return cover
+
+    def get_obfuscated_article(self, url):
+        count = 0
+        tries = 5
+        html = None
+        while (count < tries):
+            try:
+                response = self.browser.open(url)
+                html = response.read()
+                count = tries
+            except:
+                print("Retrying download...")
+            count += 1
+        if html is not None:
+            tfile = PersistentTemporaryFile('_fa.html')
+            tfile.write(html)
+            tfile.close()
+            self.temp_files.append(tfile)
+            return tfile.name
+        return None
+
+    def image_url_processor(self, baseurl, url):
+        if url.startswith('//'):
+            return 'http:' + url
+        if url.startswith('file://'):
+            return url.replace('file://', 'http://')
+        return url

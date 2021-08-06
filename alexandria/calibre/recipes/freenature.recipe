@@ -1,0 +1,37 @@
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class NatureNews(BasicNewsRecipe):
+    title = u'Nature News'
+    language = 'en'
+    __author__ = 'Kovid Goyal'
+    oldest_article = 31  # days
+    remove_empty_feeds = True
+    max_articles_per_feed = 50
+
+    no_stylesheets = True
+    use_embedded_content = False
+    remove_javascript = True
+    keep_only_tags = [
+        classes('container-type-article'),
+    ]
+    remove_tags = [
+        dict(id='related-articles'),
+        classes('u-hide-print hide-print visually-hidden'),
+        dict(name=['meta', 'link', 'source']),
+    ]
+
+    # News and comments
+    feeds = [(u'Nature News', 'http://feeds.nature.com/nature/rss/current')]
+
+    def preprocess_html(self, soup):
+        for img in soup.findAll('img', src=lambda x: x and x.startswith('//')):
+            img['src'] = 'https:' + img['src']
+            print(img)
+        return soup

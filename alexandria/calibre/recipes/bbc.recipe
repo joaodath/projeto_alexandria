@@ -1,0 +1,278 @@
+#!/usr/bin/env python
+# vim:fileencoding=utf-8
+# License: GPLv3 Copyright: 2020, Kovid Goyal <kovid at kovidgoyal.net>
+
+import json
+
+from calibre import prepare_string_for_xml
+from calibre.web.feeds.recipes import BasicNewsRecipe
+
+
+# Article JSON parser {{{
+def serialize_image(block):
+    yield '<div>'
+    block = block['model']
+    media = block['media']
+    alt = prepare_string_for_xml(media.get('alt') or '', True)
+    for q in ('originalSrc', 'src'):
+        if q in media:
+            src = prepare_string_for_xml(media[q])
+            break
+    else:
+        raise ValueError('No src found in media block: {}'.format(media))
+    yield '<img src="{}" alt="{}"/>'.format(src, alt)
+    caption = block.get('caption')
+    if caption:
+        yield '<div>{}</div>'.format(prepare_string_for_xml(caption))
+    yield '</div>'
+
+
+def block_tag(name, generator):
+    yield '<' + name + '>'
+    yield from generator
+    yield '</' + name + '>'
+
+
+def serialize_paragraph(block):
+    block = block['model']
+    for x in block['blocks']:
+        xt = x['type']
+        if xt == 'fragment':
+            styles = []
+            model = x['model']
+            for attr in model['attributes']:
+                if attr == 'bold':
+                    styles.append('font-weight: bold')
+                elif attr in ('italic', 'italics'):
+                    styles.append('font-style: italic')
+            if styles:
+                prefix = '<span style="{}">'.format('; '.join(styles))
+                suffix = '</span>'
+            else:
+                prefix = suffix = ''
+            yield prefix + prepare_string_for_xml(model['text']) + suffix
+        elif xt == 'urlLink':
+            model = x['model']
+            yield '<a href="{}">{}</a>'.format(prepare_string_for_xml(model['locator'], True), prepare_string_for_xml(model['text']))
+
+
+def serialize_list(block):
+    for x in block['model']['blocks']:
+        if x['type'] == 'listItem':
+            yield from block_tag('li', serialize_paragraph(x))
+
+
+def serialize_text(block):
+    block = block['model']
+    for x in block['blocks']:
+        xt = x['type']
+        if xt == 'paragraph':
+            yield from block_tag('p', serialize_paragraph(x))
+        elif xt == 'unorderedList':
+            yield from block_tag('ul', serialize_list(x))
+        elif xt == 'orderedList':
+            yield from block_tag('ol', serialize_list(x))
+        else:
+            raise KeyError('Unknown block type: ' + x['type'])
+
+
+def serialize_contributor(contributor):
+    if 'title' in contributor:
+        yield '<h3>' + prepare_string_for_xml(contributor['title']) + '</h3>'
+    if 'subtitle' in contributor:
+        yield '<div>' + prepare_string_for_xml(contributor['subtitle']) + '</div>'
+
+
+def parse_article_json(root, abort_article):
+    data = root['data']
+    has_media_experience = False
+    for key in data:
+        if key.startswith('article?'):
+            article = data[key]['data']
+            break
+        elif key.startswith('media-experience?'):
+            has_media_experience = True
+    else:
+        if has_media_experience:
+            abort_article('Skipping video article')
+            return
+        raise KeyError('No article found in data keys: {}'.format(data.keys()))
+    lines = []
+    if article.get('headline'):
+        lines.append('<h1>{}</h1>'.format(prepare_string_for_xml(article['headline'])))
+    if article.get('contributor'):
+        lines.extend(serialize_contributor(article['contributor']))
+    for block in article['blocks']:
+        bt = block.get('type')
+        if bt == 'image':
+            lines.extend(serialize_image(block))
+        elif bt == 'text':
+            lines.extend(serialize_text(block))
+    return '<html><body id="main-content">' + '\n'.join(lines) + '</body></html>'
+# }}}
+
+
+class BBCNews(BasicNewsRecipe):
+
+    # Select / de-select the feeds you want in your ebook.
+    feeds = [
+        ("News Home", "https://feeds.bbci.co.uk/news/rss.xml"),
+        ("UK", "https://feeds.bbci.co.uk/news/uk/rss.xml"),
+        ("World", "https://feeds.bbci.co.uk/news/world/rss.xml"),
+        # ("England", "https://feeds.bbci.co.uk/news/england/rss.xml"),
+        # ("Scotland", "https://feeds.bbci.co.uk/news/scotland/rss.xml"),
+        # ("Wales", "https://feeds.bbci.co.uk/news/wales/rss.xml"),
+        # ("N. Ireland", "https://feeds.bbci.co.uk/news/northern_ireland/rss.xml"),
+        # ("Africa", "https://feeds.bbci.co.uk/news/world/africa/rss.xml"),
+        # ("Asia", "https://feeds.bbci.co.uk/news/world/asia/rss.xml"),
+        # ("Europe", "https://feeds.bbci.co.uk/news/world/europe/rss.xml"),
+        # ("Latin America", "https://feeds.bbci.co.uk/news/world/latin_america/rss.xml"),
+        # ("Middle East", "https://feeds.bbci.co.uk/news/world/middle_east/rss.xml"),
+        ("US & Canada", "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml"),
+        ("Politics", "https://feeds.bbci.co.uk/news/politics/rss.xml"),
+        ("Science/Environment",
+         "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml"),
+        ("Technology", "https://feeds.bbci.co.uk/news/technology/rss.xml"),
+        ("Magazine", "https://feeds.bbci.co.uk/news/magazine/rss.xml"),
+        ("Entertainment/Arts",
+         "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml"),
+        # ("Health", "https://feeds.bbci.co.uk/news/health/rss.xml"),
+        # ("Education/Family", "https://feeds.bbci.co.uk/news/education/rss.xml"),
+        ("Business", "https://feeds.bbci.co.uk/news/business/rss.xml"),
+        ("Special Reports", "https://feeds.bbci.co.uk/news/special_reports/rss.xml"),
+        ("Also in the News", "https://feeds.bbci.co.uk/news/also_in_the_news/rss.xml"),
+        # ("Newsbeat", "https://www.bbc.co.uk/newsbeat/rss.xml"),
+        # ("Click", "https://newsrss.bbc.co.uk/rss/newsonline_uk_edition/programmes/click_online/rss.xml"),
+        # ("Blog: Mark D'Arcy (Parliamentary Correspondent)", "https://feeds.bbci.co.uk/news/correspondents/markdarcy/rss.sxml"),
+        # ("Blog: Robert Peston (Business Editor)", "https://feeds.bbci.co.uk/news/correspondents/robertpeston/rss.sxml"),
+        # ("Blog: Stephanie Flanders (Economics Editor)", "https://feeds.bbci.co.uk/news/correspondents/stephanieflanders/rss.sxml"),
+        ("Sport Front Page",
+         "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/front_page/rss.xml"),
+        # ("Football", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/football/rss.xml"),
+        # ("Cricket", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/cricket/rss.xml"),
+        # ("Rugby Union", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/rugby_union/rss.xml"),
+        # ("Rugby League", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/rugby_league/rss.xml"),
+        # ("Tennis", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/tennis/rss.xml"),
+        # ("Golf", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/golf/rss.xml"),
+        # ("Motorsport", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/motorsport/rss.xml"),
+        # ("Boxing", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/boxing/rss.xml"),
+        # ("Athletics", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/athletics/rss.xml"),
+        # ("Snooker", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/other_sports/snooker/rss.xml"),
+        # ("Horse Racing", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/other_sports/horse_racing/rss.xml"),
+        # ("Cycling", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/other_sports/cycling/rss.xml"),
+        # ("Disability Sport", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/other_sports/disability_sport/rss.xml"),
+        # ("Other Sport", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/other_sports/rss.xml"),
+        # ("Olympics 2012", "https://newsrss.bbc.co.uk/rss/sportonline_uk_edition/other_sports/olympics_2012/rss.xml"),
+        # ("N. Ireland Politics", "https://feeds.bbci.co.uk/news/northern_ireland/northern_ireland_politics/rss.xml"),
+        # ("Scotland Politics", "https://feeds.bbci.co.uk/news/scotland/scotland_politics/rss.xml"),
+        # ("Scotland Business", "https://feeds.bbci.co.uk/news/scotland/scotland_business/rss.xml"),
+        # ("E. Scotland, Edinburgh & Fife", "https://feeds.bbci.co.uk/news/scotland/edinburgh_east_and_fife/rss.xml"),
+        # ("W. Scotland & Glasgow", "https://feeds.bbci.co.uk/news/scotland/glasgow_and_west/rss.xml"),
+        # ("Highlands & Islands", "https://feeds.bbci.co.uk/news/scotland/highlands_and_islands/rss.xml"),
+        # ("NE. Scotland, Orkney & Shetland", "https://feeds.bbci.co.uk/news/scotland/north_east_orkney_and_shetland/rss.xml"),
+        # ("South Scotland", "https://feeds.bbci.co.uk/news/scotland/south_scotland/rss.xml"),
+        # ("Central Scotland & Tayside", "https://feeds.bbci.co.uk/news/scotland/tayside_and_central/rss.xml"),
+        # ("Wales Politics", "https://feeds.bbci.co.uk/news/wales/wales_politics/rss.xml"),
+        # ("NW. Wales", "https://feeds.bbci.co.uk/news/wales/north_west_wales/rss.xml"),
+        # ("NE. Wales", "https://feeds.bbci.co.uk/news/wales/north_east_wales/rss.xml"),
+        # ("Mid. Wales", "https://feeds.bbci.co.uk/news/wales/mid_wales/rss.xml"),
+        # ("SW. Wales", "https://feeds.bbci.co.uk/news/wales/south_west_wales/rss.xml"),
+        # ("SE. Wales", "https://feeds.bbci.co.uk/news/wales/south_east_wales/rss.xml"),
+        # ("Newyddion - News in Welsh", "https://feeds.bbci.co.uk/newyddion/rss.xml"),
+        # ("Gwleidyddiaeth", "https://feeds.bbci.co.uk/newyddion/gwleidyddiaeth/rss.xml"),
+        # ("Gogledd-Ddwyrain", "https://feeds.bbci.co.uk/newyddion/gogledd-ddwyrain/rss.xml"),
+        # ("Gogledd-Orllewin", "https://feeds.bbci.co.uk/newyddion/gogledd-orllewin/rss.xml"),
+        # ("Canolbarth", "https://feeds.bbci.co.uk/newyddion/canolbarth/rss.xml"),
+        # ("De-Ddwyrain", "https://feeds.bbci.co.uk/newyddion/de-ddwyrain/rss.xml"),
+        # ("De-Orllewin", "https://feeds.bbci.co.uk/newyddion/de-orllewin/rss.xml"),
+    ]
+
+    #    **** SELECT YOUR USER PREFERENCES ****
+
+    # Title to use for the ebook.
+    #
+    title = 'BBC News'
+
+    # A brief description for the ebook.
+    #
+    description = u'BBC web site ebook created using rss feeds.'
+
+    # The max number of articles which may be downloaded from each feed.
+    # I've never seen more than about 70 articles in a single feed in the
+    # BBC feeds.
+    #
+    max_articles_per_feed = 100
+
+    # The max age of articles which may be downloaded from each feed. This is
+    # specified in days - note fractions of days are allowed, Eg. 2.5 (2 and a
+    # half days). My default of 1.5 days is the last 36 hours, the point at
+    # which I've decided 'news' becomes 'old news', but be warned this is not
+    # so good for the blogs, technology, magazine, etc., and sports feeds.
+    # You may wish to extend this to 2-5 but watch out ebook creation time will
+    # increase as well. Setting this to 30 will get everything (AFAICT) as long
+    # as max_articles_per_feed remains set high (except for 'Click' which is
+    # v. low volume and its currently oldest article is 4th Feb 2011).
+    #
+    oldest_article = 1.5
+
+    # Number of simultaneous downloads. 20 is consistantly working fine on the
+    # BBC News feeds with no problems. Speeds things up from the defualt of 5.
+    # If you have a lot of feeds and/or have increased oldest_article above 2
+    # then you may wish to try increasing simultaneous_downloads to 25-30,
+    # Or, of course, if you are in a hurry. [I've not tried beyond 20.]
+    #
+    simultaneous_downloads = 20
+
+    # The format string for the date shown on the ebook's first page.
+    # List of all values: https://docs.python.org/library/time.html
+    # Default in news.py has a leading space so that's mirrored here.
+    # As with 'feeds' select/de-select by adding/removing the initial '#',
+    # only one timefmt should be selected, here's a few to choose from.
+    #
+    # [Fri, 14 Nov 2011] (Calibre default)
+    timefmt = ' [%a, %d %b %Y]'
+    # timefmt = ' [%a, %d %b %Y %H:%M]'       # [Fri, 14 Nov 2011 18:30]
+    # timefmt = ' [%a, %d %b %Y %I:%M %p]'    # [Fri, 14 Nov 2011 06:30 PM]
+    # timefmt = ' [%d %b %Y]'                 # [14 Nov 2011]
+    # timefmt = ' [%d %b %Y %H:%M]'           # [14 Nov 2011 18.30]
+    # timefmt = ' [%Y-%m-%d]'                 # [2011-11-14]
+    # timefmt = ' [%Y-%m-%d-%H-%M]'           # [2011-11-14-18-30]
+
+    #
+    #    **** IMPORTANT ****
+    #
+    #    DO NOT EDIT BELOW HERE UNLESS YOU KNOW WHAT YOU ARE DOING.
+    #
+    #    DO NOT EDIT BELOW HERE UNLESS YOU KNOW WHAT YOU ARE DOING.
+    #
+    #    I MEAN IT, YES I DO, ABSOLUTELY, AT YOU OWN RISK. :)
+    #
+    #    **** IMPORTANT ****
+    #
+
+    # Author of this recipe.
+    __author__ = 'Kovid Goyal'
+
+    # Specify English as the language of the RSS feeds (ISO-639 code).
+    language = 'en_GB'
+
+    # Set publisher and publication type.
+    publication_type = 'newspaper'
+    encoding = 'utf-8'
+    use_embedded_content = False
+
+    # Removes empty feeds - why keep them!?
+    remove_empty_feeds = True
+    ignore_duplicate_articles = {'title', 'url'}
+    resolve_internal_links = True
+
+    def preprocess_raw_html(self, raw_html, url):
+        q = '>window.__INITIAL_DATA__={'
+        idx = raw_html.find(q)
+        if idx < 0:
+            raise ValueError('Failed to find JSON')
+        data = raw_html[idx + len(q) - 1:]
+        idx = data.find('};</script>')
+        data = data[:idx+1]
+        root = json.loads(data)
+        return parse_article_json(root, self.abort_article)

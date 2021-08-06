@@ -1,0 +1,19 @@
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+class AdvancedUserRecipe1371743239(BasicNewsRecipe):
+    title = u'The Walrus Mag'
+    description = 'National general interest magazine about Canada and its place in the world'
+    language = 'en'
+    __author__ = 'Bert'
+    oldest_article = 34
+    max_articles_per_feed = 100
+    auto_cleanup = True
+
+    feeds = [(u'The Walrus Mag', u'https://thewalrus.ca/feed/')]
+
+    def get_article_url(self, article):
+        ans = BasicNewsRecipe.get_article_url(self, article)
+        if ans and ans.startswith('/'):
+            ans = 'https://thewalrus.ca' + ans
+        return ans

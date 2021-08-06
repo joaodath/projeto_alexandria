@@ -1,0 +1,182 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2020, Kovid Goyal <kovid at kovidgoyal.net>
+from __python__ import bound_methods, hash_literals
+
+
+def build_text_map():
+    node_list = v'[]'
+    flat_text = ''
+    ignored_tags = {
+        'style': True, 'script': True, 'noscript': True, 'title': True, 'meta': True, 'head': True, 'link': True, 'html': True,
+        'img': True
+    }
+    text_node_type = Node.TEXT_NODE
+    element_node_type = Node.ELEMENT_NODE
+
+    def process_node(node):
+        nonlocal flat_text
+        nt = node.nodeType
+        if nt is text_node_type:
+            text = node.nodeValue
+            if text and text.length:
+                node_list.push(v"{node: node, offset: flat_text.length, length: text.length}")
+                flat_text += text
+        elif nt is element_node_type:
+            if not node.hasChildNodes():
+                return
+            tag = node.tagName.toLowerCase()
+            if ignored_tags[tag]:
+                return
+            style = window.getComputedStyle(node)
+            if style.display is 'none' or style.visibility is 'hidden':
+                return
+            children = node.childNodes
+            for i in range(children.length):
+                process_node(v'children[i]')
+
+    process_node(document.body)
+    return {'timestamp': window.performance.now(), 'flat_text': flat_text, 'node_list': node_list}
+
+
+def index_for_node(node, node_list):
+    for entry in node_list:
+        if entry.node.isSameNode(node):
+            return entry.offset
+
+
+def tts_word_regex():
+    # Cf is Other, formatting, including soft hyphens zero-width joiners, etc
+    return /[\p{Letter}\p{Mark}\p{Number}\p{Punctuation}\p{Cf}]{1,50}/gu
+
+
+def tts_data(text_node, offset):
+    offset_in_flat_text = offset or 0
+    if not cache.text_map:
+        cache.text_map = build_text_map()
+    if text_node:
+        offset_in_flat_text += index_for_node(text_node, cache.text_map.node_list) or 0
+    match = None
+    first = True
+    last = None
+    marked_text = v'[]'
+    text = cache.text_map.flat_text[offset_in_flat_text:]
+    for v'match of text.matchAll(tts_word_regex())':
+        start = match.index
+        if first:
+            first = False
+            if start:
+                marked_text.push(text[:start])
+        elif start > last:
+            marked_text.push(text[last:start])
+
+        marked_text.push(start + offset_in_flat_text)
+        marked_text.push(match[0])
+        last = start + match[0].length
+    if last is None:
+        marked_text.push(text)
+    else:
+        trailer = text[last:]
+        if trailer:
+            marked_text.push(trailer)
+    return marked_text
+
+
+
+def find_node_for_index_binary(node_list, idx_in_flat_text, start):
+    # Do a binary search for idx
+    start = start or 0
+    end = node_list.length - 1
+    while start <= end:
+        mid = Math.floor((start + end)/2)
+        q = node_list[mid]
+        limit = q.offset + q.length
+        if q.offset <= idx_in_flat_text and limit > idx_in_flat_text:
+            start_node = q.node
+            start_offset = idx_in_flat_text - q.offset
+            return start_node, start_offset, mid
+        if limit <= idx_in_flat_text:
+            start = mid + 1
+        else:
+            end = mid - 1
+    return None, None, None
+
+
+def get_occurrence_data(node_list, start, end):
+    start_node, start_offset, start_pos = find_node_for_index_binary(node_list, start)
+    if start_node is not None:
+        end_node, end_offset, node_pos = find_node_for_index_binary(node_list, end, start_pos)
+        if end_node is not None:
+            return {
+                'start_node': start_node, 'start_offset': start_offset, 'start_pos': start_pos,
+                'end_node': end_node, 'end_offset': end_offset, 'end_pos': node_pos,
+            }
+
+
+def find_specific_occurrence(q, num, before_len, after_len, text_map, from_offset):
+    if not q or not q.length:
+        return
+    from_idx = from_offset or 0
+    flat_text = text_map.flat_text
+    match_num = -1
+    while True:
+        idx = flat_text.indexOf(q, from_idx)
+        if idx < 0:
+            break
+        match_num += 1
+        from_idx = idx + 1
+        if match_num < num:
+            continue
+        return get_occurrence_data(text_map.node_list, idx + before_len, idx + q.length - after_len)
+
+
+cache = {}
+
+
+def reset_find_caches():
+    nonlocal cache
+    cache = {}
+
+
+def select_find_result(match):
+    sel = window.getSelection()
+    try:
+        sel.setBaseAndExtent(match.start_node, match.start_offset, match.end_node, match.end_offset)
+    except:  # if offset is outside node
+        return False
+    return True
+
+
+def select_search_result(sr):
+    window.getSelection().removeAllRanges()
+    if not cache.text_map:
+        cache.text_map = build_text_map()
+    q = ''
+    before_len = after_len = 0
+    if sr.before:
+        q = sr.before[-15:]
+        before_len = q.length
+    q += sr.text
+    if sr.after:
+        after = sr.after[:15]
+        after_len = after.length
+        q += after
+    match = find_specific_occurrence(q, int(sr.index), before_len, after_len, cache.text_map, sr.from_offset)
+    if not match:
+        return False
+    return select_find_result(match)
+
+
+def select_tts_mark(idx_in_flat_text):
+    window.getSelection().removeAllRanges()
+    if not cache.text_map:
+        cache.text_map = build_text_map()
+    r = tts_word_regex()
+    r.lastIndex = idx_in_flat_text
+    match = v'r.exec(cache.text_map.flat_text)'
+    word_length = 5
+    if match:
+        word_length = match[0]?.length or 5
+    match = get_occurrence_data(cache.text_map.node_list, idx_in_flat_text, idx_in_flat_text + word_length)
+    if not match:
+        return False
+    return select_find_result(match)

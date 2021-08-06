@@ -1,0 +1,240 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2015, Kovid Goyal <kovid at kovidgoyal.net>
+from __python__ import hash_literals
+
+from ajax import encode_query
+from encodings import hexlify
+from book_list.theme import get_font_family
+
+
+is_ios = v'!!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform)'
+if !is_ios and v'!!navigator.platform' and window? and window.navigator.platform is 'MacIntel' and window.navigator.maxTouchPoints > 1:
+    # iPad Safari in desktop mode https://stackoverflow.com/questions/57765958/how-to-detect-ipad-and-ipad-os-version-in-ios-13-and-up
+    is_ios = True
+
+
+def default_context_menu_should_be_allowed(evt):
+    if evt.target and evt.target.tagName and evt.target.tagName.toLowerCase() in ('input', 'textarea'):
+        return True
+    return False
+
+
+def debounce(func, wait, immediate=False):
+    # Returns a function, that, as long as it continues to be invoked, will not
+    # be triggered. The function will be called after it stops being called for
+    # wait milliseconds. If `immediate` is True, trigger the function on the
+    # leading edge, instead of the trailing.
+    timeout = None
+    return def debounce_inner():  # noqa: unused-local
+        nonlocal timeout
+        context, args = this, arguments
+        def later():
+            nonlocal timeout
+            timeout = None
+            if not immediate:
+                func.apply(context, args)
+        call_now = immediate and not timeout
+        window.clearTimeout(timeout)
+        timeout = window.setTimeout(later, wait)
+        if call_now:
+            func.apply(context, args)
+
+if Object.assign:
+    copy_hash = def (obj):
+        return Object.assign({}, obj)
+else:
+    copy_hash = def (obj):
+        return {k:obj[k] for k in Object.keys(obj)}
+
+
+def parse_url_params(url=None, allow_multiple=False):
+    cache = parse_url_params.cache
+    url = url or window.location.href
+    if cache[url]:
+        return copy_hash(parse_url_params.cache[url])
+    qs = url.indexOf('#')
+    ans = {}
+    if qs < 0:
+        cache[url] = ans
+        return copy_hash(ans)
+    q = url.slice(qs + 1, (url.length + 1))
+    if not q:
+        cache[url] = ans
+        return copy_hash(ans)
+    pairs = q.replace(/\+/g, " ").split("&")
+    for pair in pairs:
+        key, val = pair.partition('=')[::2]
+        key, val = decodeURIComponent(key), decodeURIComponent(val)
+        if allow_multiple:
+            if ans[key] is undefined:
+                ans[key] = v'[]'
+            ans[key].append(val)
+        else:
+            ans[key] = val
+    cache[url] = ans
+    return copy_hash(ans)
+parse_url_params.cache = {}
+
+
+def encode_query_with_path(query, path):
+    path = path or window.location.pathname
+    return path + encode_query(query, '#')
+
+
+def full_screen_supported(elem):
+    elem = elem or document.documentElement
+    if elem.requestFullScreen or elem.webkitRequestFullScreen or elem.mozRequestFullScreen:
+        return True
+    return False
+
+
+def request_full_screen(elem):
+    elem = elem or document.documentElement
+    options = {'navigationUI': 'hide'}
+    if elem.requestFullScreen:
+        elem.requestFullScreen(options)
+    elif elem.webkitRequestFullScreen:
+        elem.webkitRequestFullScreen()
+    elif elem.mozRequestFullScreen:
+        elem.mozRequestFullScreen()
+
+
+def full_screen_element():
+    return document.fullscreenElement or document.webkitFullscreenElement or document.mozFullScreenElement or document.msFullscreenElement
+
+
+_roman = list(zip(
+[1000,900,500,400,100,90,50,40,10,9,5,4,1],
+["M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"]
+))
+
+def roman(num):
+    if num <= 0 or num >= 4000 or int(num) is not num:
+        return num + ''
+    result = []
+    for d, r in _roman:
+        while num >= d:
+            result.append(r)
+            num -= d
+    return result.join('')
+
+def fmt_sidx(val, fmt='{:.2f}', use_roman=True):
+    if val is undefined or val is None or val is '':
+        return '1'
+    if int(val) is float(val):
+        if use_roman:
+            return roman(val)
+        return int(val) + ''
+    return fmt.format(float(val))
+
+def rating_to_stars(value, allow_half_stars=False, star='★', half='⯨'):
+    r = max(0, min(int(value or 0), 10))
+    if allow_half_stars:
+        ans = star.repeat(r // 2)
+        if r % 2:
+            ans += half
+    else:
+        ans = star.repeat(int(r/2.0))
+    return ans
+
+def human_readable(size, sep=' '):
+    divisor, suffix = 1, "B"
+    for i, candidate in enumerate(('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB')):
+        if size < (1 << ((i + 1) * 10)):
+            divisor, suffix = (1 << (i * 10)), candidate
+            break
+    size = (float(size)/divisor) + ''
+    pos = size.find(".")
+    if pos > -1:
+        size = size[:pos + 2]
+    if size.endswith('.0'):
+        size = size[:-2]
+    return size + sep + suffix
+
+def document_height():
+    html = document.documentElement
+    return max(document.body.scrollHeight, document.body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight)
+
+def document_width():
+    html = document.documentElement
+    return max(document.body.scrollWidth, document.body.offsetWidth, html.clientWidth, html.scrollWidth, html.offsetWidth)
+
+_data_ns = None
+
+def data_ns(name):
+    nonlocal _data_ns
+    if _data_ns is None:
+        rand = Uint8Array(12)
+        window.crypto.getRandomValues(rand)
+        _data_ns = 'data-' + hexlify(rand) + '-'
+    return _data_ns + name
+
+def get_elem_data(elem, name, defval):
+    ans = elem.getAttribute(data_ns(name))
+    if ans is None:
+        return defval ? None
+    return JSON.parse(ans)
+
+def set_elem_data(elem, name, val):
+    elem.setAttribute(data_ns(name), JSON.stringify(val))
+
+def username_key(username):
+    return ('u' if username else 'n') + username
+
+def html_escape(text):
+    repl = { '&': "&amp;", '"': "&quot;", '<': "&lt;", '>': "&gt;" }
+    return String.prototype.replace.call(text, /[&"<>]/g, def (c): return repl[c];)
+
+def uniq(vals):
+    # Remove all duplicates from vals, while preserving order
+    ans = v'[]'
+    seen = {}
+    for x in vals:
+        if not seen[x]:
+            seen[x] = True
+            ans.push(x)
+    return ans
+
+def conditional_timeout(elem_id, timeout, func):
+    def ct_impl():
+        elem = document.getElementById(elem_id)
+        if elem:
+            func.call(elem)
+    window.setTimeout(ct_impl, timeout)
+
+
+def simple_markup(html):
+    html = (html or '').replace(/\uffff/g, '').replace(
+        /<\s*(\/?[a-zA-Z1-6]+)[^>]*>/g, def (match, tag):
+            tag = tag.toLowerCase()
+            is_closing = '/' if tag[0] is '/' else ''
+            if is_closing:
+                tag = tag[1:]
+            if simple_markup.allowed_tags.indexOf(tag) < 0:
+                tag = 'span'
+            return f'\uffff{is_closing}{tag}\uffff'
+    )
+    div = document.createElement('b')
+    div.textContent = html
+    html = div.innerHTML
+    return html.replace(/\uffff(\/?[a-z1-6]+)\uffff/g, '<$1>')
+simple_markup.allowed_tags = v"'a|b|i|br|hr|h1|h2|h3|h4|h5|h6|div|em|strong|span'.split('|')"
+
+
+def safe_set_inner_html(elem, html):
+    elem.innerHTML = simple_markup(html)
+    return elem
+
+
+def sandboxed_html(html, style, sandbox):
+    ans = document.createElement('iframe')
+    ans.setAttribute('sandbox', sandbox or '')
+    ans.setAttribute('seamless', '')
+    ans.style.width = '100%'
+    html = html or ''
+    css = 'html, body { margin: 0; padding: 0; font-family: __FONT__ } p:first-child { margin-top: 0; padding-top: 0; -webkit-margin-before: 0 }'.replace('__FONT__', get_font_family())
+    css += style or ''
+    final_html = f'<!DOCTYPE html><html><head><style>{css}</style></head><body>{html}</body></html>'
+    # Microsoft Edge does not support srcdoc not does it work using a data URI.
+    ans.srcdoc = final_html
+    return ans

@@ -14,13 +14,13 @@ class Author(db.Model):
     book = db.relationship('Book', back_populates='author')
     
     def __init__(self, name_author):
-        self.name = name_author
+        self.name_author = name_author
         
         
     
     # forma bonita de mostrar o nome do registro
     def __repr__(self):
-        return f'<Author {self.name}>'
+        return f'<Author {self.name_author}>'
     
 
 class Book(db.Model):
@@ -32,7 +32,7 @@ class Book(db.Model):
     isbn = db.Column(db.String(255))
     synopsis = db.Column(db.Text)
     release_year = db.Column(db.Text)
-    rating = db.Column(db.Float(10, 2))
+    rating = db.Column(db.Float(2, 2)) # rever casas decimais
     genre = db.Column(db.String(100))
     pages = db.Column(db.Integer)
     image = db.Column(db.String)

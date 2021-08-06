@@ -1,0 +1,43 @@
+# -*- mode: python -*-
+# -*- coding: utf-8 -*-
+
+__license__ = 'GPL v3'
+__copyright__ = '2018, Darko Miletic <darko.miletic at gmail.com>'
+'''
+www.newstatesman.com
+'''
+
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+class NewStatesman(BasicNewsRecipe):
+    title = 'New Statesman'
+    __author__ = 'Darko Miletic'
+    description = "Current affairs, world politics, the arts and more from Britain's award-winning magazine"
+    publisher = 'New Statesman Media'
+    category = 'New Statesman magazine, International Politics, British Politics, Britain, UK, Tony Blair, Gordon Brown, Geoffrey Robinson, David Cameron, Sir Menzies Campbell, Labour, Conservative, Liberal Democrat, UK Politics, House of Commons, House of Lords, Legislation, politics magazine'  # noqa
+    oldest_article = 30
+    no_stylesheets = True
+    encoding = 'utf8'
+    use_embedded_content = True
+    language = 'en_GB'
+    remove_empty_feeds = True
+    publication_type = 'magazine'
+    auto_cleanup = True
+    resolve_internal_links = True
+    ignore_duplicate_articles = {'url'}
+    masthead_url = 'https://www.newstatesman.com/sites/all/themes/creative-responsive-theme/images/newstatesman_logo@2x.png'
+
+    extra_css = """
+        body{font-family: serif}
+        img{margin-top:1em; margin-bottom: 1em; display:block}
+    """
+
+    conversion_options = {
+        'comment': description,
+        'tags': category,
+        'publisher': publisher,
+        'language': language
+    }
+
+    feeds = [(u'Articles', u'https://www.newstatesman.com/feeds/site_feed.rss')]

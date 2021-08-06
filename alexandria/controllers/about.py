@@ -6,6 +6,6 @@ from alexandria.run import app, db
 
 
 @app.route('/sobre', methods=['GET', 'POST'])
-def about():
+def sobre():
     # codigo 
-    return render_template('about.html')
+    return render_template('quemsomos.html')

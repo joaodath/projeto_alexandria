@@ -1,0 +1,136 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "EBOOK-POLISH" "1" "juli 30, 2021" "5.24.0" "calibre"
+.SH NAME
+ebook-polish \- ebook-polish
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ebook\-polish [options] input_file [output_file]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Polera böcker handlar om att sätta glans av perfektion på
+dina noggrant utformade e\-böcker.
+.sp
+Polering försöker minimera ändringarna i den interna koden av din e\-bok.
+Till skillnad från konvertering, plattar den inte ut CSS, byter namn på filer, ändrar teckenstorlekar, justerar marginaler o.s.v. Varje åtgärd utför endast minsta uppsättning av ändringar som krävs för önskad effekt.
+.sp
+Du bör använda det här verktyget som det sista steget i din e\-bokskaparprocess.
+.sp
+Observera att polering endast fungerar på filer av formaten AZW3 eller EPUB.
+.sp
+När du skickar argument till \fBebook\-polish\fP som har mellanslag i dem, bifoga argumenten i citattecken. Till exempel: "/some path/with spaces"
+.SH [ALTERNATIV]
+.INDENT 0.0
+.TP
+.B \-\-add\-soft\-hyphens, \-H
+Lägg till mjuka bindestreck till alla ord i boken. Detta gör att boken kan göras bättre när texten är justerad, i läsare som inte stöder avstavning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-compress\-images, \-i
+Komprimerar förlustfritt bilder i boken, för att minska filstorleken, utan att påverka bildkvaliteten.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-cover, \-c
+Sökvägen till en omslagsbild. Ändrar omslag angivit i boken. Om inget omslag finns, eller omslaget inte är korrekt identifierade, infogas ett nytt omslag.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-embed\-fonts, \-e
+Bädda in alla teckensnitt som refereras i dokumentet och som inte redan är inbäddade. Detta kommer att skanna din dator efter teckensnitt, och om de finns, kommer de att  bäddas in i dokumentet. Vänligen se till att du har rätt licens för att bädda in teckensnitt som används i detta dokument.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-help, \-h
+visa denna hjälptext och avsluta
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-jacket, \-j
+Infoga ett \fB"\fPbokomslag\fB"\fP i början av boken som innehåller  alla om bokens metadata som titel, taggar, författare, serier, kommentarer,  o.s.v. Alla tidigare bokomslag kommer att ersättas.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-opf, \-o
+Sökväg till en OPF\-fil. Metadata i boken uppdateras från OPF\-filen.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-jacket
+Ta bort tidigare infogat bokomslag.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-soft\-hyphens
+Ta bort mjuka bindestreck från all text i boken.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-unused\-css, \-u
+Ta bort alla oanvända CSS\-regler från formatmallar och <format>taggar. Vissa böcker  skapade från produktionsmallar kan ha ett stort antal extra CSS\-regler  som inte matchar något av det faktiska innehållet. Dessa extra regler kan slöa ner läsare  när den behöver tolka dem alla.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-smarten\-punctuation, \-p
+Konvertera streck, ellipser, citationstecken, flertal bindestreck o.s.v. för oformaterad text i deras typografiskt korrekta motsvarigheter. Observera att algoritmen ibland kan generera felaktiga resultat, särskilt när enstaka citat i början av sammandragningar är inblandade.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-subset\-fonts, \-f
+Underuppsätta teckensnitt innebär att man reducerar ett inbäddat teckensnitt så att det endast innehåller de tecken som används från det teckensnittet i boken. Detta minskar storleken på teckensnittsfilerna (halvering av teckensnittsfilstorlekar är vanligt). Till exempel, om boken använder ett specifikt teckensnitt för rubriker, kommer underuppsättningen att minska teckensnittet så att det endast innehåller de tecken som finns i själva rubrikerna i boken. Eller om boken bäddar in de fet och kursiva versionerna av ett teckensnitt, men fet och kursiv text är relativt sällsynt, eller helt saknas, kan fetstil och kursiv teckensnitt antingen reduceras till bara några få tecken eller tas bort helt. Den enda nackdelen med att underuppsätta teckensnitt är att om du vid ett senare tillfälle bestämmer dig för att lägga till mer text i dina böcker kanske den nyligen tillagda texten inte täcks av teckensnittet för delmängden.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-upgrade\-book, \-U
+Uppgradera bokens interna strukturer, om möjligt. Till exempel uppgraderar EPUB 2 böcker till EPUB 3 böcker.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-verbose
+Producera mera utförligt utmatning, användbart för felsökning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-version
+visar programmets versionsnummer och avsluta
+.UNINDENT
+.SH AUTHOR
+Kovid Goyal
+.SH COPYRIGHT
+Kovid Goyal
+.\" Generated by docutils manpage writer.
+.
