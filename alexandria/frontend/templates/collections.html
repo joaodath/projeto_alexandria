@@ -1,38 +1,45 @@
 {% extends "base.html" %}
-{% block title %}Acervo - Alexandria{% endblock %} 
+{% block title %}Acervo - Alexandria{% endblock %}
 
 {% block content %}
-<table>
-        
-    <thead>
-        <tr>
-            <th>Nome Autor</th>
-            <th>Sobrenome Autor</th>
-            <th>ISBN</th>
-            <th>Nome do Livro</th>
-            <th>Ano da Publicação</th>
-            <th>Release</th>
-            <th>Nota</th>
-            <th>Páginas</th>
-            <th>Imagem</th>
-            <th>Link de Download</th>
-            <th>Link de Compra</th>
-            <th>Ações</th>
-        </tr>
+<section class="card-center extra-margin">
+    <!-- title -->
+    <div class="parte-superior">
+        <div class="titulo">
+            <p>Bem vindes</p>
+            <h1>Biblioteca do</h1>
+        </div>
+        <button class="btn-o">Editar</button>
+    </div>
+    <!-- bottom part -->
+    <div class="card-wrapper">
+        <!-- cards -->
+        <!-- single card -->
+        <article class="">
+            <img src="https://images-na.ssl-images-amazon.com/images/I/41L2ffvMKIL._SX342_SY445_QL70_ML2_.jpg" alt="">
+            <h2>Torto Arado</h2>
+            <aside><p>Itamar Vieira Júnior</p> <p>Ficção/Literatura/Romance</p></aside>
+            <p class="descricao">Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus cupiditate iste quae aspernatur dicta totam alias beatae omnis illo architecto!</p>
+            <span class="acoes"><a class="btn-o"href="">editar</a><a class="btn-o btn-transparent"href="">remover</a></span>
+        </article>
+        <!-- card info -->
+        <article class="">
+            <img src="https://images-na.ssl-images-amazon.com/images/I/41L2ffvMKIL._SX342_SY445_QL70_ML2_.jpg" alt="">
+            <h2>Torto Arado</h2>
+            <aside><p>Itamar Vieira Júnior</p> <p>Ficção/Literatura/Romance</p></aside>
+            <p class="descricao">Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus cupiditate iste quae aspernatur dicta totam alias beatae omnis illo architecto!</p>
+            <span class="acoes"><a class="btn-o"href="">editar</a><a class="btn-o btn-transparent"href="">remover</a></span>
+        </article>
+        <!-- card info -->
+        <article class=>
+            <img src="https://images-na.ssl-images-amazon.com/images/I/41L2ffvMKIL._SX342_SY445_QL70_ML2_.jpg" alt="">
+            <h2>Torto Arado</h2>
+            <aside><p>Itamar Vieira Júnior</p> <p>Ficção/Literatura/Romance</p></aside>
+            <p class="descricao">Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus cupiditate iste quae aspernatur dicta totam alias beatae omnis illo architecto!</p>
+            <span class="acoes"><a class="btn-o"href="">editar</a><a class="btn-o btn-transparent"href="">remover</a></span>
+        </article>
+    </div>
     
-    </thead>
-    <tbody>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-    </tbody>
-</table>
+</section>
+
 {% endblock %}
