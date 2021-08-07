@@ -22,21 +22,44 @@
     </thead>
     <tbody>
         <tr>
-            {%for b in book%}
-            <td>{{b.name_author}}</td>
-            <td>{{b.name_book}}</td>
-            <td>{{b.synopsis}}</td>
-            <td>{{b.rating}}</td>
-            <td>{{b.genre}}</td>
-            <td>{{b.pages}}</td>
+            {% for book in book.items %}
+            <td>{{book.name}}</td>
+            <td>{{book.author}}</td>
+            <td>{{book.publisher}}</td>
+            
+
             <td>
-                <a href="/deletar/{{b.id_book}}" type="text">Excluir</a>
+                <a href="/deletar/{{book.id}}" type="text">Excluir</a>
             </td>
+
             <td>
-                <a href="/editar-livro/{{b.id_book}}" type="text">Editar</a>
+                <a href="/editar-livro/{{book.id}}" type="text">Editar</a>
             </td>
             {%endfor%}
         </tr>
+        
     </tbody>
 </table>
+
+ {% for page_num in book.iter_pages(left_edge=1, right_edge=1,
+    left_current=2, right_current=2) %} {% if page_num %} {% if book.page ==
+    page_num %}
+    <a
+      class=""
+      href="{{ url_for('acervo', page=page_num) }}"
+      >{{ page_num }}</a
+    >
+    {% else %}
+    <a
+      class=""
+      href="{{ url_for('acervo', page=page_num) }}"
+      >{{ page_num }}</a
+    >
+        {% endif %} 
+        {% else %} 
+        . . . 
+        {% endif %} 
+{% endfor %}
+
+
 {% endblock %}

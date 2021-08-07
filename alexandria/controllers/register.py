@@ -1,4 +1,5 @@
 from flask import render_template, redirect, request
+from flask import url_for
 
 from alexandria.run import app, db
 
@@ -7,16 +8,14 @@ from alexandria.models.schemas import Book
 
 @app.route('/cadastrar', methods=['GET', 'POST'])
 def cadastrar():
-    # codigo 
     if request.method == 'POST':
-        author = Book(
-            request.form['book'],
-            request.form['author'],
-            'na mão',
+        book = Book(
+            request.form['name-book'],
+            request.form['name-author']
             )
-        db.session.add(author)
+        db.session.add(book)
         db.session.commit()
-        return redirect('/acervo')
+        return redirect(url_for('cadastrar'))
     
     return render_template('cadastrar.html')
 

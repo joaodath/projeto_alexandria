@@ -4,11 +4,15 @@
 {% block content %}
 <!-- Insira os códigos específicos do editar-livro.html aqui -->
 
-<form action="/editar-livro/{{book.id_book}}" method="POST">
-    <label for="">Nome Autor:</label>
-    <input type="text" id="author" name="author">
+<form action="/editar-livro/{{book.id}}" method="POST">
     <label for="">Nome do Livro:</label>
-    <input type="text" id="book" name="book" required value="{{book.name_book}}">
+    <input type="text" id="book" name="book" required value="{{book.name}}">
+
+    <label for="">Nome do Autor:</label>
+    <input type="text" id="author" name="author" required value="{{book.author}}">
+
+    <label for="">Nome da Editora:</label>
+    <input type="text" id="publisher" name="publisher" required value="{{book.publisher}}">
     <button type="submit">Confirmar</button>
 </form>
 
