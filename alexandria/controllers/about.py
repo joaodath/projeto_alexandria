@@ -8,4 +8,4 @@ from alexandria.run import app, db
 @app.route('/sobre', methods=['GET', 'POST'])
 def sobre():
     # codigo 
-    return render_template('quemsomos.html')
+    return render_template('about.html')
