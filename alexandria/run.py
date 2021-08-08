@@ -5,7 +5,7 @@ from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
 
-app = Flask(__name__, template_folder='../frontend/templates')
+app = Flask(__name__, template_folder='./frontend/templates',static_folder='./frontend/static')
 
 # recebendo as configurações do banco de dados
 app.config.from_object('config')
@@ -32,4 +32,5 @@ from .controllers import book_details
 from .controllers import collection
 from .controllers import edit
 from .controllers import register
+from .controllers import delete
 

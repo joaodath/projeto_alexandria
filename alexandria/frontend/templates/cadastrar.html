@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Cadastrar novo livro - Alexandria{% endblock %} 
+
+{% block content %}
+<!-- Insira os códigos específicos do cadastrar.html aqui -->
+
+<form action="/cadastrar" method="POST">
+    <label for="">Nome do Livro:</label>
+    <input type="text" id="name-book" name="name-book">
+
+    <label for="">Nome do Autor:</label>
+    <input type="text" id="name-author" name="name-author">
+
+    <button type="submit">Cadastrar</button>
+</form>
+
+{% endblock %}

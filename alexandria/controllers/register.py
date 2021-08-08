@@ -1,39 +1,21 @@
 from flask import render_template, redirect, request
-from flask.helpers import url_for
+from flask import url_for
 
 from alexandria.run import app, db
 
-from alexandria.models.schemas import Author, Book
+from alexandria.models.schemas import Book
 
 
-@app.route('/registrarlivro', methods=['GET', 'POST'])
-def register():
-    # codigo 
-    if request.method == 'POST':
-        author = Author(
-            name = request.form['name-author'],
-        ) 
-        db.session.add(author)
-        db.session.commit() 
-        
+@app.route('/cadastrar', methods=['GET', 'POST'])
+def cadastrar():
     if request.method == 'POST':
         book = Book(
             request.form['name-book'],
-            request.form['year-published'],
-            request.form['synopsis'],
-            request.form['release'],
-            request.form['rating'],
-            request.form['genre'],
-            request.form['pages'],
-            request.form['image'],
-            request.form['download'],
-            request.form['buy'],
-        )
-        db.session.add(book) 
+            request.form['name-author']
+            )
+        db.session.add(book)
         db.session.commit()
-        return redirect(url_for('acervo'))
+        return redirect(url_for('cadastrar'))
     
-    return render_template('register.html')
+    return render_template('cadastrar.html')
 
-
-    

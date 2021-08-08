@@ -1,7 +1,7 @@
 
 from flask import render_template
 
-from alexandria.run import app, db
+from alexandria.run import app
 
 
 
