@@ -15,29 +15,16 @@
     <div class="card-wrapper">
         <!-- cards -->
         <!-- single card -->
+        {%for b in book%}
         <article class="">
             <img src="https://images-na.ssl-images-amazon.com/images/I/41L2ffvMKIL._SX342_SY445_QL70_ML2_.jpg" alt="">
-            <h2>Torto Arado</h2>
-            <aside><p>Itamar Vieira Júnior</p> <p>Ficção/Literatura/Romance</p></aside>
-            <p class="descricao">Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus cupiditate iste quae aspernatur dicta totam alias beatae omnis illo architecto!</p>
-            <span class="acoes"><a class="btn-o"href="">editar</a><a class="btn-o btn-transparent"href="">remover</a></span>
+            <h2>{{b.name}}</h2>
+            <aside><p>{{b.author}}</p> <p>Ficção/Literatura/Romance</p></aside>
+            <p class="descricao">{{b.synopsis}}</p>
+            <span class="acoes"><a class="btn-o"href="/editar-livro/{{b.id}}">editar</a><a class="btn-o btn-transparent"href="">remover</a></span>
         </article>
+        {%endfor%}
         <!-- card info -->
-        <article class="">
-            <img src="https://images-na.ssl-images-amazon.com/images/I/41L2ffvMKIL._SX342_SY445_QL70_ML2_.jpg" alt="">
-            <h2>Torto Arado</h2>
-            <aside><p>Itamar Vieira Júnior</p> <p>Ficção/Literatura/Romance</p></aside>
-            <p class="descricao">Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus cupiditate iste quae aspernatur dicta totam alias beatae omnis illo architecto!</p>
-            <span class="acoes"><a class="btn-o"href="">editar</a><a class="btn-o btn-transparent"href="">remover</a></span>
-        </article>
-        <!-- card info -->
-        <article class=>
-            <img src="https://images-na.ssl-images-amazon.com/images/I/41L2ffvMKIL._SX342_SY445_QL70_ML2_.jpg" alt="">
-            <h2>Torto Arado</h2>
-            <aside><p>Itamar Vieira Júnior</p> <p>Ficção/Literatura/Romance</p></aside>
-            <p class="descricao">Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus cupiditate iste quae aspernatur dicta totam alias beatae omnis illo architecto!</p>
-            <span class="acoes"><a class="btn-o"href="">editar</a><a class="btn-o btn-transparent"href="">remover</a></span>
-        </article>
     </div>
     
 </section>
