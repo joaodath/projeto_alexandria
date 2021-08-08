@@ -8,10 +8,10 @@ from alexandria.models.schemas import Book
 def edit(id):
     book = Book.query.get(id)
     if request.method == 'POST':
-        book.name = request.form['name-book']
-        book.author = request.form['name-author']
+        book.name = request.form['book']
+        book.author = request.form['author']
         book.publisher = request.form['publisher']
         db.session.commit()
-        return redirect('/acervo')
+        return redirect('acervo')
     
     return render_template('edit.html', book=book)

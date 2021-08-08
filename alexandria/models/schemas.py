@@ -29,3 +29,4 @@ class Book(db.Model):
     
     def __repr__(self):
         return f'<Author {self.name}>'
+
