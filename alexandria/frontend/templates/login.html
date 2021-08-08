@@ -4,4 +4,18 @@
 {% block content %}
 <!-- Insira os códigos específicos do login.html aqui -->
 <!-- FruFru -->
+
+<form action="/cadastrar" method="POST">
+    <label for="">Nome:</label>
+    <input type="text" id="name" name="name">
+
+    <label for="">email</label>
+    <input type="text" id="email" name="email">
+
+    <label for="">Senha</label>
+    <input type="password" id="password" name="password">
+
+    <button type="submit">Cadastrar</button>
+</form>
+
 {% endblock %}

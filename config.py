@@ -16,6 +16,7 @@ SQLALCHEMY_DATABASE_URI='postgresql://yplcqsod:7zYLgQpctwTio0jipae_zPbJXb5x4lFg@
 # notificações SQLAlchemy
 SQLALCHEMY_TRACK_MODIFICATIONS=True
 
+SECRET_KEY='teste-senha'
 # Localhost SQLite3 
 # SQLALCHEMY_DATABASE_URI= 'sqlite:///' + os.path.join(basedir, 'alexandria.db')
 

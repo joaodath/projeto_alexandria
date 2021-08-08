@@ -1,6 +1,7 @@
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
@@ -12,13 +13,14 @@ app.config.from_object('config')
 
 # db recebe a instância de SQLAlchemy com parametro app
 db = SQLAlchemy(app)
+login_manager = LoginManager(app)
 
 # instancia que vai controlar as migrações do banco de dados
 migrate = Migrate(compare_type=True)
-migrate.init_app(app, db) # recebe a app e o banco
+migrate.init_app(app, db, login_manager) # recebe a app e o banco
 
 # controle de informação
-manager = Manager(app)
+manager = Manager(app,login_manager)
 manager.add_command('db', MigrateCommand)
 
 
@@ -33,4 +35,6 @@ from .controllers import collection
 from .controllers import edit
 from .controllers import register
 from .controllers import delete
+from .controllers import login
+from .controllers import signup
 
