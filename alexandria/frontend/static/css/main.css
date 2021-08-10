@@ -297,12 +297,26 @@ main {
 }
 
 .content-container {
-  display: block;
-  text-align: center;
-  flex-shrink: 1;
-  flex-wrap: wrap;
+  min-height: 60vh;
+  width: 100vw;
+  padding: 0 2rem;
 }
-
+.content-center{
+  display: flex;
+  height: 80vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+.content-center h2{
+  margin-left: -2rem;
+  margin-bottom: -10px;
+  font-size: 1.8rem;
+}
+.black-name{
+  color: #000;
+}
 .section-center {
 
   max-width: 1170px;
@@ -316,11 +330,17 @@ main {
 video {
   display: none;
 }
+.video-wrapper{
+  display: none;
+}
 
 @media screen and (min-width: 992px) {
   main {
     min-height: calc(100vh - 278.9px);
 
+  }
+  .content-container{
+    display: none;
   }
   video{
     display: block;
@@ -373,8 +393,8 @@ video {
     border: var(--primary-main);
   }
 
-  }
- 
+}
+
 
 
 .section-center h1 {
@@ -449,7 +469,26 @@ footer .mensagem{
   color: var(--white);
   padding: 0 0.5rem;
 }
-
+@media  screen and (max-width:992px) {
+  footer{
+    padding: 0;
+    text-align: center;
+    
+  }
+  
+  .footer-wrapper{
+    flex-direction:column;
+    align-items: center;
+    gap: 1rem 0;
+  }
+  footer img{
+    width:10rem;
+  }
+  footer .mensagem{
+    
+    width: 15rem;
+  }
+}
 .copyright {
   padding: 0.5rem;
   text-align: center;
@@ -586,6 +625,7 @@ footer .mensagem{
   font-size: 1.2rem;
   cursor: pointer;
   transition: var(--transition);
+  line-height: auto;
 
 }
 
@@ -662,9 +702,9 @@ span.acoes {
 
 .btn-transparent {
   background: none;
-  padding: 0;
   border: 1px solid var(--primary-main);
   color: var(--primary-main);
+  line-height:normal;
 }
 .acervo a{
   padding: 0.25rem 1rem;
@@ -926,6 +966,7 @@ padding-right: 1rem;
   gap: 1rem;
   text-align: center;
   font-weight: 500;
+}
 }
 
 
