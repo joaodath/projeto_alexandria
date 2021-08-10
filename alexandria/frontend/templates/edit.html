@@ -14,7 +14,7 @@
         </div>
         <div class="form">
             <h3>editar livro</h3>
-            <h1>Nome do livro</h1>
+            <h1>{{book.name}}</h1>
             <form action="/editar-livro/{{book.id}}" method="POST">
                 <label for="">Nome do Livro:</label>
                 <input type="text" id="name-book" name="name-book" required value="{{book.name}}">
@@ -39,7 +39,7 @@
                 <label for="description">Sinopse</label>
                 <textarea></textarea>
     
-                <div class="register-buttons"><button type="submit" class="btn-o"><a>salvar</a></button> <a href="/acervo" class=" btn-o btn-transparent">cancelar</a></div>
+                <div class="register-buttons"><button type="submit" class="btn-o"><a>salvar</a></button> <a href="/detalhelivro/{{book.id}}" class=" btn-o btn-transparent">cancelar</a></div>
             </form>
         </div>
         <div class="info">

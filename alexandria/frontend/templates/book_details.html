@@ -25,13 +25,12 @@
             <span><p>publicado em</p><h1>{{book.release_year}}</h1></span>
             <span><p>páginas</p><h1>{{book.pages}}</h1></span>
             </div>
-            <div class="buttons-details"><a href="" class="btn-o">editar</a><a href="" class="btn-o btn-transparent">remover</a></div>
+            <div class="buttons-details"><a href="/editar-livro/{{book.id}}" class="btn-o">editar</a><a href="/deletar/{{book.id}}" class="btn-o btn-transparent">remover</a></div>
             <!-- <div class="register-buttons"><button type="submit" class="btn-o"><a class="btn-o"
                         href="/editar-livro/">editar</a></button> <a href="/acervo"
                     class=" btn-o btn-transparent">cancelar</a></div>
              -->
         </div>
-
     </section>
 </main>
 {% endblock %}

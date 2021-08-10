@@ -13,6 +13,6 @@ def edit(id):
         book.publisher = request.form['publisher']
         db.session.add(book)
         db.session.commit()
-        return redirect('/acervo')
+        return redirect('/editartodos')
     
     return render_template('edit.html', book=book)
