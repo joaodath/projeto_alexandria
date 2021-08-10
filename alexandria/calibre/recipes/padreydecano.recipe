@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+##
+# Title:        Padreydecano.com News, Sports, and Blog
+# Contact:      Carlos Alves - <carlosalves90@gmail.com>
+##
+# License:      GNU General Public License v3 - http://www.gnu.org/copyleft/gpl.html
+# Copyright:    Carlos Alves - <carlosalves90@gmail.com>
+##
+# Written:      September 2013
+# Last Edited:  2018-02-13
+##
+__license__ = 'GPL v3'
+__author__ = '2016, Carlos Alves <carlosalves90@gmail.com>'
+
+'''
+padreydecano.com
+'''
+
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+class General(BasicNewsRecipe):
+    title = 'Padre y Decano'
+    __author__ = 'Carlos Alves'
+    description = 'El sitio del pueblo'
+    tags = 'soccer, futbol, Peñarol'
+    language = 'es_UY'
+    timefmt = '[%a, %d %b, %Y]'
+    use_embedded_content = False
+    recursion = 5
+    encoding = None
+    remove_javascript = True
+    no_stylesheets = True
+
+    oldest_article = 10
+    max_articles_per_feed = 100
+    keep_only_tags = [
+        dict(name='h1', attrs={'class': 'entry-title'}),
+        dict(name='div', attrs={'class': 'entry-content clearfix'})
+    ]
+
+    remove_tags = [
+        dict(name='div', attrs={
+             'class': ['br', 'hr', 'titlebar', 'navigation']}),
+        dict(name='dl', attrs={'class': 'gallery-item'}),
+        dict(name=['object', 'link'])
+    ]
+
+    extra_css = '''
+                h1{font-family: Georgia,"Times New Roman",Times,serif}
+                h3{font-family: Georgia,"Times New Roman",Times,serif}
+                h2{font-family: Georgia,"Times New Roman",Times,serif}
+                p{font-family: Verdana,Arial,Helvetica,sans-serif}
+                body{font-family: Verdana,Arial,Helvetica,sans-serif}
+                img{margin-bottom: 0.4em; display:block;}
+                '''
+
+    feeds = [
+        (u'Padre y Decano | Club Atlético Peñarol',
+         u'http://www.padreydecano.com/cms/feed/')
+    ]
+
+    def get_cover_url(self):
+        return None
+
+    def preprocess_html(self, soup):
+        for item in soup.findAll(style=True):
+            del item['style']
+        return soup

@@ -1,0 +1,137 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "EBOOK-POLISH" "1" "julho 30, 2021" "5.24.0" "calibre"
+.SH NAME
+ebook-polish \- ebook-polish
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ebook\-polish [options] input_file [output_file]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Polimento de livros tem a ver com buscar o brilho da perfeição em
+seus e\-books cuidadosamente criados.
+Polir tenta minimizar as alterações no código interno do seu e\-book.
+Diferente da conversão, ele nãoachata CSS, renomeia arquivos, muda tamanho
+de fonte, ajusta margens, etc. Cada ação realiza apenas o mínimo de
+mudanças necessárias para o efeito desejado.
+.sp
+Você deveria usar essa ferramenta como último passo na criação de e\-books.
+.sp
+Note que embelezar funciona apenas em arquivos no formato AZW3 ou EPUB.
+.sp
+Sempre que você for passar argumentos para \fBebook\-polish\fP que possuem espaços em branco, coloque o argumento dentro de aspas. Por exemplo: "/some path/with spaces"
+.SH [OPÇÕES]
+.INDENT 0.0
+.TP
+.B \-\-add\-soft\-hyphens, \-H
+Adicionar hifens condicionais a todas as palavras do livro. Isto permite uma melhor exibição de texto justificado em leitores que não suportam hifenização.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-compress\-images, \-i
+Comprime imagens no livro sem perda, para reduzir o seu tamanho sem afetar a qualidade da imagem.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-cover, \-c
+Caminho para uma imagem de capa. Altera a capa especificada no e\-book. Se não houver capa ou a capa não estiver identificada corretamente, insere uma nova capa.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-embed\-fonts, \-e
+incorporar todas as fontes que são referenciadas no documento e ainda não estão incorporadas. Isto irá analisar o seu computador pelas fontes, e se eles forem encontradas, elas serão incorporadas no documento.  Certifique\-se que você tenha a licença adequada para incorporar as fontes usadas neste documento.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-help, \-h
+mostrar esta mensagem de ajuda e sair
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-jacket, \-j
+Inserir uma \fB"\fPsobrecapa de livro\fB"\fP no começo do livro que contenha todos os metadados do livro, como título, etiquetas, autores, série, comentários, etc. Qualquer sobrecapa anterior será substituída.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-opf, \-o
+Caminho para um arquivo OPF. Os metadados no livro é atualizado do arquivo OPF.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-jacket
+Remover uma página de sobrecapa de livro inserida anteriormente.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-soft\-hyphens
+Remover hifens condicionais de todo o texto do livro.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-unused\-css, \-u
+Remove todas as regras CSS não utilizadas de folhas de estilo e elementos <style>. Alguns livros criados a partir de modelos de produção podem ter um grande número de regras CSS extras que não correspondem a qualquer conteúdo real. Estas regras extras podem retardar leitores que precisam processar todas elas.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-smarten\-punctuation, \-p
+Converter traços simples texto, reticências, aspas, vários hífens, etc em seus equivalentes tipograficamente corretos. Observe que o algoritmo pode, algumas vezes produzir resultados incorretos, especialmente quando aspas simples no começo das contrações estão envolvidas.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-subset\-fonts, \-f
+Criar um subconjunto de fontes significa reduzir uma fonte incorporada para conter apenas os caracteres utilizados desta fonte no livro. Isso reduz consideravelmente o tamanho dos arquivos de fonte (reduzir o tamanho do arquivo da fonte pela metade é comum). Por exemplo, se o livro usa uma fonte específica para os cabeçalhos, então o subconjunto irá reduzir esse tipo de fonte para conter apenas os caracteres presentes nos cabeçalhos atuais no livro. Ou, se o livro incorpora as versões em negrito e itálico de uma fonte, mas o texto em negrito e itálico é relativamente raro, ou ausente por completo, então as fontes em negrito e itálico podem ser reduzidas para apenas alguns caracteres ou completamente removida. A única desvantagem para o subconjunto de fontes é que se, algum dia mais tarde, você decidir adicionar mais texto aos seus livros, o texto recém\-adicionado pode não ser abrangido pela subconjunto da fonte.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-upgrade\-book, \-U
+Atualize as estruturas internas do livro, se possível. Por exemplo,  atualiza livros EPUB 2 para livros EPUB 3.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-verbose
+Produz saída mais detalhada, útil para depuração.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-version
+mostrar número da versão do programa e sair
+.UNINDENT
+.SH AUTHOR
+Kovid Goyal
+.SH COPYRIGHT
+Kovid Goyal
+.\" Generated by docutils manpage writer.
+.

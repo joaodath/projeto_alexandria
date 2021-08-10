@@ -11,7 +11,7 @@ DEBUG=True
 # SQLALCHEMY_DATABASE_URI='postgresql://postgres:senha@localhost/alexandria'
 
 # host remote elephantsql
-SQLALCHEMY_DATABASE_URI='postgresql://yplcqsod:7zYLgQpctwTio0jipae_zPbJXb5x4lFg@kesavan.db.elephantsql.com/yplcqsod'
+SQLALCHEMY_DATABASE_URI='postgresql://aaynmydx:fzy-s6vf8ZC-3bBg5iPfOou0GN5ry6WM@kesavan.db.elephantsql.com/aaynmydx'
 
 # notificações SQLAlchemy
 SQLALCHEMY_TRACK_MODIFICATIONS=True

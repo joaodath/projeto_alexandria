@@ -1,0 +1,21 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2019, Kovid Goyal <kovid at kovidgoyal.net>
+# noqa: eol-semicolon
+from __python__ import bound_methods, hash_literals
+
+from read_book.globals import current_spine_item
+
+def elem_for_ref(refnum):
+    refnum = int(refnum)
+    return document.getElementsByTagName('p')[refnum - 1]
+
+
+def start_reference_mode():
+    si = current_spine_item().index
+    for i, p in enumerate(document.getElementsByTagName('p')):
+        p.dataset.calibreRefNum = f'{si}.{i + 1}'
+    document.body.classList.add('calibre-reference-mode')
+
+
+def end_reference_mode():
+    document.body.classList.remove('calibre-reference-mode')

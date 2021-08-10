@@ -1,0 +1,105 @@
+'''
+scmp.com
+'''
+
+from mechanize import Request
+import json
+from calibre.web.feeds.news import BasicNewsRecipe
+from calibre.ebooks.BeautifulSoup import Tag
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+def new_tag(soup, name, attrs=()):
+    impl = getattr(soup, 'new_tag', None)
+    if impl is not None:
+        return impl(name, attrs=dict(attrs))
+    return Tag(soup, name, attrs=attrs or None)
+
+
+class SCMP(BasicNewsRecipe):
+    title = 'South China Morning Post'
+    __author__ = 'llam'
+    description = "SCMP.com, Hong Kong's premier online English daily provides exclusive up-to-date news, audio video news, podcasts, RSS Feeds, Blogs, breaking news, top stories, award winning news and analysis on Hong Kong and China."  # noqa
+    publisher = 'South China Morning Post Publishers Ltd.'
+    oldest_article = 2
+    delay = 1
+    max_articles_per_feed = 200
+    no_stylesheets = True
+    encoding = 'utf-8'
+    use_embedded_content = False
+    language = 'en_CN'
+    remove_empty_feeds = True
+    needs_subscription = 'optional'
+    publication_type = 'newspaper'
+
+    keep_only_tags = [
+        dict(name='h1'),
+        classes('info__subHeadline article-author main__right'),
+    ]
+    remove_tags = [
+        dict(name='button')
+    ]
+
+    def get_browser(self):
+        br = BasicNewsRecipe.get_browser(self)
+        if self.username is not None and self.password is not None:
+            # br.set_debug_http(True)
+            # br.set_debug_responses(True)
+            # br.set_debug_redirects(True)
+            rq = Request('https://account.scmp.com/login', headers={
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Referer': 'https://account.scmp.com/login',
+                }, data=json.dumps({'username': self.username, 'password': self.password}))
+            self.log('Sending login request...')
+            try:
+                res = br.open(rq)
+            except Exception as err:
+                if hasattr(err, 'read'):
+                    raise Exception('Login request failed with error: {} and body: {}'.format(err, err.read().decode('utf-8', 'replace')))
+                raise
+            if res.code != 200:
+                raise ValueError('Failed to login, check your username and password')
+            nonce = json.loads(res.read())['nonce']
+            rq = Request('https://www.scmp.com/centralize/signin?nonce=' + nonce, headers={
+                'referer': 'https://account.scmp.com/login',
+                'sec-fetch-mode': 'navigate',
+                'sec-fetch-site': 'same-site',
+                'sec-fetch-user': '?1'})
+            res = br.open(rq)
+            if res.code != 200:
+                raise ValueError('Failed to login, check your username and password')
+        return br
+
+    feeds = [
+        ('Hong Kong', 'https://www.scmp.com/rss/2/feed'),
+        ('China', 'https://www.scmp.com/rss/4/feed'),
+        ('Asia', 'https://www.scmp.com/rss/3/feed'),
+        ('World', 'https://www.scmp.com/rss/5/feed'),
+        ('Business', 'https://www.scmp.com/rss/92/feed'),
+        ('Tech', 'https://www.scmp.com/rss/36/feed'),
+        ('Life', 'https://www.scmp.com/rss/94/feed'),
+        ('Culture', 'https://www.scmp.com/rss/322296/feed'),
+        ('Sport', 'https://www.scmp.com/rss/95/feed'),
+        ('Post Mag', 'https://www.scmp.com/rss/71/feed'),
+        ('Style', 'https://www.scmp.com/rss/72/feed'),
+    ]
+
+    def preprocess_html(self, soup):
+        for img in soup.findAll("img", attrs={'data-original':True}):
+            img['src'] = img['data-original']
+        meta = soup.find('meta', attrs={'name':'twitter:image:src'}, content=True)
+        if meta is not None:
+            wrapper = soup.find(**classes('image-wrapper__placeholder'))
+            if wrapper is not None:
+                p = wrapper.parent
+                img = new_tag(soup, 'img')
+                img['src'] = meta['content']
+                p.append(img)
+                wrapper.extract()
+        return soup

@@ -1,0 +1,42 @@
+# -*- mode: python -*-
+# -*- coding: utf-8 -*-
+
+__license__ = 'GPL v3'
+__copyright__ = '2008-2021, Darko Miletic <darko.miletic at gmail.com>'
+'''
+infobae.com
+'''
+
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+class Infobae(BasicNewsRecipe):
+    title = 'Infobae.com'
+    __author__ = 'Darko Miletic and Sujata Raman'
+    description = 'Infobae.com es el sitio de noticias con mayor actualizacion de Latinoamérica. Noticias actualizadas las 24 horas, los 365 días del año.'
+    publisher = 'Infobae.com'
+    category = 'news, politics, Argentina'
+    oldest_article = 1
+    max_articles_per_feed = 100
+    no_stylesheets = True
+    use_embedded_content = False
+    auto_cleanup = True
+    language = 'es_AR'
+    encoding = 'utf8'
+    remove_empty_feeds = True
+    handle_gzip = True
+    compress_news_images = True
+    scale_news_images_to_device = True
+    ignore_duplicate_articles = {'url'}
+    masthead_url = 'https://www.infobae.com/pf/resources/images/logo_infobae_naranja.svg?d=662'
+    extra_css             = '''
+                              body{font-family: Arial,Helvetica,sans-serif}
+                              img{display: block}
+                              .categoria{font-size: small; text-transform: uppercase}
+                            '''
+
+    conversion_options = {
+        'comment': description, 'tags': category, 'publisher': publisher, 'language': language
+    }
+
+    feeds = [(u'Ahora', u'https://www.infobae.com/feeds/rss/')]

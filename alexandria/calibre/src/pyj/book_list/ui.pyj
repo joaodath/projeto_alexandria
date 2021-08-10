@@ -1,0 +1,97 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2015, Kovid Goyal <kovid at kovidgoyal.net>
+from __python__ import hash_literals, bound_methods
+
+from dom import ensure_id, clear
+from elementmaker import E
+
+from book_list.constants import book_list_container_id
+from book_list.globals import get_current_query
+from book_list.router import push_state
+from book_list.library_data import current_library_id, current_virtual_library
+from utils import encode_query_with_path
+
+
+panel_handlers = {}
+default_panel_handler = None
+
+
+def set_panel_handler(panel, handler):
+    panel_handlers[panel] = handler
+
+
+def set_default_panel_handler(handler):
+    nonlocal default_panel_handler
+    default_panel_handler = handler
+
+
+def develop_panel(container_id):
+    # To use, go to URL:
+    # http://localhost:8080/#panel=develop-widgets&widget_module=<module name>
+    # Implement the develop(container) method in that module.
+    container = document.getElementById(container_id)
+    q = get_current_query()
+    m = q.widget_module
+    if m:
+        m = get_module(m)
+        if m?.develop:
+            m.develop(container)
+        else:
+            container.textContent = 'The module {} either does not exist or has no develop method.'.format(q.widget_module)
+
+set_panel_handler('develop-widgets', develop_panel)
+
+
+def currently_showing_panel():
+    c = document.getElementById(book_list_container_id)
+    return c.dataset.panel
+
+
+def add_library_info(query):
+    if not query.library_id:
+        query.library_id = current_library_id()
+    if not query.vl:
+        if query.vl is None:
+            v'delete query.vl'
+        else:
+            vlid = current_virtual_library()
+            if vlid:
+                query.vl = vlid
+
+def prepare_query(query, panel):
+    q = {k:query[k] for k in (query or {}) if k is not 'panel'}
+    if panel is not 'home':
+        q.panel = panel
+        add_library_info(q)
+    return q
+
+def query_as_href(query, panel):
+    q = prepare_query(query, panel or 'book_list')
+    return encode_query_with_path(q)
+
+def show_panel(panel, query=None, replace=False):
+    push_state(prepare_query(query, panel), replace=replace)
+
+
+def apply_url_state(state):
+    panel = state.panel or 'home'
+    c = document.getElementById(book_list_container_id)
+    clear(c)
+    c.appendChild(E.div())
+    c.dataset.panel = panel
+    handler = panel_handlers[panel] or default_panel_handler
+    handler(ensure_id(c.firstChild, 'panel'))
+
+
+apply_url_state.back_from_current = def back_from_current(current_query):
+    q = current_query
+    if q.panel:
+        if '^' in q.panel:
+            q = {k:q[k] for k in q}
+            q.panel = q.panel.rpartition('^')[0]
+        elif q.panel is 'book_list':
+            q = {}
+        else:
+            q = {'panel':'book_list'}
+            add_library_info(q)
+    return q

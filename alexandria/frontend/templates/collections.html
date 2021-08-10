@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Acervo - Alexandria{% endblock %}
+
+{% block content %}
+<section class="card-center extra-margin">
+    <!-- title -->
+    <div class="parte-superior">
+        <div class="titulo">
+            <p>Bem vinde</p>
+            <h1>Biblioteca</h1>
+        </div>
+        <div>
+        <a href="{{ url_for('editartudo') }}"><button class="btn-o">Editar</button></a>
+    </div>
+    </div>
+    <!-- bottom part -->
+    <div class="card-wrapper">
+        <!-- cards -->
+        <!-- single card -->
+        {%for b in book.items %}
+        <article class="card">
+            <img src="../static/img/placeholder_biblioteca.png" alt="">
+            <h2>{{b.name}}</h2>
+            <aside><p class="autor">{{b.author}}</p> <p class="genero">{{b.genre}}</p></aside>
+            <p class="descricao">{{b.synopsis}}</p>
+            <span class="btn-acervo"><a class="btn-o"href="/detalhelivro/{{b.id}}">ver mais</a></span>
+            <!-- <span class="acoes"><a class="btn-o"href="/editar-livro/{{b.id}}">ver mais</a></span> -->
+        </article>
+        {%endfor%}
+        <!-- card info -->
+    </div>
+    <div class="paginacao">
+    {% for page_num in book.iter_pages(left_edge=1, right_edge=1,
+        left_current=2, right_current=2) %} {% if page_num %} {% if book.page ==
+        page_num %}
+        
+        <a class="" href="{{ url_for('acervo', page=page_num) }}">
+            {{ page_num }}
+        </a>
+        {% else %}
+        
+        <a class="" href="{{ url_for('acervo', page=page_num) }}">
+            {{ page_num }}
+        </a>
+            {% endif %} 
+            {% else %} 
+            . . . 
+            {% endif %} 
+    {% endfor %}
+</div>
+    
+</section>
+
+
+
+{% endblock %}

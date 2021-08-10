@@ -1,0 +1,275 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "CALIBRE-SERVER" "1" "7月 30, 2021" "5.24.0" "calibre"
+.SH NAME
+calibre-server \- calibre-server
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+calibre\-server [オプション] [ライブラリフォルダへのpath...]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Calibreのコンテンツサーバを開始。コンテンツサーバはCalibreライブラリを
+インターネット上に公開します。\fBcalibre\-server\fP の引数としてライブラリフォルダへのpathを
+指定することができます。pathの指定がない場合には、Calibreプログラムの知っている
+すべてのライブラリが対象となります。
+.sp
+スペースを含む引数を \fBcalibre\-server\fP に渡す場合には、クォーテーションマークでくくってください。例: "/some path/with spaces"
+.SH [オプション]
+.INDENT 0.0
+.TP
+.B \-\-access\-log
+アクセスログファイルへのpath。このログにはクライアントからサーバへの接続や、要求についての情報が記録されます。デフォルトでは、アクセスログは記録しません。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-ajax\-timeout
+クエリ実行時にサーバからの応答を待つ最大時間 (秒指定).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-auth\-mode
+使用する認証タイプ.  サーバが使用するHTTP認証モード。SSLプロキシを介してサーバを公開する場合には \fB"\fPbasic\fB"\fP を設定してください。そうでない場合には \fB"\fPauto\fB"\fP にしてください。\fB"\fPauto\fB"\fP は、SSLが設定されている場合には \fB"\fPbasic\fB"\fP を使用し、それ以外の場合には \fB"\fPdigest\fB"\fP を使用します。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-auto\-reload
+ソースコードが変更されたとき自動的にサーバーの再読み込みを行います。デバッグ時に有用です。シャットダウンタイムアウトに小さい値を指定するのもよいでしょう。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-ban\-after
+利用停止するまでのログイン失敗回数.  ログインに何回失敗したらIPアドレスを遮断するかを指定。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-ban\-for
+連続してログインに失敗したIPアドレスを遮断する.   繰り返しログインに失敗したIPアドレスを、指定した時間 (分単位) だけ一時的に遮断します。ブルートフォース攻撃への対策として有効です。0 を設定すると、遮断しません。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-book\-list\-mode
+デフォルトの書籍一覧モードを選択.   新しいユーザ向けのデフォルトの書籍一覧モードを設定します。個々のユーザは自分で設定することによりデフォルトのモードを上書きできます。初期設定ではカバーグリッドを使用します。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-compress\-min\-size
+応答がデータ圧縮を使用する最小サイズ (バイト単位).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-custom\-list\-template
+カスタムな本一覧モードのテンプレートを格納したJSONへのpath。このテンプレートを作成する最も簡単な方法は、Calibreの「設定」→「ネット共有」→「書籍一覧テンプレート」へ行ってテンプレートを作成し、エクスポートすることです。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-daemonize
+プロセスをバックグラウンドでデーモンとして起動 (Linuxのみ)
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-displayed\-fields
+表示するユーザ定義フィールドを限定.  コンテンツサーバ /opds および /mobile ビューで表示させるユーザ定義の書誌情報フィールドを、カンマ区切りで指定。このオプションを指定したとき、リストにないフィールドは表示されなくなります。例: my_rating,my_tags
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-enable\-allow\-socket\-preallocation, \-\-disable\-allow\-socket\-preallocation
+ソケットの事前割り当て。たとえばsystemdソケットアクティベーションなどと使用する場合。. デフォルトでは、このオプションは有効に設定されています。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-enable\-auth, \-\-disable\-auth
+サーバアクセスにパスワード認証を使用.         通常、サーバへのアクセスには制限を設けず、誰にでもアクセスできるようになっています。このオプションを使うと、アクセスを事前に定義したユーザに限定することができます。 デフォルトでは、このオプションは無効に設定されています。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-enable\-fallback\-to\-detected\-interface, \-\-disable\-fallback\-to\-detected\-interface
+自動認識したインタフェースにフォールバックする.    何らかの理由によりlisten_onオプションで指定されたインタフェースにサーバがバインドできない場合、外部に接続するインタフェースを検出してバインドしようと試みます。 デフォルトでは、このオプションは有効に設定されています。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-enable\-local\-write, \-\-disable\-local\-write
+認証されていないローカルコネクションでの変更を許可する.        通常、認証を有効にしていない場合には、匿名ユーザがCalibreライブラリに変更を加えることができないよう、サーバは読み取り専用モードで動作します。このオプションを有効にすると、サーバと同じコンピュータからの接続の場合には、誰でも変更を加えることができるようになります。認証なしでサーバを運用しながら、Calibreライブラリを変更するのにcalibredbを利用する場合に便利です。 デフォルトでは、このオプションは無効に設定されています。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-enable\-log\-not\-found, \-\-disable\-log\-not\-found
+HTTP 404 (Not Found) 要求をログする.       通常、サーバはリソースが見つからなかったときのHTTP要求をログ保存します。しかしBOTの標的にされた場合には、ログがスパムであふれることになります。ログを止めるためにこのオプションを利用してください。 デフォルトでは、このオプションは有効に設定されています。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-enable\-use\-bonjour, \-\-disable\-use\-bonjour
+BonJour経由でOPDSフィードを公開する.    BonJourサービス経由でOPDSフィードを公開します。これによりOPDSベースのリーダアプリがサーバを自動的に検出して接続できるようになります。 デフォルトでは、このオプションは有効に設定されています。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-enable\-use\-sendfile, \-\-disable\-use\-sendfile
+性能向上のためゼロコピーでファイル転送する.      ネットワーク上でファイルを転送する際、性能向上のためにカーネル内転送にゼロコピーを使用します。ただし、変則的なファイルシステム上では転送されたファイルが破損することがあります。転送ファイルが破損していた場合には、無効に設定してください。 デフォルトでは、このオプションは有効に設定されています。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-help, \-h
+このヘルプメッセージを表示して終了
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-ignored\-fields
+無視するユーザ定義書誌情報フィールド.         コンテンツサーバに /opds および /mobile ビューで表示させないユーザ定義の書誌情報フィールドを、カンマ区切りで指定。例: my_rating,my_tags
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-listen\-on
+接続を待ち受けするインタフェース.   デフォルトでは、すべての利用可能なインタフェースで待ち受けします。これをたとえば \fB"\fP127.0.0.1\fB"\fP に変更するとローカルマシンからの接続に限定し、\fB"\fP::\fB"\fP に変更するとIPv6とIPv4の接続を待ち受けします。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-log
+サーバログファイルへのpath。このログにはサーバ情報とエラーが記録されますが、アクセスログは記録しません。デフォルトでは標準出力に出力されます。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-manage\-users
+Manage the database of users allowed to connect to this server. You can use it in automated mode by adding a \-\-. See calibre\-server \fI\%\-\-manage\-users\fP \fB\-\-\fP help for details. See also the \fI\%\-\-userdb\fP option.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-max\-header\-line\-size
+単一のHTTPヘッダの最大サイズ (KB単位).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-max\-job\-time
+ワーカープロセスの最大時間.      ワーカープロセスの実行を許可する最大時間 (分単位)。制限しない場合にはゼロを指定。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-max\-jobs
+ワーカープロセスの最大数.       ワーカープロセスは本の閲覧準備/追加/変換などの大きなジョブを扱うために、必要に応じて起動されます。通常、こうしたプロセスの最大数はCPUコア数に基づいて決定します。この設定では、そのプロセス最大数を制御できます。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-max\-log\-size
+ログファイルの最大長 (MB単位).  サーバが精製するログファイルの最大サイズ。ログが指定のサイズを超えると、先頭から上書きされます。0を設定すると、上書きしなくなります。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-max\-opds\-items
+OPDSフィード中の最大冊数.     サーバが単一のOPDSフィード内に返す本の最大数
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-max\-opds\-ungrouped\-items
+フィード中でグループ化していないアイテム数のOPDS最大数.      著者やタグなどのカテゴリの1文字目の数がここで指定した数を超えた場合にグループ化します。0を指定するとグループ化しません。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-max\-request\-body\-size
+サーバへのアップロードを許可する最大サイズ (MB単位).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-num\-per\-page
+1ページあたりに表示する本の数.    ブラウザ1ページあたりに表示する本の数
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-pidfile
+プロセスPIDを書き込むファイルを指定
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-port
+コネクションの接続待ち用ポート.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-search\-the\-net\-urls
+「インターネットで検索」で使用する、URLを記述したJSONファイルへのパス。「設定」→「ネット共有」→「インターネットで検索」へ行き、URLを作成してエクスポートすると簡単にファイルを作成できます。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-shutdown\-timeout
+クリーンシャットダウンを行う前の待ち時間 (秒単位).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-ssl\-certfile
+SSL認証ファイルへのpath.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-ssl\-keyfile
+SSLプライベートキーファイルへのpath.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-timeout
+アイドルな接続を切断するまでの時間 (秒単位).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-trusted\-ips
+指定したIPからの非認証接続での変更を許可.      Normally, if you do not turn on authentication, the server operates in read\-only mode, so as to not allow anonymous users to make changes to your calibre libraries. This option allows anybody connecting from the specified IP addresses to make changes. Must be a comma separated list of address or network specifications. This is useful if you want to run the server without authentication but still use calibredb to make changes to your calibre libraries. Note that turning on this option means anyone connecting from the specified IP addresses can make changes to your calibre libraries.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-url\-prefix
+すべてのURLに追加するプリフィックス.        リバースプロキシをはさんでサーバを運用する場合に有用です。使用例: URLプリフィックスとして /calibre
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-userdb
+認証に使用するユーザデータベースへのpath。データベースはSQLiteファイルです。データベース作成には:option:
+.nf
+\(ga
+.fi
+\-\-manage\-users\(gaを使用します。ユーザ管理についての詳細は \fI\%https://manual.calibre\-ebook.com/server.html#managing\-user\-accounts\-from\-the\-command\-line\-only\fP を参照してください。
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-version
+プログラムのバージョン番号を表示して終了
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-worker\-count
+要求を処理するワーカースレッド数.
+.UNINDENT
+.SH AUTHOR
+Kovid Goyal
+.SH COPYRIGHT
+Kovid Goyal
+.\" Generated by docutils manpage writer.
+.

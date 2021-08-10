@@ -1,0 +1,138 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "EBOOK-POLISH" "1" "Julai 30, 2021" "5.24.0" "calibre"
+.SH NAME
+ebook-polish \- ebook-polish
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ebook\-polish [pilihan] fail_input [fail_output]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Menggilap buku ialah menjadikan e\-buku yang dibina lebih terserlah
+.sp
+Penggilapan cuba meminimumkan perubahan kod dalaman e\-buku anda.
+Tidak seperti pertukaran, ia tidak meratakan CSS, namakan semula fail,
+ubah saiz fon, laras margins, dll. Setiap tindakan yang dilakukan hanya membuat
+perubahan minimum yang diperlukan untuk kesan yang dikehendaki.
+.sp
+Anda patut guna alat ini kerana merupakan langkah terakhir dalam penciptaan
+e\-buku anda.
+.sp
+Perhatian, penggilapan hanya berfungsi pada faill dalam format AZW3atauEPUB.
+.sp
+Whenever you pass arguments to \fBebook\-polish\fP that have spaces in them, enclose the arguments in quotation marks. For example: "/some path/with spaces"
+.SH [PILIHAN]
+.INDENT 0.0
+.TP
+.B \-\-add\-soft\-hyphens, \-H
+Add soft hyphens to all words in the book. This allows the book to be rendered better when the text is justified, in readers that do not support hyphenation.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-compress\-images, \-i
+Mampat imej secara tak hilang dalam buku, untuk mengurangkan saiz fail, tanpa mempengaruhi kualiti imej.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-cover, \-c
+Laluan ke imej kulit buku. Perubahan kulit buku dinyatakan dalam e\-buku. Jika tiada kulit buku hadir, atau kulit buku tidak dikenalpasti dengan baik, sisipkan satu kulit buku baharu.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-embed\-fonts, \-e
+Benamkan semua fon yang dirujuk dalam dokumen tetapi sebenarnya tidak dibenam.  Ia akan mengimbas fon tersebut dalam komputer anda, dan jika temui, ia akan dibenamkan ke dalam dokumen. Sila pastikan anda mempunyai lesen yang sah untuk membenamkan fon tersebut untuk digunakan dalam dokumen ini.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-help, \-h
+tunjuk mesej bantuan ini dan keluar
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-jacket, \-j
+Sisip laman \fB"\fPjaket buku\fB"\fP pada permulaan buku yang mengandungi semua data meta buku seperti tajuk, tag, pengarang, siri, ulasan dan, lain\-lain. Mana\-mana jaket buku terdahulu akan diganti.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-opf, \-o
+Laluan ke fail OPF. Data meta dalam buku dikemaskini dari fail OPF.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-jacket
+Buang halaman jaket buku yang disisip sebelum ini.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-soft\-hyphens
+Remove soft hyphens from all text in the book.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-unused\-css, \-u
+Remove all unused CSS rules from stylesheets and <style> tags. Some books created from production templates can have a large number of extra CSS rules that don\fB\(aq\fPt match any actual content. These extra rules can slow down readers that need to parse them all.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-smarten\-punctuation, \-p
+Tukar sengkang teks, elipsis, petikan, hyphen berbilang, dan lain\-lain ke dalam setara yang betul secara tipografi. Perhatian algoritma kadangkala jana keputusan yang salah, terutamanya bila petikan tunggal pada permulaan pemendekan yang terlibat.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-subset\-fonts, \-f
+Subset fon bermaksud mengurangkan fon terbenam yang hanya mengandungi aksara yang perlu sahaja digunakan dalam fon di dalam buku. Ia mengurangkan saiz fail fon (separuh saiz fail fon adalah biasa). Contohnya, jika buku guna fon khusus untuk pengepala maka subset akan mengurangkan fon yang hanya mengandungi aksara yang hadir dalam pengepala di dalam buku. Atau jika buku membenamkan versi tebal dan condong fon, tetapi teks tebal dan condong jarang digunakan, atau tiada langsung digunakan. Oleh itu, fon tebal dan condong boleh dikurangkan atau dibuang sepenuhnya. Kelemahan membuat subset fon ialah jika anda bercadang mahu menambah lagi teks ke dalam buku anda, teks yang baru ditambah mungkin tidak dapat dipapar sepenuhnya kerana fon telah disubset.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-upgrade\-book, \-U
+Tatar struktur dalaman buku, jika boleh. Sebagai contoh, tatar buku EPUB 2 ke buku EPUB 3.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-verbose
+Hasilkan lagi output berjela, berguna untuk penyahpepijatan.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-version
+tunjuk nombor versi program dan keluar
+.UNINDENT
+.SH AUTHOR
+Kovid Goyal
+.SH COPYRIGHT
+Kovid Goyal
+.\" Generated by docutils manpage writer.
+.

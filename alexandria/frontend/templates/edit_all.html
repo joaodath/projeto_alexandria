@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Acervo completo - Alexandria{% endblock %}
+
+{% block content %}
+<section class="section-center table-section">
+    <table class="styled-table">
+    <thead class="table-top">
+        
+        <tr>
+            <th>#ID</th>
+            <th>Livro</th>
+            <th>Autor</th>
+            <th>Ano da Publicação</th>
+            <th>Ações</th>
+        </tr>
+
+    </thead>
+    
+    <tbody>
+        {%for b in book.items %}
+        <tr>
+           <td>{{b.id}}</td>
+           <td>{{b.name}}</td>
+           <td>{{b.author}}</td>
+           <td>{{b.release_year}}</td>
+            <td class="acoes">
+                <a href="/editar-livro/{{b.id}}" type="text">Editar</a><a href="/deletar/{{b.id}}" type="text">Excluir</a>
+            </td>
+            </td>
+        </tr>
+        {%endfor%}
+    </tbody>
+    
+</table>
+
+</section>
+<div class="paginacao">
+    {% for page_num in book.iter_pages(left_edge=1, right_edge=1,
+        left_current=2, right_current=2) %} {% if page_num %} {% if book.page ==
+        page_num %}
+        
+        <a class="" href="{{ url_for('acervo', page=page_num) }}">
+            {{ page_num }}
+        </a>
+        {% else %}
+        
+        <a class="" href="{{ url_for('acervo', page=page_num) }}">
+            {{ page_num }}
+        </a>
+            {% endif %} 
+            {% else %} 
+            . . . 
+            {% endif %} 
+    {% endfor %}
+</div>
+{% endblock %}

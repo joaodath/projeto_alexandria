@@ -17,5 +17,5 @@ def cadastrar():
         db.session.commit()
         return redirect(url_for('cadastrar'))
     
-    return render_template('cadastrar.html')
+    return render_template('register.html')
 

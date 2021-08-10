@@ -1,0 +1,117 @@
+#!/usr/bin/env python
+__license__ = 'GPL v3'
+__copyright__ = '2008, Kovid Goyal kovid@kovidgoyal.net'
+__docformat__ = 'restructuredtext en'
+
+'''
+www.guardian.co.uk
+'''
+from calibre import random_user_agent
+from calibre.web.feeds.news import BasicNewsRecipe
+from datetime import date
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class Guardian(BasicNewsRecipe):
+
+    title = u'The Guardian and The Observer'
+    if date.today().weekday() == 6:
+        base_url = "https://www.theguardian.com/theobserver"
+    else:
+        base_url = "https://www.theguardian.com/uk"
+
+    __author__ = 'Kovid Goyal'
+    language = 'en_GB'
+
+    oldest_article = 7
+    max_articles_per_feed = 100
+    remove_javascript = True
+    encoding = 'utf-8'
+    remove_empty_feeds = True
+    no_stylesheets = True
+    remove_attributes = ['style', 'width', 'height']
+    ignore_duplicate_articles = {'title', 'url'}
+
+    timefmt = ' [%a, %d %b %Y]'
+
+    remove_tags = [
+        dict(attrs={'class': lambda x: x and '--twitter' in x}),
+        dict(attrs={'class': lambda x: x and 'submeta' in x.split()}),
+        dict(attrs={'data-component': ['share', 'social']}),
+        dict(attrs={'data-link-name': 'block share'}),
+        dict(attrs={'data-print-layout': 'hide'}),
+        dict(id=['dfp-ad--survey', 'sub-nav-root', 'the-caption', 'bannerandheader']),
+        {'for': 'the-checkbox'},
+        dict(href='#maincontent'),
+        dict(role='navigation'),
+        dict(attrs={'class': lambda x: x and 'inline-expand-image' in x}),
+        dict(name='a', attrs={'aria-label': lambda x: x and 'Share On' in x}),
+        dict(name='a', attrs={'class': lambda x: x and 'social__action js-social__action--top' in x}),
+        dict(name='div', attrs={'id': 'share-count-root'}),
+        dict(attrs={'class': lambda x: x and 'modern-visible' in x.split()}),
+        classes('badge-slot reveal-caption__checkbox mobile-only element-rich-link'),
+        dict(name=['link', 'meta', 'style', 'svg', 'input', 'source', 'noscript', 'button']),
+    ]
+    remove_tags_after = [
+        classes('content__article-body js-bottom-marker article-body-commercial-selector'),
+    ]
+
+    extra_css = """
+            img {
+                max-width: 100% !important;
+                max-height: 100% !important;
+            }
+
+            a span {
+                color: #E05E02;
+            }
+
+            figcaption span {
+                font-size: 0.5em;
+                color: #6B6B6B;
+            }
+        """
+
+    def get_browser(self, *a, **kw):
+        # This site returns images in JPEG-XR format if the user agent is IE
+        if not hasattr(self, 'non_ie_ua'):
+            try:
+                self.non_ie_ua = random_user_agent(allow_ie=False)
+            except TypeError:
+                self.non_ie_ua = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.111 Safari/537.36'
+        kw['user_agent'] = self.non_ie_ua
+        br = BasicNewsRecipe.get_browser(self, *a, **kw)
+        return br
+
+    def parse_section(self, url, title_prefix=''):
+        feeds = []
+        soup = self.index_to_soup(url)
+        for section in soup.findAll('section'):
+            title = title_prefix + self.tag_to_string(section.find(
+                attrs={'class': 'fc-container__header__title'})).strip().capitalize()
+            self.log('\nFound section:', title)
+            if 'Video' in title:
+                self.log('=======> Skip section:', title)
+                continue
+            feeds.append((title, []))
+            for li in section.findAll('li'):
+                for a in li.findAll('a', attrs={'data-link-name': 'article'}, href=True):
+                    title = self.tag_to_string(a).strip()
+                    url = a['href']
+                    self.log(' ', title, url)
+                    feeds[-1][1].append({'title': title, 'url': url})
+                    break
+        return feeds
+
+    def parse_index(self):
+        feeds = self.parse_section(self.base_url)
+        feeds += self.parse_section(
+            'https://www.theguardian.com/uk/sport', 'Sport - ')
+        if date.today().weekday() in (5, 6):
+            feeds += self.parse_section('https://www.theguardian.com/theguardian/weekend', 'Weekend - ')
+        return feeds

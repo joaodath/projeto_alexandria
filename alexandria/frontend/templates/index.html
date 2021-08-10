@@ -8,18 +8,27 @@
 {% block content %}
 <main>
     <!-- section to center items -->
-    <section class="section-center">
-      <div class="content">
-        <video autoplay loop class="bg_video">
+    <section class="video-wrapper">
+        <video autoplay loop muted class="bg_video">
           <source src="../static/img/video.mp4" type="video/mp4"/>
         </video>
-      </div>
-      <!-- <article class="content-container">
-                  <h1>Bem-Vindo</h1>
-                  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ex totam animi esse iste molestias vero reprehenderit eius maiores dolorum unde. </p>
-                  <a href="" class="btn btn-content">Saiba Mais</a> -->
-      <!-- <img src="foto-home.png" alt=""> -->
-      <!-- </article> -->
+        <div class="title-home">
+          <h2>Bem vinde <span class="minuscula">a</span></h2>
+          <h1>Alexandria!</h1>
+          <p>organizamos a sua biblioteca de livros para que você passe menos tempo procurando uma capa e mais tempo lendo.</p>
+          <a href="/acervo" class="btn-o btn-home">Acervo</a><a href="/cadastrar"class="btn-o btn-transparent">Cadastrar livro</a>
+        </div>
+      
     </section>
+    <article class="content-container">
+      <div class="content-center">
+        <img src="" alt="">
+        <h2>Bem vinde <span class="minuscula">a</span></h2>
+        <h1 class="black-name">Alexandria!</h1>
+        <p>organizamos a sua biblioteca de livros para que você passe menos tempo procurando uma capa e mais tempo lendo.</p>
+        <a href="/acervo" class="btn-o btn-home">Acervo</a><a href="/cadastrar"class="btn-o btn-transparent">Cadastrar livro</a>
+<img src="foto-home.png" alt="">
+</div>
+</article>
   </main>
 {% endblock %}

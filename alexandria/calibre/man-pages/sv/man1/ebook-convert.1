@@ -1,0 +1,618 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "EBOOK-CONVERT" "1" "juli 30, 2021" "5.24.0" "calibre"
+.SH NAME
+ebook-convert \- ebook-convert
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ebook\-convert input_file output_file [alternativ]
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Konvertera en e\-bok från ett format till ett annat.
+.sp
+input_file är inmatningsfilen och output_file är utmatningsfilen. Båda måste anges som de två första argumenten i kommandot.
+.sp
+Utmatningsformatet för e\-boken uppskattas utifrån filändelsen i output_file. output_file kan även ges specialformatet .EXT, där EXT är utmatningsfilsändelsen. Om det används kommer namnet på utmatningsfilen att härledas från namnet på inmatningsfilen. Observera att filnamnen inte får börja med bindestreck. Om ingen filinsticksmodul har angivits för utmatningsfilen, så behandlas den som en mapp till vilken en "Öppen e\-bok" (OEB) bestående av HTML filer kommer att skrivas till den mappen. Dessa filer är de filer som normalt sett skulle ha skickats till utmatningsinsticksmodulen.
+.sp
+Efter att ha angivit in\- och utmatningsfilerna kan du anpassa konverteringen genom att ange olika alternativ. Vilka alternativ som är tillgängliga beror på in\- och utmatningsfiltyperna. För att få hjälp med dem, ange in\- och utmatningsfilerna och lägg därefter till alternativet \-h.
+.sp
+För fullständig dokumentation om konverteringssystemet, gå till
+conversion
+.sp
+När du skickar argument till \fBebook\-convert\fP som har mellanslag i dem, bifoga argumenten i citattecken. Till exempel: "/some path/with spaces"
+.sp
+Alternativen och standardvärden för ändringsalternativ beror på både
+inmatning\- och utmatningsformat, därför bör du alltid kontrollera med:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ebook\-convert myfile.input_format myfile.output_format \-h
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Nedan finns alternativen som är vanliga vid all konvertering följt av
+alternativen unika för varje inmatning\- och utmatningsformat.
+.INDENT 0.0
+.IP \(bu 2
+\fI\%ALTERNATIV FÖR INMATNING\fP
+.IP \(bu 2
+\fI\%ALTERNATIV FÖR UTMATNING\fP
+.IP \(bu 2
+\fI\%UTSEENDE OCH KÄNSLA\fP
+.IP \(bu 2
+\fI\%HEURISTISK BEARBETNING\fP
+.IP \(bu 2
+\fI\%SÖK OCH ERSÄTT\fP
+.IP \(bu 2
+\fI\%STRUKTURDETEKTERING\fP
+.IP \(bu 2
+\fI\%INNEHÅLLSFÖRTECKNING\fP
+.IP \(bu 2
+\fI\%METADATA\fP
+.IP \(bu 2
+\fI\%FELSÖK\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-help, \-h
+visa denna hjälptext och avsluta
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-input\-profile
+Ange inmatningsprofilen. Profilen ger information till konverteringssystemet om hur information i inmatning ska tolkas. Till exempel upplösningsberoende längder (d.v.s. längder i pixlar). Alternativen är: cybookg3, cybook_opus, default, hanlinv3, hanlinv5, illiad, irexdr1000, irexdr800, kindle, msreader, mobipocket, nook, sony, sony300, sony900
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-list\-recipes
+Lista inbyggda receptnamn. Du kan skapa en e\-bok från ett inbyggt recept så här: ebook\-convert \fB"\fPReceptnamn.recipe\fB"\fP utmatning.epub
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-output\-profile
+Ange utmatningsprofilen. Utmatningsprofilen berättar för konverteringssystemet hur man optimerar det skapade dokumentet för den angivna enheten (t.ex. genom att ändra storlek på bilder för enhetens skärmstorlek). I vissa fall kan en utmatningsprofil användas för att optimera utmatningen för en viss enhet, men detta är sällan nödvändigt. Alternativen är:cybookg3, cybook_opus, default, generic_eink, generic_eink_hd, generic_eink_large, hanlinv3, hanlinv5, illiad, ipad, ipad3, irexdr1000, irexdr800, jetbook5, kindle, kindle_dx, kindle_fire, kindle_oasis, kindle_pw, kindle_pw3, kindle_voyage, kobo, msreader, mobipocket, nook, nook_color, nook_hd_plus, pocketbook_inkpad3, pocketbook_lux, pocketbook_hd, pocketbook_900, pocketbook_pro_912, galaxy, sony, sony300, sony900, sony\-landscape, sonyt3, tablet
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-version
+visar programmets versionsnummer och avsluta
+.UNINDENT
+.SH ALTERNATIV FÖR INMATNING
+.sp
+Alternativ för att anpassa bearbetningen av ingående mobi fil
+.INDENT 0.0
+.TP
+.B \-\-input\-encoding
+Ange teckenkodning för inmatningsdokumentet. Det här alternativet åsidosätter eventuell teckenkodning som dokumentet själv anger. Särskilt användbart för dokument som inte deklarerar en kodning eller som har felaktiga kodningsdeklarationer.
+.UNINDENT
+.SH ALTERNATIV FÖR UTMATNING
+.sp
+Alternativ för att anpassa bearbetningen av utmatning epub
+.INDENT 0.0
+.TP
+.B \-\-dont\-split\-on\-page\-breaks
+Inaktivera delning vid sidbrytningar. Normalt delas inmatningsfilen automatiskt vid varje sidbrytning i två filer. Detta ger en utmatad e\-bok som kan tolkas snabbare och med mindre resurser. Att dela är dock långsamt och om din källfil innehåller ett mycket stort antal sidbrytningar bör du inaktivera delning vid sidbrytning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-epub\-flatten
+Det här alternativet behövs endast om du tänker använda EPUB med FBReaderJ. Det plattar ut filsystemet inuti EPUB och lägger alla filer i den översta nivån.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-epub\-inline\-toc
+Infoga en innehållsförteckning som kommer att visas som en del av bokens innehåll.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-epub\-toc\-at\-end
+Lägg den infogade innehållsförteckningen i slutet av boken istället för i början.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-epub\-version
+Versionen av EPUB\-filen som ska genereras. EPUB 2 är den mest kompatibla, använd endast EPUB 3 om du vet att du faktiskt behöver det.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-extract\-to
+Packa upp innehållet i den genererade EPUB\-filen till den angivna mappen. Innehållet i mappen tas bort först, så var försiktig.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-flow\-size
+Dela alla HTML\-filer som är större än denna storlek (i KiB). Detta är nödvändigt eftersom de flesta EPUB\-läsenheter inte kan hantera stora filer. Standardvärdet 260KB är den storlek som krävs för Adobe Digital Editions. Satt till 0 för stänga av storleksbaserad delning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-no\-default\-epub\-cover
+Om inmatningsfilen inte har något omslag och du inte ställer in ett, skapas normalt ett standardomslag genererats med titel, författare o.s.v. Med det här alternativet aktiverat skapas inga standardomslag.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-no\-svg\-cover
+Använd inte SVG\-grafik till omslag. Använd om din EPUB\-fil kommer att användas på enheter som inte stöder SVG, t.ex. iPhone och JetBook Lite. Om det här alternativet inte väljs, kommer dessa enheter att visa ett tomt omslag.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-preserve\-cover\-aspect\-ratio
+När man använder ett SVG\-omslag kommer det här alternativet att få omslaget att skalas om för att täcka det tillgängliga skärmområdet, men bevarar fortfarande dess bildförhållande (förhållandet mellan bredd och höjd). Det innebär att det kan finnas vita kanter på sidorna eller på toppen och botten av bilden, men bilden kommer aldrig att förvrängas. Om det här alternativet inaktiveras, kan bilden bli en aning förvrängd, men det kommer inte finnas några ramar.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-pretty\-print
+Om detta anges, kommer insticksmodulen att försöka skapa utskrifter som är så läsliga som möjligt. Detta kanske inte har någon effekt för vissa instick för utmatning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-toc\-title
+Titel för alla genererade infogade innehållsförteckningar.
+.UNINDENT
+.SH UTSEENDE OCH KÄNSLA
+.sp
+Alternativ för att anpassa utmatningens utseende och känsla
+.INDENT 0.0
+.TP
+.B \-\-asciiize
+Translitterera Unicode\-tecken till en ASCII\-representation. Används med försiktighet, eftersom detta kommer att ersätta Unicode\-tecken med ASCII. Till exempel kommer det att ersätta \fB"\fPPelé\fB"\fP med \fB"\fPPele\fB"\fP\&. Tänk också på att i de fall där det finns flera representationer av ett tecken (exempelvis tecken som delas av kinesiska och japanska) kommer representationen som grundar sig på aktuella calibre\-gränssnittsspråket att användas.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-base\-font\-size
+Grundteckenstorleken i punkter. Alla teckenstorlekar i den producerade boken kommer att skalas om baserat på den här storleken. Genom att välja en större storlek kan du få teckensnittet i utmatningen större och vice versa. Som standard, när värdet är noll kommer grundteckenstorleken för teckensnitt att väljas baserat på utmatningsprofilen du väljer.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-change\-justification
+Ändra textjusteringen. Värdet \fB"\fPvänster\fB"\fP konverterar all marginaljusterad text i källan till vänsterjusterad text (d.v.s. ojusterad). Med värdet \fB"\fPjustera\fB"\fP konverteras all ojusterad text till mariginaljusterad. Värdet \fB"\fPoriginal\fB"\fP (standard) behåller de inställningar för justering som anges i källfilen. Observera att endast vissa format stöder mariginaljustering.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-font\-rescaling
+Inaktivera all omskalning av teckenstorlekar.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-embed\-all\-fonts
+Bädda in varje teckensnitt som refereras i inmatningsdokumentet som inte redan är inbäddat. Detta kommer att söka i ditt system efter teckensnitt och om de påträffas, kommer de att bäddas in. Inbäddning fungerar bara om det format du konverterar till stöder inbäddade teckensnitt, t.ex. EPUB, AZW3, DOCX eller PDF. Vänligen se till att du har rätt licens för att bädda in teckensnitt som används i detta dokument.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-embed\-font\-family
+Bädda in den angivna teckensnittsfamiljen i boken. Här anges \fB"\fPbas\fB"\fP\-teckensnitt som används för boken. Om inmatningsdokumentet specificerar sina egna teckensnitt, kan de åsidosätta detta grundteckensnitt. Du kan använda informationsalternativet filterformat för att ta bort teckensnitt från inmatningsdokumentet. Observera att bädda in teckensnitt endast fungerar med vissa utmatningsformat, främst EPUB, AZW3 och DOCX.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-expand\-css
+Som standard kommer calibre att använda stenografiformen för olika CSS\-egenskaper som marginal, utfyllnad, kanter, o.s.v. Det här alternativet kommer att få den att använda hela expanderade formen istället. Observera att CSS alltid utökas vid generering av EPUB\-filer med utmatningsprofilen inställd på en av Nook\-profilerna eftersom Nook inte kan hantera stenografisk CSS.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-extra\-css
+Antingen sökvägen till ett CSS\-formatmall eller rå CSS. Denna CSS läggs till i formatreglerna från källfilen, så den kan användas för att åsidosätta dessa regler.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-filter\-css
+En kommaseparerad lista över CSS\-egenskaper som kommer att tas bort från alla CSS\-formatregler. Detta är användbart om förekomsten av viss formatinformation förhindrar att den åsidosätts på din enhet. Till exempel: font\-family,color,margin\-left,margin\-right
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-font\-size\-mapping
+Kartlägger CSS\-teckensnittsnamn till teckenstorlekar i punkter. En exempelinställning är 12,12,14,16,18,20,22,24. Detta konverterar storlekarna xx\-liten till xx\-stor, den sista storleken används för enorma teckensnitt. Omskalningsalgoritmen använder dessa storlekar för att på ett smart sätt skala om teckensnitten. Som standard används en kartläggning baserad på din valda utmatningsprofil.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-insert\-blank\-line
+Infoga en blankrad mellan stycken. Fungerar inte om källfilen inte använder stycken (<p>\-eller <div>\- markeringar).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-insert\-blank\-line\-size
+Ställ in höjden på de infogade tomma raderna (i em). Höjden på raderna mellan styckena kommer att vara det dubbla av det här värdet.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-keep\-ligatures
+Bevara ligaturer som finns i inmatningsdokumentet. En ligatur är en speciell framställning ett teckenpar som ff, fi, fl och så vidare. De flesta läsenheter saknar stöd för ligaturer i deras standardteckensnitt så det är osannolikt att de återges korrekt. Som standard konverterar calibre en ligatur till motsvarande par av vanliga tecken. Det här alternativet kommer att bevara ligaturerna istället.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-line\-height
+Radavståndet i punkter. Anpassar mellanrum mellan på varandra följande textrader. Gäller endast element som inte definierar sitt eget radavstånd. I de flesta fall är det minsta radavståndet valet mer användbart. Som standard utför ingen ändring i radavstånd.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-linearize\-tables
+Vissa dåligt utformade dokument använder tabeller för att anpassa textutformningen för texten på sidan. Vid konvertering har dessa dokument ofta text som går utanför sidan och andra artefakter. Detta alternativ extraherar innehållet från tabellerna och presenterar det linjärt.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-margin\-bottom
+Ställ in nedre marginalen i punkter. Standard är 5.0. Om du ställer in det här till mindre än noll kommer ingen marginal att ställas in (marginalinställningen i originaldokumentet bevaras). Observera: Sidorienterade format som PDF och DOCX har egna marginalinställningar som har företräde.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-margin\-left
+Ställ in vänstra marginalen i punkter. Standard är 5.0. Om du ställer in det här till mindre än noll kommer ingen marginal att ställas in (marginalinställningen i originaldokumentet bevaras). Observera: Sidorienterade format som PDF och DOCX har egna marginalinställningar som har företräde.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-margin\-right
+Ställ in högra marginalen i punkter. Standard är 5.0. Om du ställer in det här till mindre än noll kommer ingen marginal att ställas in (marginalinställningen i originaldokumentet bevaras). Observera: Sidorienterade format som PDF och DOCX har egna marginalinställningar som har företräde.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-margin\-top
+Ställ in övre marginalen i punkter. Standard är 5.0. Om du ställer in det här till mindre än noll kommer ingen marginal att ställas in (marginalinställningen i originaldokumentet bevaras). Observera: Sidorienterade format som PDF och DOCX har egna marginalinställningar som har företräde.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-minimum\-line\-height
+Den minsta radavståndet, som andel av elementets beräknat m.h.a. teckenstorlek. calibre kommer att säkerställa att varje element har en radavstånd av minst denna inställning, oavsett vad det ingående dokument specificerar. Sätt till noll för att inaktivera. Standard är 120%. Använd den här inställningen istället för det direkt angivna radavståndet såvida inte du vet vad du gör. Till exempel kan du uppnå \fB"\fPdubbelt radavstånd\fB"\fP i texten genom att sätta detta till 240.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-paragraph\-spacing
+Ta bort mellanrum mellan stycken. Drar även in första raden på det nya stycket med 1,5 em. Mellanrumsavlägsnande fungerar inte om källfilen inte använder stycken (<p> eller <div> taggar).
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-paragraph\-spacing\-indent\-size
+När calibre tar bort tomma rader mellan stycken, anger det automatiskt ett styckeindrag, för att se till att styckeindelningen syns tydligt. Det här alternativet bestämmer bredden för indraget (i em). Om du anger ett negativt värde kommer indraget som anges i inmatningsdokumentet användas, det vill säga, calibre ändrar inte indraget.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-smarten\-punctuation
+Konvertera rena citat, bindestreck och ellips till deras typografiskt korrekta motsvarigheter. För detaljer, se \fI\%https://daringfireball.net/projects/smartypants\fP\&.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-subset\-embedded\-fonts
+Använd delmängd av alla inbäddade teckensnitt. Varje inbäddat teckensnitt reduceras till endast innehålla de glyfer som används i detta dokument. Detta minskar storleken på teckensnittsfiler. Användbart om du bäddar in ett särskilt stort teckensnitt med massor av oanvända glyfer.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-transform\-css\-rules
+Sökvägen till en fil som innehåller regler för att förändra CSS\-format i denna bok. Det enklaste sättet att skapa en sådan fil är att använda guiden för att skapa regler i det grafiska gränssnittet för calibre. Gå till det i \fB"\fPUtseende och känsla\->Omvandla format\fB"\fP avsnittet i konverteringsdialogrutan. När du har skapat reglerna, kan du använda knappen \fB"\fPExportera\fB"\fP för att spara dem till en fil.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-unsmarten\-punctuation
+Konvertera snitsiga citat, streck och specialtecken till deras motsvarigheter i vanlig text.
+.UNINDENT
+.SH HEURISTISK BEARBETNING
+.sp
+Ändra dokumenttexten och strukturen med vanliga mönster. Inaktiverad som standard. Använd \-\-enable\-heuristics för att aktivera. Individuella åtgärder kan inaktiveras med alternativen \-\-disable\-
+.nf
+*
+.fi
+\&.
+.INDENT 0.0
+.TP
+.B \-\-disable\-dehyphenate
+Analysera avstavade ord i hela dokumentet. Själva dokumentet används som en ordbok för att avgöra om bindestreck ska behållas eller tas bort.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-delete\-blank\-paragraphs
+Ta bort tomma stycken från dokumentet när de förekommer mellan vartannat stycke
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-fix\-indents
+Vändningsindrag som skapats från flera icke\-brytande mellanslagsenheter i CSS\-indrag.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-format\-scene\-breaks
+Vänsterjusterade scenbrytningsmarkörer är centrerade. Ersätt mjuka scenbrytningar som använder flera tomma rader med horisontella regler.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-italicize\-common\-cases
+Leta efter vanliga ord och mönster som betecknar kursiv och kursivera dem.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-markup\-chapter\-headings
+Identifiera oformaterade huvud\- och underrubriker. Ändra dem till H2\- och H3\-taggar. Den här inställningen kommer inte att skapa en innehållsförteckning, men kan användas i kombination med strukturidentifiering för att skapa ett.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-renumber\-headings
+Letar efter förekomster av sekventiella <h1> eller <h2>\-taggar. Taggarna ska numreras för att förhindra uppdelning i mitten av kapitelrubrikerna.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-unwrap\-lines
+Radbrytning genom att använda skiljetecken och andra formateringsindikationer.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-enable\-heuristics
+Aktivera heuristisk bearbetning. Denna möjlighet måste anges för någon heuristisk bearbetning ske.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-html\-unwrap\-factor
+Skala som används för att bestämma längden på vilken en rad ska radbrytas. Giltiga värden är ett decimaltal mellan 0 och 1. Standard är 0,4, precis under medianradens längd. Om bara ett fåtal rader i dokumentet kräver radbrytning bör detta värde minskas
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-replace\-scene\-breaks
+Ersätt scenbrytningar med den angivna texten. Som standard är texten från inmatningsdokumentet som används.
+.UNINDENT
+.SH SÖK OCH ERSÄTT
+.sp
+Ändra dokumenttexten och strukturen med användardefinierade mönster.
+.INDENT 0.0
+.TP
+.B \-\-search\-replace
+Sökvägen till en fil som innehåller reguljära uttryck för att söka och ersätta. Filen måste innehålla alternerande rader av reguljära uttryck följt av ersättande mönster (vilket kan vara en tom rad). Det reguljära uttrycket ska vara i Python\-regex\-syntax och filen måste vara UTF\-8\-kodad.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr1\-replace
+Ersättning för att ersätta texten som hittades med SR1\-sökning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr1\-search
+Sökmönster (reguljära uttryck) att ersätta med SR1\-ersättning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr2\-replace
+Ersättning för att ersätta texten funnen med SR2\-sökning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr2\-search
+Sökmönster (reguljära uttryck) att ersätta med SR2\-ersättning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr3\-replace
+Ersättning för att ersätta texten hittades med SR3\-sökning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-sr3\-search
+Sökmönster (reguljära uttryck) att ersätta med SR3\-ersättning.
+.UNINDENT
+.SH STRUKTURDETEKTERING
+.sp
+Anpassa automatisk identifiering av dokumentets struktur.
+.INDENT 0.0
+.TP
+.B \-\-chapter
+Ett XPath\-uttryck för att identifiera kapitelrubrikerna. Standard är att betrakta <h1>\- eller <h2>\-taggar som innehåller orden \fB"\fPchapter\fB"\fP, \fB"\fPbook\fB"\fP, \fB"\fPsection\fB"\fP, \fB"\fPprologue\fB"\fP, \fB"\fPepilogue\fB"\fP eller \fB"\fPpart\fB"\fP som kapitelrubriker samt alla taggar som har class=\fB"\fPchapter\fB"\fP\&. Uttrycket som används måste utvärderas till en lista med element. För att inaktivera kapitelidentifiering, använd uttrycket \fB"\fP/\fB"\fP\&. Se XPath\-handledningen i användarhandboken för calibre för ytterligare hjälp med att använda den här funktionen.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-chapter\-mark
+Anger hur identifierade kapitel markeras. Värdet \fB"\fPpagebreak\fB"\fP infogar en sidbrytning före kapitel. Värdet \fB"\fPrule\fB"\fP infogar en blankrad före kapitel. Värdet \fB"\fPnone\fB"\fP inaktiverar kapitelmarkering och om värdet \fB"\fPboth\fB"\fP anges kommer både sidbrytningar och blankrader att markera kapitel.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-disable\-remove\-fake\-margins
+Vissa dokument anger sidmarginaler genom att ange en vänster\- och höger marginal på varje enskild punkt. calibre kommer att försöka identifiera och ta bort dessa marginaler. Ibland kan detta orsaka avlägsnande av marginaler som inte borde ha tagits bort. I detta fall kan du inaktivera borttagning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-insert\-metadata
+Infoga bokens metadata i början av boken. Används om din läsenhet inte kan visa eller söka efter metadata direkt.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-page\-breaks\-before
+Ett XPath\-uttryck. Sidbrytningar infogas före de angivna elementen. För att inaktivera använd uttrycket: /
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-prefer\-metadata\-cover
+Använd omslag från källfilen istället för det angivna omslaget.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-remove\-first\-image
+Ta bort den första bilden från den inmatade e\-boken. Praktiskt om inmatningsdokumentet har en omslagsbild som inte identifieras som ett omslag. Om du anger ett omslag i calibre kommer det resulterande dokumentet ha två omslagsbilder om du inte markerar det här alternativet.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-start\-reading\-at
+Ett XPath\-uttryck för att identifiera platsen i dokumentet där du ska börja läsa. Vissa e\-bokläsningsprogram (framförallt Kindle) använder denna plats som position för att öppna boken. Se XPath\-handledningen i användarhandboken för calibre för ytterligare hjälp med att använda den här funktionen.
+.UNINDENT
+.SH INNEHÅLLSFÖRTECKNING
+.sp
+Anpassa hur innehållsförteckningen genereras. Om källfilen har en innehållsförteckning, kommer denna att användas istället för den automatiskt genererade.
+.INDENT 0.0
+.TP
+.B \-\-duplicate\-links\-in\-toc
+När du skapar en innehållsförteckning från länkar i inmatningsdokumentet, tillåt dubbla poster, d.v.s. tillåt mer än en post med samma text, förutsatt att de pekar på en annan plats.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-level1\-toc
+XPath\-uttryck som anger alla taggar som ska läggas till i innehållsförteckningen på nivå ett. Om detta anges har det företräde framför andra former av automatisk detektering. Se XPath\-handledningen i användarhandboken för calibre för exempel.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-level2\-toc
+XPath\-uttryck som anger alla taggar som ska läggas till i innehållsförteckningen på nivå två. Varje post läggs till under föregående nivå en. Se XPath\-handledningen i användarhandboken för calibre för exempel.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-level3\-toc
+XPath\-uttryck som anger alla taggar som ska läggas till i innehållsförteckningen på nivå tre. Varje post läggs till under föregående nivå två. Se XPath\-handledningen i användarhandboken för calibre för exempel.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-max\-toc\-links
+Högst antal länkar för att infoga i innehållsförteckningen. Ställ in på 0 för att inaktivera. Standard är: 50. Länkarna läggs endast till innehållsförteckningen om antalet identifierade kapitel är lägre än tröskelvärdet.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-no\-chapters\-in\-toc
+Lägg inte till automatiskt identifierade kapitel i innehållsförteckningen.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-toc\-filter
+Ta bort poster från innehållsförteckningen vilkas titlar matchar det angivna reguljära uttrycket. Matchande poster och alla deras skapelser tas bort.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-toc\-threshold
+Om färre än detta antal kapitel identifieras, så läggs länkar i innehållsförteckningen. Default: 6
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-use\-auto\-toc
+Om källfilen redan har en innehållsförteckning, används normalt denna i stället för den automatiskt genererade. Med det här alternativet används alltid den automatiskt genererade.
+.UNINDENT
+.SH METADATA
+.sp
+Alternativ för att ställa in metadata i utmatning
+.INDENT 0.0
+.TP
+.B \-\-author\-sort
+Sträng att användas vid sortering av författaren.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-authors
+Ange författarna. Flera författare ska avgränsas med &\-tecken.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-book\-producer
+Ange bokens producent.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-comments
+Ange e\-bokbeskrivning.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-cover
+Ställ in omslaget till den angivna filen eller webbadressen
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-isbn
+Ange ISBN för boken.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-language
+Ange språket.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-pubdate
+Ange publiceringsdatum (antas vara i den lokala tidszonen, såvida inte tidszonen uttryckligen anges)
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-publisher
+Ange e\-bokutgivare.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-rating
+Ange betyg. Bör vara ett nummer mellan 1 och 5.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-read\-metadata\-from\-opf, \-\-from\-opf, \-m
+Läs metadata från den angivna OPF\-filen. Metadata som läses från den här filen åsidosätter alla metadata i källfilen.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-series
+Ange serien denna e\-bok tillhör.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-series\-index
+Ange bokens index i denna serie.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-tags
+Ange taggar för boken. Skall vara en kommaseparerad lista.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-timestamp
+Ange bokens tidsstämpel (används inte längre någonstans)
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-title
+Ange titeln.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-title\-sort
+Versionen av titeln som ska användas för sortering.
+.UNINDENT
+.SH FELSÖK
+.sp
+Alternativ för att hjälpa till att felsöka konverteringen
+.INDENT 0.0
+.TP
+.B \-\-debug\-pipeline, \-d
+Spara utmatning från olika skeden av konverteringssekvensen till den angivna mappen. Användbart om du är osäker i vilket skede av konverteringsprocessen ett problem uppstår.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-verbose, \-v
+Nivå på informationsnivån. Ange flera gånger för ökad informationsnivå. Att ange den två gånger resulterar i full informationsnivån, en gång i medelinformationsnivån och noll gånger i minsta nivån.
+.UNINDENT
+.SH AUTHOR
+Kovid Goyal
+.SH COPYRIGHT
+Kovid Goyal
+.\" Generated by docutils manpage writer.
+.

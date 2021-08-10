@@ -1,0 +1,469 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2016, Kovid Goyal <kovid at kovidgoyal.net>
+from __python__ import bound_methods, hash_literals
+
+from encodings import base64decode, base64encode
+from gettext import gettext as _
+
+from book_list.router import is_reading_book
+from modals import error_dialog
+from read_book.annotations import merge_annotation_maps
+from session import get_interface_data
+from utils import username_key
+
+
+def upgrade_schema(idb, old_version, new_version, transaction):
+    print('upgrade_schema:', old_version, new_version)
+    if not idb.objectStoreNames.contains('books'):
+        idb.createObjectStore('books', {'keyPath':'key'})
+    if not idb.objectStoreNames.contains('files'):
+        idb.createObjectStore('files')
+    if not idb.objectStoreNames.contains('mathjax'):
+        idb.createObjectStore('mathjax')
+    if not idb.objectStoreNames.contains('objects'):
+        idb.createObjectStore('objects', {'keyPath':'key'})
+
+    # Create indices
+    books_store = transaction.objectStore('books')
+    if not books_store.indexNames.contains('recent_index'):
+        books_store.createIndex('recent_index', 'recent_date')
+
+def file_store_name(book, name):
+    return book.book_hash + ' ' + name
+
+def get_error_details(event):
+    desc = event.target
+    if desc.error and desc.error.toString:
+        desc = desc.error.toString()
+    elif desc.errorCode:
+        desc = desc.errorCode
+    elif desc.error:
+        desc = desc.error
+        if desc.name is 'QuotaExceededError':
+            desc = _('Offline storage quota exceeded! Try deleting some stored books first.')
+        elif desc.name:
+            desc = desc.name
+    return desc or 'Unknown Error'
+
+
+def new_book(key, metadata):
+    return {
+        'key':key,
+        'is_complete':False,
+        'stored_files': {},
+        'book_hash':None,
+        'metadata': metadata,
+        'manifest': None,
+        'cover_width': None,
+        'cover_height': None,
+        'cover_name': None,
+        'recent_date': new Date(),
+        'last_read': {},
+        'last_read_position': {},
+        'annotations_map': {},
+    }
+
+
+DB_NAME = 'calibre'
+DB_VERSION = 1
+
+
+def indexed_db_api():
+    if window?:
+        return window.indexedDB
+    if self?:
+        return self.indexedDB
+
+
+class DB:
+
+    def __init__(self, callback, show_read_book_error):
+        self.initialized = False
+        self.is_ok = False
+        self.initialize_error_msg = None
+        self.callback = callback
+        self.show_read_book_error = show_read_book_error
+        self.initialize_stage1()
+
+    def show_error(self, title, msg, det_msg):
+        if not window? or is_reading_book():
+            self.show_read_book_error(title, msg, det_msg)
+        else:
+            error_dialog(title, msg, det_msg)
+
+    def initialize_stage1(self):
+        idb = indexed_db_api()
+        if not idb:
+            self.initialize_error_msg = _('Your browser does not support IndexedDB. Cannot read books. Consider using a modern browser, such as Chrome or Firefox.')
+            self.initialized = True
+            # Callers assume __init__ has finished before the callback is
+            # called, since we are called in __init__, only callback after
+            # event loop ticks over
+            setTimeout(self.callback, 0)
+            return
+
+        request = idb.open(DB_NAME, DB_VERSION)
+
+        request.onupgradeneeded = def(event):
+            upgrade_schema(event.target.result, event.oldVersion, event.newVersion, event.target.transaction)
+
+        request.onblocked = def(event):
+            self.initialize_error_msg = _('Please close all other browser tabs with calibre open')
+            self.initialized = True
+            console.log(event)
+            self.callback()
+
+        request.onerror = def(event):
+            self.initialize_error_msg = _('You must allow calibre to use IndexedDB storage in your browser to read books')
+            self.initialized = True
+            console.log(event)
+            self.callback()
+
+        request.onsuccess = def(event):
+            blob = Blob(['test'], {'type':"text/plain"})
+            idb = event.target.result
+            store = idb.transaction(['files'], 'readwrite').objectStore('files')
+            try:
+                req = store.put(blob, ':-test-blob-:')
+            except:
+                self.initialize_stage2(idb, False)
+                return
+            req.onsuccess = def(event):
+                self.initialize_stage2(idb, True)
+            req.onerror = def(event):
+                # We use setTimeout as otherwise the idb.onerror handler is
+                # called with this error on Safari
+                setTimeout(self.initialize_stage2.bind(None, idb, False), 0)
+
+    def initialize_stage2(self, idb, supports_blobs):
+        self.idb = idb
+        self.supports_blobs = supports_blobs
+        self.initialized = True
+        self.is_ok = True
+        if not supports_blobs:
+            print('WARNING: browser does not support blob storage, calibre falling back to base64 encoding')
+
+        idb.onerror = def(event):
+            self.display_error(None, event)
+            if console.dir:
+                console.dir(event)
+            else:
+                console.log(event)
+
+        idb.onversionchange = def(event):
+            idb.close()
+            self.show_error(_('Database upgraded!'), _(
+                'A newer version of calibre is available, please click the Reload button in your browser.'))
+        self.callback()
+
+    def display_error(self, msg, event):
+        if event.already_displayed_by_calibre:
+            return
+        event.already_displayed_by_calibre = True
+        msg = msg or _(
+            'There was an error while interacting with the'
+            ' database used to store books for offline reading. Click "Show details" for more information.')
+        self.show_error(_('Cannot read book'), msg, get_error_details(event))
+
+    def do_op(self, stores, data, error_msg, proceed, op='get', store=None):
+        store = store or stores[0]
+        if op is 'get':
+            transaction = self.idb.transaction(stores)
+            req = transaction.objectStore(store).get(data)
+            req.onsuccess = def(event):
+                proceed(req.result)
+        elif op is 'put':
+            transaction = self.idb.transaction(stores, 'readwrite')
+            req = transaction.objectStore(store).put(data)
+            req.onsuccess = proceed
+        req.onerror = def(event):
+            self.display_error(error_msg, event)
+
+    def get_book(self, library_id, book_id, fmt, metadata, proceed):
+        fmt = fmt.toUpperCase()
+        # The key has to be a JavaScript array as otherwise it cannot be stored
+        # into indexed db, because the RapydScript list has properties that
+        # refer to non-serializable objects like functions.
+        book_id = int(book_id)
+        key = v'[library_id, book_id, fmt]'
+        self.do_op(['books'], key, _('Failed to read from the books database'), def(result):
+            if result and not result.annotations_map:
+                result.annotations_map = {}
+            proceed(result or new_book(key, metadata))
+        )
+
+    def get_mathjax_info(self, proceed):
+        self.do_op(['objects'], 'mathjax-info', _('Failed to read from the objects database'), def(result):
+            proceed(result or {'key':'mathjax-info'})
+        )
+
+    def save_manifest(self, book, manifest, proceed):
+        book.manifest = manifest
+        book.metadata = manifest.metadata
+        book.book_hash = manifest.book_hash.hash
+        book.stored_files = {}
+        book.is_complete = False
+        newest_epoch = newest_pos = None
+        for pos in manifest.last_read_positions:
+            if newest_epoch is None or pos.epoch > newest_epoch:
+                newest_epoch = pos.epoch
+                newest_pos = pos.cfi
+        username = get_interface_data().username
+        unkey = username_key(username)
+        if newest_pos and username:
+            book.last_read[unkey] = new Date(newest_epoch * 1000)
+            book.last_read_position[unkey] = newest_pos
+        if manifest.annotations_map:
+            book.annotations_map[unkey] = manifest.annotations_map
+
+        v'delete manifest.metadata'
+        v'delete manifest.last_read_positions'
+        v'delete manifest.annotations_map'
+        self.do_op(['books'], book, _('Failed to write to the books database'), proceed, op='put')
+
+    def store_file(self, book, name, xhr, proceed, is_cover):
+        store_as_text = xhr.responseType is 'text' or not xhr.responseType
+        fname = file_store_name(book, name)
+        needs_encoding = not store_as_text and not self.supports_blobs
+        mt = book.manifest.files[name]?.mimetype
+        if not mt and is_cover:
+            mt = 'image/jpeg'
+        book.stored_files[fname] = {'encoded':needs_encoding, 'mimetype':mt, 'store_as_text':store_as_text}
+        if is_cover:
+            self.store_cover(book, needs_encoding, xhr.response, name, fname, proceed)
+        else:
+            self.store_file_stage2(needs_encoding, xhr.response, name, fname, proceed)
+
+    def store_cover(self, book, needs_encoding, data, name, fname, proceed):
+        blob = data
+        if needs_encoding:
+            blob = Blob([data], {'type':'image/jpeg'})
+        url = window.URL.createObjectURL(blob)
+        img = new Image()
+        book.cover_name = name
+        proceeded = False
+
+        def done():
+            nonlocal proceeded
+            if not proceeded:
+                proceeded = True
+                window.URL.revokeObjectURL(url)
+                self.store_file_stage2(needs_encoding, data, name, fname, proceed)
+
+        img.onload = def():
+            book.cover_width = this.width
+            book.cover_height = this.height
+            done()
+
+        img.onerror = def():
+            print('WARNING: Failed to read dimensions of cover')
+            done()
+        img.src = url
+
+    def store_file_stage2(self, needs_encoding, data, name, fname, proceed):
+        if needs_encoding:
+            data = base64encode(Uint8Array(data))
+        req = self.idb.transaction(['files'], 'readwrite').objectStore('files').put(data, fname)
+        req.onsuccess = def(event):
+            proceed()
+        req.onerror = def(event):
+            proceed(_('Failed to store book data ({0}) with error: {1}').format(name, get_error_details(event)))
+
+    def clear_mathjax(self, proceed):
+        self.idb.transaction(['mathjax'], 'readwrite').objectStore('mathjax').clear().onsuccess = proceed
+
+    def store_mathjax_file(self, name, xhr, proceed):
+        data = xhr.response
+        if not self.supports_blobs:
+            data = base64encode(Uint8Array(data))
+        req = self.idb.transaction(['mathjax'], 'readwrite').objectStore('mathjax').put(data, name)
+        req.onsuccess = def(event): proceed()
+        req.onerror = def(event):
+            proceed(_('Failed to store mathjax file ({0}) with error: {1}').format(name, get_error_details(event)))
+
+    def finish_book(self, book, proceed):
+        book.is_complete = True
+        self.do_op(['books'], book, _('Failed to write to the books database'), proceed, op='put')
+
+    def finish_mathjax(self, mathjax_info, proceed):
+        self.do_op(['objects'], mathjax_info, _('Failed to write to the objects database'), proceed, op='put')
+
+    def update_last_read_time(self, book):
+        unkey = username_key(get_interface_data().username)
+        now = new Date()
+        book.last_read[unkey] = book.recent_date = now
+        self.do_op(['books'], book, _('Failed to write to the books database'), op='put')
+
+    def update_metadata(self, book, new_metadata):
+        if book.metadata:
+            for key in Object.keys(new_metadata):
+                book.metadata[key] = new_metadata[key]
+            self.do_op(['books'], book, _('Failed to write to the books database'), op='put')
+
+    def update_annotations_data_from_key(self, library_id, book_id, fmt, new_data):
+        unkey = username_key(get_interface_data().username)
+        self.get_book(library_id, book_id, fmt, None, def(book):
+            if book.metadata:  # book exists
+                changed = False
+                if new_data.last_read_position:
+                    book.last_read[unkey] = book.recent_date = new_data.last_read
+                    book.last_read_position[unkey] = new_data.last_read_position
+                    changed = True
+                if not book.annotations_map:
+                    book.annotations_map = v'{}'
+                if new_data.annotations_map:
+                    existing = book.annotations_map[unkey]
+                    if not existing:
+                        changed = True
+                        book.annotations_map[unkey] = new_data.annotations_map
+                    else:
+                        updated, merged = merge_annotation_maps(existing, new_data.annotations_map)
+                        if updated:
+                            changed = True
+                            book.annotations_map[unkey] = merged
+                if changed:
+                    self.do_op(['books'], book, _('Failed to write to the books database'), op='put')
+        )
+
+    def get_file(self, book, name, proceed):
+        key = file_store_name(book, name)
+        err = _(
+            'Failed to read the file {0} for the book {1} from the browser offline cache.'
+        ).format(name, book.metadata.title)
+        self.do_op(['files'], key, err, def (result):
+            if not result:
+                # File was not found in the cache, this happens in Chrome if
+                # the Application Cache is full. IndexedDB put succeeds,
+                # but get fails. Browsers are a horrible travesty.
+                bad = err + _(
+                    ' This usually means the cache is close to full. Clear the browser'
+                    ' cache from the browser settings.')
+                self.show_error(_('Cannot read file from book'), bad)
+                return
+            fdata = book.stored_files[key]
+            mt = fdata.mimetype or 'application/octet-stream'
+            if fdata.encoded:
+                result = Blob([base64decode(result)], {'type':mt})
+            proceed(result, name, mt, book)
+        )
+
+    def get_book_file(self, book_hash, stored_files, name, proceed):
+        stores = ['files']
+        key = file_store_name({'book_hash': book_hash}, name)
+        transaction = self.idb.transaction(stores)
+        req = transaction.objectStore(stores[0]).get(key)
+        req.onsuccess = def(event):
+            if not req.result:
+                proceed({'ok': False, 'name': name, 'details': 'ENOENT'})
+                return
+            fdata = stored_files[key]
+            mt = fdata.mimetype or 'application/octet-stream'
+            if fdata.encoded:
+                result = Blob([base64decode(result)], {'type':mt})
+            proceed({'ok': True, 'result': req.result, 'name': name, 'mt': mt})
+        req.onerror = def(event):
+            details = get_error_details(event)
+            proceed({'ok': False, 'name': name, 'details': details})
+
+    def get_mathjax_files(self, proceed):
+        c = self.idb.transaction('mathjax').objectStore('mathjax').openCursor()
+        c.onerror = def(event):
+            err = _('Failed to read the MathJax files from the browser offline cache.')
+            self.display_error(err, event)
+        data = {}
+        c.onsuccess = def(event):
+            cursor = event.target.result
+            if cursor:
+                name, result = cursor.key, cursor.value
+                if not isinstance(result, Blob):
+                    mt = 'application/x-font-woff' if name.endswith('.woff') else 'text/javascript'
+                    result = Blob([base64decode(result)], {'type':mt})
+                data[name] = result
+                cursor.continue()
+            else:
+                proceed(data)
+
+    def get_recently_read_books(self, proceed, limit):
+        limit = limit or 3
+        c = self.idb.transaction(['books'], 'readonly').objectStore('books').index('recent_index').openCursor(None, 'prev')
+        books = v'[]'
+        c.onerror = def(event):
+            err = _('Failed to read recent books from local storage')
+            self.display_error(err, event)
+        c.onsuccess = def (ev):
+            cursor = ev.target.result
+            if cursor:
+                books.push(cursor.value)
+            if books.length >= limit or not cursor:
+                proceed(books)
+                return
+            if cursor:
+                cursor.continue()
+
+    def has_book_matching(self, library_id, book_id, proceed):
+        # Should really be using a multiEntry index to avoid iterating over all
+        # books in JS, but since the number of stored books is not that large,
+        # I can't be bothered.
+        c = self.idb.transaction(['books'], 'readonly').objectStore('books').index('recent_index').openCursor(None, 'prev')
+        c.onerror = def(event):
+            proceed(False)
+        book_id = int(book_id)
+        c.onsuccess = def (ev):
+            cursor = ev.target.result
+            if cursor:
+                book = cursor.value
+                if book.key[0] is library_id and book.key[1] is book_id:
+                    proceed(True)
+                    return
+                cursor.continue()
+            else:
+                proceed(False)
+
+    def delete_book(self, book, proceed):
+        c = self.idb.transaction(['books', 'files'], 'readwrite')
+        files = c.objectStore('files')
+        books = c.objectStore('books')
+        filenames = Object.keys(book.stored_files)
+        c.oncomplete = def(event):
+            proceed(book)
+        c.onerror = def (event):
+            proceed(book, c.error.toString())
+
+        def next_step():
+            if filenames.length:
+                r = files.delete(filenames.pop())
+                r.onsuccess = next_step
+            else:
+                books.delete(book.key)
+        next_step()
+
+    def delete_books_matching(self, library_id, book_id, proceed):
+        c = self.idb.transaction(['books'], 'readonly').objectStore('books').index('recent_index').openCursor(None, 'prev')
+        c.onerror = def(event):
+            pass
+        book_id = int(book_id)
+        matches = v'[]'
+
+        def delete_all():
+            if matches.length:
+                book = matches.pop()
+                self.delete_book(book, delete_all)
+            else:
+                if proceed:
+                    proceed()
+
+        c.onsuccess = def (ev):
+            cursor = ev.target.result
+            if cursor:
+                book = cursor.value
+                if book.key[0] is library_id and book.key[1] is book_id:
+                    matches.push(book)
+                cursor.continue()
+            else:
+                delete_all()
+
+
+def get_db(callback, show_read_book_error):
+    if not get_db.ans:
+        get_db.ans = DB(callback, show_read_book_error)
+    return get_db.ans

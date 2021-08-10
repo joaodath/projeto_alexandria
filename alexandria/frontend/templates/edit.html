@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Editar livro - Alexandria{% endblock %} 
+
+{% block content %}
+<!-- Insira os códigos específicos do editar-livro.html aqui -->
+
+<main class="white-bg">
+    <section class="edit-section">
+        <div class="book">
+            <img src="{{book.image}}" alt="">
+            <p class="genres">Lorem/ipsum/dolor</p>
+            <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde aut doloremque aliquid iure
+                architecto impedit qui praesentium et optio mollitia?</p>
+        </div>
+        <div class="form">
+            <h3>editar livro</h3>
+            <h1>{{book.name}}</h1>
+            <form action="/editar-livro/{{book.id}}" method="POST">
+                <label for="">Nome do Livro:</label>
+                <input type="text" id="name-book" name="name-book" required value="{{book.name}}">
+                <label for="">Autor:</label>
+                <input type="text" id="name-author" name="name-author" required value="{{book.author}}">
+                <label for="">Editora:</label>
+                <input type="text" id="publisher" name="publisher" required value="{{book.publisher}}">
+                <label for="">ISBN:</label>
+                <input type="text" id="isbn" name="isbn">
+                <label for="">Publicado em:</label>
+                <input type="text" id="release" name="release">
+                <label for="">Genero:</label>
+                <input type="text" id="genre" name="genre">
+                <label for="">Paginas:</label>
+                <input type="text" id="pages" name="pages">
+                <label for="">Imagem da Capa:</label>
+                <input type="text" id="image" name="image">
+                <!-- <label for="">Link Download:</label>
+                <input type="text" id="download" name="download">
+                <label for="">Link de Compra:</label>
+                <input type="text" id="buy" name="buy"> -->
+                <label for="description">Sinopse</label>
+                <textarea></textarea>
+    
+                <div class="register-buttons"><button type="submit" class="btn-o"><a>salvar</a></button> <a href="/detalhelivro/{{book.id}}" class=" btn-o btn-transparent">cancelar</a></div>
+            </form>
+        </div>
+        <div class="info">
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic itaque mollitia nemo aspernatur neque suscipit
+                quibusdam ab similique cum quia!</p>
+        </div>
+    </section>
+    </main>
+
+{% endblock %}

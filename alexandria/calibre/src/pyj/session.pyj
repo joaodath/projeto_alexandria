@@ -1,0 +1,333 @@
+# vim:fileencoding=utf-8
+# License: GPL v3 Copyright: 2015, Kovid Goyal <kovid at kovidgoyal.net>
+from __python__ import bound_methods, hash_literals
+
+from uuid import short_uuid
+
+from ajax import ajax_send
+
+
+defaults = {
+    # Book list settings
+    'copy_to_library_dupes': 'add;overwrite',
+    'last_sort_order': {},
+    'show_all_metadata': False, # show all metadata fields in the book details panel
+    'sort': 'timestamp.desc',  # comma separated list of items of the form: field.order
+    'view_mode': 'cover_grid',
+
+    # Tag Browser settings
+    'and_search_terms': False,  # how to add search terms to the search expression from the Tag Browser
+    'collapse_at': 25,  # number of items at which sub-groups are created, 0 to disable
+    'dont_collapse': '',  # comma separated list of category names
+    'hide_empty_categories': 'no',
+    'partition_method': 'first letter',  # other choices: 'disable', 'partition'
+    'sort_tags_by': 'name', # other choices: popularity, rating
+
+    # Book reader settings
+    'background_image_fade': 0,
+    'background_image_style': 'scaled',
+    'background_image': None,
+    'base_font_size': 16,
+    'book_scrollbar': False,
+    'columns_per_screen': {'portrait':0, 'landscape':0},
+    'controls_help_shown_count': 0,
+    'controls_help_shown_count_rtl_page_progression': 0,
+    'cover_preserve_aspect_ratio': True,
+    'current_color_scheme': 'system',
+    'footer': {'right': 'progress'},
+    'header': {},
+    'controls_footer': {'right': 'progress'},
+    'left-margin': {},
+    'right-margin': {},
+    'hide_tooltips': False,
+    'keyboard_shortcuts': {},
+    'lines_per_sec_auto': 1,
+    'lines_per_sec_smooth': 20,
+    'margin_bottom': 20,
+    'margin_left': 20,
+    'margin_right': 20,
+    'margin_top': 20,
+    'max_text_height': 0,
+    'max_text_width': 0,
+    'override_book_colors': 'never',
+    'paged_margin_clicks_scroll_by_screen': True,
+    'paged_wheel_scrolls_by_screen': False,
+    'paged_taps_scroll_by_screen': False,
+    'paged_pixel_scroll_threshold': 60,
+    'read_mode': 'paged',
+    'scroll_auto_boundary_delay': 5,
+    'scroll_stop_boundaries': False,
+    'standalone_font_settings': {},
+    'standalone_misc_settings': {},
+    'standalone_recently_opened': v'[]',
+    'user_color_schemes': {},
+    'user_stylesheet': '',
+    'word_actions': v'[]',
+    'highlight_style': None,
+    'highlights_export_format': 'text',
+    'custom_highlight_styles': v'[]',
+    'show_selection_bar': True,
+    'net_search_url': 'https://google.com/search?q={q}',
+    'selection_bar_actions': v"['copy', 'lookup', 'highlight', 'remove_highlight', 'search_net', 'clear']",
+    'selection_bar_quick_highlights': v"[]",
+    'skipped_dialogs': v'{}',
+    'tts': v'{}',
+    'tts_backend': v'{}',
+    'fullscreen_when_opening': 'auto',
+    'book_search_mode': 'contains',
+    'book_search_case_sensitive': False,
+    'reverse_page_turn_zones': False,
+}
+
+is_local_setting = {
+    'skipped_dialogs': True,
+    'background_image_fade': True,
+    'background_image_style': True,
+    'background_image': True,
+    'base_font_size': True,
+    'columns_per_screen': True,
+    'controls_help_shown_count': True,
+    'controls_help_shown_count_rtl_page_progression': True,
+    'lines_per_sec_auto': True,
+    'lines_per_sec_smooth': True,
+    'margin_bottom': True,
+    'margin_left': True,
+    'margin_right': True,
+    'margin_top': True,
+    'max_text_height': True,
+    'max_text_width': True,
+    'read_mode': 'paged',
+    'scroll_auto_boundary_delay': True,
+    'scroll_stop_boundaries': True,
+    'standalone_font_settings': True,
+    'standalone_misc_settings': True,
+    'standalone_recently_opened': True,
+    'user_stylesheet': True,
+    'highlight_style': True,
+    'tts': True,
+    'tts_backend': True,
+    'fullscreen_when_opening': True,
+    'highlights_export_format': True,
+    'book_search_mode': True,
+    'book_search_case_sensitive': True,
+    'reverse_page_turn_zones': True,
+}
+
+
+def session_defaults():
+    return defaults
+
+
+def storage_available(which):
+    which = which or 'localStorage'
+    try:
+        storage = window[which]
+        x = '__storage__test__'
+        storage.setItem(x, x)
+        storage.removeItem(x)
+        return True
+    except:
+        return False
+
+class FakeStorage:
+
+    def __init__(self):
+        self.data = {}
+
+    def getItem(self, key):
+        return self.data[key]
+
+    def setItem(self, key, value):
+        if jstype(value) is not 'string':
+            value = JSON.stringify(value)
+        self.data[key] = value
+
+    def clear(self):
+        self.data = {}
+
+def get_session_storage():
+    if not get_session_storage.ans:
+        if storage_available('localStorage'):
+            get_session_storage.ans = window.localStorage
+        elif storage_available('sessionStorage'):
+            get_session_storage.ans = window.sessionStorage
+            console.error('localStorage not available using sessionStorage instead')
+        else:
+            get_session_storage.ans = FakeStorage()
+            console.error('sessionStorage and localStorage not available using a temp cache instead')
+    return get_session_storage.ans
+
+class SessionData:
+
+    def __init__(self, global_prefix=None):
+        self.global_prefix = global_prefix or 'calibre-session-'
+        self.storage = get_session_storage()
+        self.overflow_storage = {}
+        self.has_overflow = False
+
+    def get(self, key, defval):
+        key = self.global_prefix + key
+        if self.has_overflow:
+            ans = self.overflow_storage[key]
+            if ans is undefined:
+                ans = self.storage.getItem(key)
+        else:
+            ans = self.storage.getItem(key)
+        if ans is undefined or ans is None:
+            if defval is undefined:
+                defval = None
+            return defval
+        try:
+            return JSON.parse(ans)
+        except:
+            if defval is undefined:
+                defval = None
+            return defval
+
+    def set(self, key, value):
+        key = self.global_prefix + key
+        if value is None:
+            self.storage.removeItem(key)
+            v'delete self.overflow_storage[key]'
+            return True
+        value = JSON.stringify(value)
+        try:
+            self.storage.setItem(key, value)
+            v'delete self.overflow_storage[key]'
+            return True
+        except:
+            self.overflow_storage[key] = value
+            self.has_overflow = True
+            console.error('session storage has overflowed, using a temp cache instead')
+        return False
+
+    def clear(self):
+        self.storage.clear()
+        self.overflow_storage = {}
+        self.has_overflow = False
+
+
+def local_storage():
+    if not local_storage.storage:
+        local_storage.storage = SessionData('calibre-local-')
+    return local_storage.storage
+
+
+def get_device_uuid():
+    if not get_device_uuid.ans:
+        s = local_storage()
+        ans = s.get('device_uuid')
+        if not ans:
+            ans = short_uuid()
+            s.set('device_uuid', ans)
+        get_device_uuid.ans = ans
+    return get_device_uuid.ans
+
+
+default_interface_data = {
+    'username': None,
+    'output_format': 'EPUB',
+    'input_formats': {'EPUB', 'MOBI', 'AZW3'},
+    'gui_pubdate_display_format': 'MMM yyyy',
+    'gui_timestamp_display_format': 'dd MMM yyyy',
+    'gui_last_modified_display_format': 'dd MMM yyyy',
+    'use_roman_numerals_for_series_number': True,
+    'default_library_id': None,
+    'default_book_list_mode': defaults.view_mode,
+    'library_map': None,
+    'search_the_net_urls': [],
+    'donate_link': 'https://calibre-ebook.com/donate',
+    'icon_map': {},
+    'icon_path': '',
+    'custom_list_template': None,
+    'num_per_page': 50,
+}
+
+def get_interface_data():
+    if not get_interface_data.storage:
+        get_interface_data.storage = SessionData('calibre-interface-data-')
+    ans = get_interface_data.storage.get('current')
+    if ans:
+        ans.is_default = False
+    else:
+        ans = {'is_default': True}
+        for k in default_interface_data:
+            ans[k] = default_interface_data[k]
+    return ans
+
+
+def update_interface_data(new_data):
+    data = get_interface_data()
+    for k in default_interface_data:
+        nval = new_data[k]
+        if k is not undefined:
+            data[k] = nval
+    if not get_interface_data.storage:
+        get_interface_data.storage = SessionData('calibre-interface-data-')
+    get_interface_data.storage.set('current', data)
+
+
+def get_translations(newval):
+    if not get_translations.storage:
+        get_translations.storage = SessionData('calibre-translations-')
+    if newval?:
+        get_translations.storage.set('current', newval)
+    else:
+        return get_translations.storage.get('current')
+
+
+class UserSessionData(SessionData):
+
+    def __init__(self, username, saved_data):
+        self.prefix = (username or '') + '-'
+        self.has_user = bool(username)
+        self.username = username
+        SessionData.__init__(self)
+        self.echo_changes = False
+        self.changes = {}
+        self.has_changes = False
+        self.push_timer_id = None
+        if saved_data:
+            for key in saved_data:
+                if not is_local_setting[key]:
+                    self.set(key, saved_data[key])
+        self.echo_changes = True
+
+    def defval(self, key):
+        return defaults[key]
+
+    def get(self, key, defval):
+        if defval is undefined:
+            defval = defaults[key]
+        return SessionData.get(self, (self.prefix + key), defval)
+
+    def get_library_option(self, library_id, key, defval):
+        if not library_id:
+            return self.get(key, defval)
+        lkey = key + '-||-' + library_id
+        if defval is undefined:
+            defval = defaults[key]
+        return self.get(lkey, defval)
+
+    def set(self, key, value):
+        if self.echo_changes and self.has_user and not is_local_setting[key]:
+            self.changes[key] = value
+            self.has_changes = True
+            if self.push_timer_id is not None:
+                clearTimeout(self.push_timer_id)
+            self.push_timer_id = setTimeout(self.push_to_server.bind(self), 1000)
+        return SessionData.set(self, (self.prefix + key), value)
+
+    def set_library_option(self, library_id, key, value):
+        if library_id:
+            key = key + '-||-' + library_id
+        return self.set(key, value)
+
+    def push_to_server(self):
+        if self.has_changes:
+            ajax_send('interface-data/set-session-data', self.changes, def(end_type, xhr, ev):
+                if end_type is not 'load':
+                    console.error('Failed to send session data to server: ' + xhr.error_html)
+            )
+            self.changes = {}
+            self.has_changes = False

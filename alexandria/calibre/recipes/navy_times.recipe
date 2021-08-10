@@ -1,0 +1,36 @@
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+class NavyTimes(BasicNewsRecipe):
+    title = 'Army and Navy Times'
+    __author__ = 'jde'
+    __date__ = '16 May 2012'
+    __version__ = '1.0'
+    description = 'News of the U.S. Navy'
+    language = 'en'
+    publisher = 'NavyTimes.com'
+    category = 'news, U.S. Navy'
+    tags = 'news, U.S. Navy'
+    oldest_article = 7  # days
+    max_articles_per_feed = 25
+    publication_type = 'newspaper'
+    no_stylesheets = True
+    use_embedded_content = False
+    encoding = None
+    recursions = 0
+    needs_subscription = False
+    remove_javascript = True
+    remove_empty_feeds = True
+    auto_cleanup = True
+
+    feeds = [
+        ('Pentagon and Congress',   'http://feeds.feedburner.com/navy-times/news/pentagon-congress'),
+        ('Your Air Force',   'http://feeds.feedburner.com/air-force-times/news/your-air-force'),
+        ('Your Army',   'http://feeds.feedburner.com/army-times/news/your-army'),
+        ('Your Marine Core',   'http://feeds.feedburner.com/marine-corps-times/news/your-marine-corps'),
+        ('Your Navy',   'http://feeds.feedburner.com/navy-times/news/your-navy'),
+        ('Pay and Benefits',   'http://feeds.feedburner.com/navy-times/pay-benefits'),
+        ('Veterans',   'http://feeds.feedburner.com/navy-times/veterans'),
+        ('Education and Trnasition',   'http://feeds.feedburner.com/navy-times/education-transition'),
+        ('Flashpoints',   'http://feeds.feedburner.com/navy-times/flashpoints'),
+    ]

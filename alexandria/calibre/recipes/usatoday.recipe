@@ -1,0 +1,79 @@
+#!/usr/bin/env python
+
+__license__ = 'GPL v3'
+__copyright__ = '2008, Kovid Goyal <kovid at kovidgoyal.net>'
+'''
+usatoday.com
+'''
+
+from calibre.web.feeds.news import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class USAToday(BasicNewsRecipe):
+
+    title = 'USA Today'
+    __author__ = 'Kovid Goyal'
+    description = 'newspaper'
+    encoding = 'utf-8'
+    language = 'en'
+
+    use_embedded_content = False
+    timefmt = ' [%d %b %Y]'
+    max_articles_per_feed = 15
+    no_stylesheets = True
+    remove_empty_feeds = True
+
+    keep_only_tags = [
+        classes('gnt_ar_hl gnt_ar_by gnt_ar_b topper__inner in-depth-content'),
+    ]
+
+    remove_tags = [
+        classes('component--pullquote__icon gnt_ss gnt_em_vp__tp'),
+        dict(attrs={'aria-label': ['advertisement']}),
+        dict(name=['link', 'media-gallery', 'button']),
+    ]
+
+    extra_css = '''
+                    h1, h2 {
+                        font-size:xx-large;
+                        font-family:Arial,Helvetica,sans-serif;}
+                    #post-attributes, .info,
+                    .clear {
+                        font-size:xx-small; color:#4D4D4D;
+                        font-family:Arial,Helvetica,sans-serif;
+                    }
+                    #post-body,
+                    #content {
+                        font-size:medium;
+                        font-family:Arial,Helvetica,sans-serif;
+                    }
+                '''
+
+    feeds = [
+        ('Top Headlines',
+         'http://rssfeeds.usatoday.com/usatoday-newstopstories&x=1'),
+        ('Tech Headlines',
+         'http://rssfeeds.usatoday.com/usatoday-techtopstories&x=1'),
+        ('Personal Tech',
+         'http://rssfeeds.usatoday.com/usatodaycomtech-personaltalk&x=1'),
+        ('Health',
+         'http://rssfeeds.usatoday.com/usatodaycomhealth-topstories&x=1'),
+        ('Travel Headlines',
+         'http://rssfeeds.usatoday.com/usatodaycomtravel-topstories&x=1'),
+        ('Money Headlines',
+         'http://rssfeeds.usatoday.com/usatodaycommoney-topstories&x=1'),
+        ('Entertainment Headlines',
+         'http://rssfeeds.usatoday.com/usatoday-lifetopstories&x=1'),
+        ('Sport Headlines',
+         'http://rssfeeds.usatoday.com/usatodaycomsports-topstories&x=1'),
+        ('Weather Headlines',
+         'http://rssfeeds.usatoday.com/usatoday-weathertopstories&x=1'),
+        ('Most Popular',
+         'http://rssfeeds.usatoday.com/usatoday-mostviewedarticles&x=1'),
+    ]

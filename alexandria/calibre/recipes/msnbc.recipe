@@ -1,0 +1,57 @@
+__license__ = 'GPL v3'
+__copyright__ = '2010-2011, Darko Miletic <darko.miletic at gmail.com>'
+'''
+msnbc.msn.com
+'''
+
+from calibre.web.feeds.recipes import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+class MsNBC(BasicNewsRecipe):
+    title = 'MSNBC'
+    __author__ = 'Darko Miletic'
+    description = 'A Fuller Spectrum of News from msnbc.com and nbcnews.com'
+    oldest_article = 2
+    max_articles_per_feed = 100
+    no_stylesheets = True
+    use_embedded_content = False
+    encoding = 'utf8'
+    publisher = 'msnbc.com'
+    language = 'en'
+    remove_empty_feeds = True
+    ignore_duplicate_articles = {'title', 'url'}
+    keep_only_tags = [
+        classes('article-hero__container article-body')
+    ]
+    remove_tags = [
+        dict(name=['iframe', 'button', 'meta', 'link']),
+        classes('widget_video ad-container related'),
+        dict(attrs={'data-test': ['social-share-inline']}),
+        dict(name='source'),
+    ]
+
+    feeds = [
+        ('Latest', 'https://feeds.nbcnews.com/msnbc/public/news'),
+        ('Top stories', 'https://feeds.nbcnews.com/nbcnews/public/news'),
+        ('Politics', 'https://feeds.nbcnews.com/nbcnews/public/politics'),
+        ('U.S. News', 'https://feeds.nbcnews.com/nbcnews/public/us-news'),
+        ('World', 'https://feeds.nbcnews.com/nbcnews/public/world'),
+        ('Business', 'https://feeds.nbcnews.com/nbcnews/public/business'),
+        ('Opinion', 'https://feeds.nbcnews.com/nbcnews/public/think'),
+    ]
+
+    def get_article_url(self, article):
+        ans = article.get('guid')
+        if '/video/' not in ans:
+            return ans
+
+    def preprocess_html(self, soup):
+        for img in soup.findAll('img', attrs={'data-original': True}):
+            img['src'] = img['data-original']
+        return soup

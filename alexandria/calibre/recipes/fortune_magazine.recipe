@@ -1,0 +1,75 @@
+from calibre.web.feeds.recipes import BasicNewsRecipe
+
+
+def classes(classes):
+    q = frozenset(classes.split(' '))
+    return dict(attrs={
+        'class': lambda x: x and frozenset(x.split()).intersection(q)})
+
+
+def prefix_classes(classes):
+    q = classes.split()
+
+    def test(x):
+        if x:
+            for cls in x.split():
+                for c in q:
+                    if cls.startswith(c):
+                        return True
+        return False
+    return dict(attrs={'class': test})
+
+
+class Fortune(BasicNewsRecipe):
+
+    title = 'Fortune Magazine'
+    __author__ = 'Rick Shang'
+
+    description = 'FORTUNE is a global business magazine that has been revered in its content and credibility since 1930. FORTUNE covers the entire field of business, including specific companies and business trends, prominent business leaders, and new ideas shaping the global marketplace.'  # noqa
+    language = 'en'
+    category = 'news'
+    encoding = 'UTF-8'
+    keep_only_tags = [
+        classes('amp-wp-title amp-wp-dek amp-header-meta amp-wp-article-featured-image amp-wp-article-content'),
+    ]
+
+    no_javascript = True
+    no_stylesheets = True
+    needs_subscription = 'optional'
+
+    def get_browser(self):
+        br = BasicNewsRecipe.get_browser(self)
+        if self.username and self.password:
+            br.open('https://fortune.com/')
+            br.select_form(id='sign-in-form')
+            br['username'] = self.username
+            br['password'] = self.password
+            br.submit()
+        return br
+
+    def preprocess_html(self, soup, *a):
+        for ai in soup.findAll(name='amp-img'):
+            ai.name = 'img'
+        return soup
+
+    def parse_index(self):
+        articles = []
+
+        # Go to the latestissue
+        soup = self.index_to_soup('https://fortune.com/section/magazine/')
+        articles = []
+
+        for li in soup.findAll('li', attrs={'class': lambda x: x and 'termArchiveContentList__item--' in x}):
+            a = li.find('a', href=True)
+            url = a['href'].rstrip('/') + '/amp'
+            div = li.find(attrs={'class': lambda x: x and 'termArchiveContentListItem__title--' in x})
+            title = self.tag_to_string(div)
+            if title.startswith('Magazine'):
+                title = title[len('Magazine'):]
+            desc = ''
+            div = li.find(attrs={'class': lambda x: x and 'termArchiveContentListItem__excerpt--' in x})
+            if div is not None:
+                desc = self.tag_to_string(div)
+            self.log(title, url)
+            articles.append({'title': title, 'url': url, 'description': desc})
+        return [('Articles', articles)]
