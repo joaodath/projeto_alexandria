@@ -653,6 +653,7 @@ button.btn-o{
   margin: 0 auto;
 }
 
+
 span.acoes {
   display: flex;
   justify-content: center;
@@ -664,6 +665,9 @@ span.acoes {
   padding: 0;
   border: 1px solid var(--primary-main);
   color: var(--primary-main);
+}
+.acervo a{
+  padding: 0.25rem 1rem;
 }
 
 /* edit */
@@ -839,7 +843,6 @@ width: 60%;
 }
 .acoes a{
   color: var(--primary-main);
-  
   margin-left: 1rem;
 }
 
