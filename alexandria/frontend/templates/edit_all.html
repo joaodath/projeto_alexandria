@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Acervo completo - Alexandria{% endblock %}
+
+{% block content %}
+<section class="section-center table-section">
+    <table class="styled-table">
+    <thead class="table-top">
+        <tr>
+            <th>#ID</th>
+            <th>Livro</th>
+            <th>Autor</th>
+            <th>Ano da Publicação</th>
+            <th>Ações</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        <tr>
+           <td>Autor</td>
+           <td>Livro</td>
+           <td>Ano</td>
+           <td>Lorem</td>
+            <td>
+                <a href="/deletar/" type="text">Excluir</a><a href="/editar-livro/{" type="text">Editar</a>
+            </td>
+            </td>
+
+        </tr>
+        <tr>
+            <td>Autor</td>
+            <td>Livro</td>
+            <td>Ano</td>
+            <td>Lorem</td>
+             <td>
+                 <a href="/deletar/" type="text">Excluir</a><a href="/editar-livro/" type="text">Editar</a>
+             </td>
+ 
+         </tr>
+    </tbody>
+</table>
+</section>
+{% endblock %}

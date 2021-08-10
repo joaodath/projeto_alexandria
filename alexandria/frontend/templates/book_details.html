@@ -1,6 +1,37 @@
 {% extends "base.html" %}
-{% block title %}Livro - Alexandria{% endblock %} 
+{% block title %}Livro - Alexandria{% endblock %}
 
 {% block content %}
-<!-- Insira os códigos específicos do livro.html aqui -->
+<main class="white-bg">
+    <section class="edit-section book-detail">
+        <div class="book">
+            <img src="https://images-na.ssl-images-amazon.com/images/I/41L2ffvMKIL._SX342_SY445_QL70_ML2_.jpg" alt="">
+            <p class="genres">Lorem/ipsum/dolor</p>
+            <p class="description">{{book.synopsis}}</p>
+        </div>
+        
+        <div class="details">
+            <p>detalhes</p>
+            <h1>{{book.name}}</h1>
+            <p>autor</p>
+            <h1>{{book.author}}</h1>
+            <p>editora</p>
+            <h1>{{book.publisher}}</h1>
+            <p>ISBN</p>
+            <h1>{{book.isbn}}</h1>
+            <p>gênero</p>
+            <h1>{{book.genre}}</h1>
+            <div class="conjunto">
+            <span><p>publicado em</p><h1>{{book.release_year}}</h1></span>
+            <span><p>páginas</p><h1>{{book.pages}}</h1></span>
+            </div>
+            <div class="buttons-details"><a href="" class="btn-o">editar</a><a href="" class="btn-o btn-transparent">remover</a></div>
+            <!-- <div class="register-buttons"><button type="submit" class="btn-o"><a class="btn-o"
+                        href="/editar-livro/">editar</a></button> <a href="/acervo"
+                    class=" btn-o btn-transparent">cancelar</a></div>
+             -->
+        </div>
+
+    </section>
+</main>
 {% endblock %}

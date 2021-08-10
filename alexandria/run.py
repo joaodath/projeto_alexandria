@@ -35,6 +35,7 @@ from .controllers import collection
 from .controllers import edit
 from .controllers import register
 from .controllers import delete
+from .controllers import edit_all
 
 #Cache Control
 # @app.after_request

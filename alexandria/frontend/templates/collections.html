@@ -2,14 +2,14 @@
 {% block title %}Acervo - Alexandria{% endblock %}
 
 {% block content %}
-<section class="card-center extra-margin">
+<section class="card-centerr extra-margin">
     <!-- title -->
     <div class="parte-superior">
         <div class="titulo">
             <p>Bem vinde</p>
             <h1>Biblioteca do</h1>
         </div>
-        <button class="btn-o">Editar</button>
+        <a href="{{ url_for('editartudo') }}"><button class="btn-o">Editar</button></a>
     </div>
     <!-- bottom part -->
     <div class="card-wrapper">
@@ -21,7 +21,8 @@
             <h2>{{b.name}}</h2>
             <aside><p>{{b.author}}</p> <p>Ficção/Literatura/Romance</p></aside>
             <p class="descricao">{{b.synopsis}}</p>
-            <span class="acoes"><a class="btn-o"href="/editar-livro/{{b.id}}">editar</a><a class="btn-o btn-transparent"href="/deletar/{{b.id}}">remover</a></span>
+            <span class="acoes"><a class="btn-o"href="/detalhelivro/{{b.id}}">ver mais</a></span>
+            <!-- <span class="acoes"><a class="btn-o"href="/editar-livro/{{b.id}}">ver mais</a></span> -->
         </article>
         {%endfor%}
         <!-- card info -->
