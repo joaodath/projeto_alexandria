@@ -109,7 +109,9 @@ h4 {
 h5 {
   font-size: 1.25rem;
 }
-
+p{
+  margin: 0;
+}
 small,
 .text-small {
   font-size: var(--smallText);
@@ -336,9 +338,8 @@ video {
 }
 
 @media screen and (min-width: 992px) {
-  main {
-    min-height: 70vh;
-
+  main.home {
+    min-height:100vh;
   }
   .content-container{
     display: none;
@@ -349,7 +350,7 @@ video {
   .video-wrapper{
     display: flex;
     position: relative;
-    height: 70vh;
+    height: 100vh;
     justify-content: center;
 }
   .bg_video{
@@ -549,6 +550,7 @@ footer .mensagem{
 .card {
   box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.2);
   border-radius: 40px;
+  position: relative;
 }
 
 .card img{
@@ -602,6 +604,17 @@ footer .mensagem{
 
 }
 
+.card .btn-o{
+  
+  position: absolute;
+left: 50%;
+transform: translate(-50%, 0);
+bottom: -4rem;
+}
+
+.card aside{
+  font-weight: 600;
+}
 
 /* acervo */
 .parte-superior {
@@ -627,6 +640,7 @@ footer .mensagem{
   cursor: pointer;
   transition: var(--transition);
   line-height: auto;
+  display: inline-block;
 
 }
 
@@ -690,7 +704,10 @@ button.btn-o{
 }
 
 .descricao {
-  max-width: 280px;
+  min-width: 280px;
+  text-align: justify;
+  max-height:280px ;
+  overflow: hidden;
   margin: 0 auto;
 }
 
@@ -843,7 +860,8 @@ width: 60%;
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  margin: 2rem 0;
+  padding: 1rem;
+  margin-top: 6rem;
 }
 
 .paginacao a{
@@ -969,3 +987,62 @@ padding-right: 1rem;
   font-weight: 500;
 }
 
+.modal-overlay{
+  position: fixed;
+  background: rgba(0, 0, 0, 0.4);
+  inset: 0;
+  display: grid;
+  place-items: center;
+  visibility: hidden;
+  z-index: -10;
+}
+
+.open-modal{
+  visibility: visible;
+  z-index: 10;
+}
+
+.modal-container{
+  background: var(--white);
+  border-radius: 30px;
+  width: 70vw;
+  max-width: 600px;
+  position: relative;
+  height: 30vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  position: relative;
+}
+.modal-btn{
+  cursor: pointer;
+}
+.close-btn2{
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 2rem;
+  background: transparent;
+  border-color: transparent;
+  cursor: pointer;
+  color: var(--primary-main);
+  transition:var(--transition);
+}
+.close-btn2:hover{
+  color: var(--orange-dark);
+  transform: rotate(360deg) scale(1.3);
+}
+
+/* delete */
+.delete-section{
+  height: 80vh;
+  padding: 2rem;
+  margin:0 auto;
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.poster{
+width: 80vw;
+max-width: 700px;
+}

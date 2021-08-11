@@ -3,10 +3,12 @@
 
 {% block content %}
 
-    <div>
+    <div class="delete-section">
+        <div class="poster">
         <h2>Você quer mesmo excluir o livro {{book.name}}?</h2>
-        <a href="/deletar/{{book.id}}">Deletar</a>
-        <a href="/detalhelivro/{{book.id}}">Cancelar</a>
+        <a class="btn-o"href="/deletar/{{book.id}}">Deletar</a>
+        <a class="btn-o btn-transparent"href="/editartodos">Cancelar</a>
+        </div>
     </div>
 
 {% endblock %}
