@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import render_template, request, redirect
 
 from alexandria.run import app, db
 from alexandria.models.schemas import Book
@@ -20,7 +20,6 @@ def edit(id):
         book.image= request.form['image']
         db.session.add(book)
         db.session.commit()
-        alert_show = True
-        return render_template('book_details.html', book=book, show=alert_show)
+        return redirect(f'/detalhelivro-editado/{book.id}')
     
     return render_template('edit.html', book=book)
