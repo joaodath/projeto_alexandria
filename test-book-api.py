@@ -1,9 +1,9 @@
-from alexandria.book_api import search_book_kan
+from kan_alexandria.book_api import search_book_kan as search
 
 booktitle = input(str('Informe o título do livro: '))
 bookauthor = input(str('Informe o nome do autor: '))
 
-avocado = search_book_kan(booktitle, bookauthor)
+avocado = search(booktitle, bookauthor)
 
 """
 Searches the book in the internet using kan module. Provide at least one
