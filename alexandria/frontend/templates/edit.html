@@ -29,23 +29,23 @@
                 <label for="">Editora:</label>
                 <input type="text" id="publisher" name="publisher" required value="{{book.publisher}}">
                 <label for="">ISBN:</label>
-                <input type="text" id="isbn" name="isbn">
+                <input type="text" id="isbn" name="isbn" value="{{book.isbn}}">
                 <label for="">Publicado em:</label>
-                <input type="text" id="release" name="release">
+                <input type="text" id="release" name="release" value="{{book.release_year}}">
                 <label for="">Genero:</label>
-                <input type="text" id="genre" name="genre">
+                <input type="text" id="genre" name="genre" value="{{book.genre}}">
                 <label for="">Paginas:</label>
-                <input type="text" id="pages" name="pages">
+                <input type="text" id="pages" name="pages" value="{{book.pages}}">
                 <label for="">Imagem da Capa:</label>
-                <input type="text" id="image" name="image">
+                <input type="text" id="image" name="image" value="{{book.image}}">
                 <!-- <label for="">Link Download:</label>
                 <input type="text" id="download" name="download">
                 <label for="">Link de Compra:</label>
                 <input type="text" id="buy" name="buy"> -->
                 <label for="description">Sinopse</label>
-                <textarea></textarea>
+                <textarea name="synopsis"value="{{book.synopsis}}"></textarea>
     
-                <div class="register-buttons"><button type="submit" class="btn-o"><a>salvar</a></button> <a href="/detalhelivro/{{book.id}}" class=" btn-o btn-transparent">cancelar</a></div>
+                <div class="register-buttons"><button type="submit" class="btn-o"><a>salvar</a></button> <a href="/editartodos" class=" btn-o btn-transparent">cancelar</a></div>
             </form>
         </div>
         <div class="info">

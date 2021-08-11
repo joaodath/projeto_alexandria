@@ -20,7 +20,6 @@ closeBtn2.addEventListener('click', () => {
   sidebar.classList.remove('show-sidebar')
 })
 
-
 modalBtn.addEventListener('click', function () {
   modal.classList.add('open-modal')
 })
