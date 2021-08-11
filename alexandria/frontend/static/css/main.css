@@ -65,6 +65,7 @@ body {
   line-height: 1.75;
   width: 100vw;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 p {
@@ -183,6 +184,7 @@ Sidebar
   box-shadow: var(--shadow-2);
   transition: var(--transition);
   transform: translate(-100%);
+  z-index: 4;
   /* todo hide sidebar */
 }
 
@@ -229,6 +231,7 @@ Sidebar
 }
 
 .links a {
+  text-decoration: none;
   display: block;
   font-size: 1.5rem;
   text-transform: capitalize;
@@ -270,6 +273,7 @@ Sidebar
   }
 
   .links a {
+    text-decoration: none;
     padding-bottom: 0.88rem;
     padding-left: 1.75rem;
     font-size: 1rem;
@@ -335,8 +339,8 @@ video {
 }
 
 @media screen and (min-width: 992px) {
-  main {
-    min-height: calc(100vh - 278.9px);
+  main.home {
+    min-height:100vh;
 
   }
   .content-container{
@@ -348,7 +352,7 @@ video {
   .video-wrapper{
     display: flex;
     position: relative;
-    height: calc(100vh - 278.9px);
+    height: 100vh;
     justify-content: center;
 }
   .bg_video{
@@ -455,12 +459,14 @@ footer .mensagem{
 } 
 
 .footer-wrapper{
+  height: (30vh - 60px);
   padding: 2rem 3rem;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
 }
 .footer-links a {
+  text-decoration: none;
   font-weight: 600;
   color: var(--white);
   text-transform: capitalize;
@@ -540,7 +546,8 @@ footer .mensagem{
 /* about */
 
 .card-center {
-  width: 80vw !important;
+  width: 80vw;
+  min-height: 70vh;
   max-width: 1170px;
   margin: 0 auto;
 }
@@ -582,8 +589,11 @@ footer .mensagem{
 
 .card-info img {
   border-radius: 50%;
-  width: 50%;
-  height: 50%;
+
+  width: 200px;
+  height: 200px;
+  -o-object-fit: cover;
+     object-fit: cover;
 }
 
 .card-social a {
@@ -877,7 +887,7 @@ width: 60%;
 
 /* table */
 .table-section{
-  min-height: calc(100vh - 108px);
+  min-height: calc(100vh - 20vh);
   display: flex;
   align-items: flex-start;
 }
@@ -891,12 +901,15 @@ width: 60%;
   margin: 25px 0;
   font-size: 0.9em;
   font-family: sans-serif;
-  min-width: 800px;
+  width: 800px;
+  height: 150px;
+  overflow:auto;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
   border-radius: 20px;
   text-align: center;
   border-top-left-radius:var(--borderRadius);
   border-top-right-radius: var(--borderRadius);
+  
 }
 
 .styled-table thead tr {

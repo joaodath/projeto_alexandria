@@ -15,7 +15,7 @@ def cadastrar():
             )
         db.session.add(book)
         db.session.commit()
-        return redirect(url_for('cadastrar'))
+        return render_template('register.html',book=book)
     
     return render_template('register.html')
 
