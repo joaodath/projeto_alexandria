@@ -39,11 +39,6 @@ If you're on Windows, you can head to Python's download page to download an
 executable (.exe) for quick installation. Choose the latest version.
 [Click here](https://www.python.org/downloads/windows/) to download Python.
 
-After installing Python, run the following command on your PowerShell or 
-Terminal window to install Pygame only for the local user instead of globally:
-```
-python -m pip install -U pygame --user
-```
 
 #### Linux-based systems
 We'll show how to download and install Python on Ubuntu OS. The instructions
@@ -61,10 +56,5 @@ $ sudo apt-get update
 $ sudo apt-get install python3.9
 ```
 
-After installing Python, run the following command on your Terminal window to 
-install Pygame only for the local user instead of globally:
-```
-python3 -m pip install -U pygame --user
-```
 
 We designed Alexandria to rely on minimal dependencies
