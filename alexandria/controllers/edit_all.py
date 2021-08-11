@@ -1,12 +1,12 @@
-from flask import render_template, request, flash
+from flask import render_template, request
 from werkzeug.utils import redirect
 
 from alexandria.run import app, db
 from alexandria.models.schemas import Book
 
-app.secret_key = 'seilaqualsenhausarnessabagaça'
 
-# renderiza o 
+
+# função para a paginação
 @app.route('/editartodos')
 def editartodos():
     page = request.args.get('page', 1, type=int)
@@ -21,5 +21,4 @@ def editar_id(id):
     book=  Book.query.get(id)
     db.session.delete(book)
     db.session.commit()
-    flash('Deletado com sucesso.')
     return redirect('/editartodos')
