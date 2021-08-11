@@ -65,6 +65,7 @@ body {
   line-height: 1.75;
   width: 100vw;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 p {
@@ -336,7 +337,7 @@ video {
 
 @media screen and (min-width: 992px) {
   main {
-    min-height: calc(100vh - 278.9px);
+    min-height: 70vh;
 
   }
   .content-container{
@@ -348,7 +349,7 @@ video {
   .video-wrapper{
     display: flex;
     position: relative;
-    height: calc(100vh - 278.9px);
+    height: 70vh;
     justify-content: center;
 }
   .bg_video{
@@ -967,7 +968,4 @@ padding-right: 1rem;
   text-align: center;
   font-weight: 500;
 }
-}
 
-
-}
