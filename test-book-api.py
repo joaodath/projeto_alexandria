@@ -3,7 +3,15 @@ from kan_alexandria.book_api import search_book_kan as search
 booktitle = input(str('Informe o título do livro: '))
 bookauthor = input(str('Informe o nome do autor: '))
 
-avocado = search(booktitle, bookauthor)
+book_dict = search(booktitle, bookauthor)
+
+for k, v in book_dict.items():
+    if book_dict[k] == ' ':
+        book_dict[k] = 'N/A'
+if book_dict['title'] == None or book_dict['title'] == 'N/A':
+    book_dict['title'] = 'request.form'
+if book_dict['author'] == None or book_dict['author'] == 'N/A':
+    book_dict['author'] = 'request.form'
 
 """
 Searches the book in the internet using kan module. Provide at least one
@@ -24,24 +32,24 @@ The result is a dict with the following keys:
 
 print('\n\n')
 print('*'*10)
-print(avocado)
+print(book_dict)
 print('\n\n')
 print('*'*10)
-print(avocado['title'])
+print(book_dict['title'])
 print('*'*10)
-print(avocado['author'])
+print(book_dict['author'])
 print('*'*10)
-print(avocado['isbn'])
+print(book_dict['isbn'])
 print('*'*10)
-print(avocado['categories'])
+print(book_dict['categories'])
 print('*'*10)
-print(avocado['description'])
+print(book_dict['description'])
 print('*'*10)
-print(avocado['img'])
+print(book_dict['img'])
 print('*'*10)
-print(avocado['publisher'])
+print(book_dict['publisher'])
 print('*'*10)
-print(avocado['publishedDate'])
+print(book_dict['publishedDate'])
 print('*'*10)
-print(avocado['pageCount'])
+print(book_dict['pageCount'])
 print('*'*10)
