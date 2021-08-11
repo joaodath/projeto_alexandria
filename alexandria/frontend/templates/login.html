@@ -2,56 +2,68 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="../static/css/main.css">
-    <title>Login/Cadastro</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login</title>
+    <link rel="stylesheet" href="../static/css/login.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
 </head>
 <body>
     <div class="container">
-        <a class="link" id="paralogin"></a>
-        <a class="link" id="paracadastro"></a>
-
-        <div class="content">
-            <!--Formulário de Login-->
-            <section id="login">
-                <form method="POST" action="/alexandria/frontend/templates/index.html">
-                    <h1>Login</h1>
-
-                    <label for="email">Email:</label>
-                    <input id="email" name="email" type="email" placeholder="ex: exemplo@exemplo.com">
+        <div class="content first-content">
+            <div class="first-column">
+                <h1 class="title title-primary">Login</h1>
+                <p>Faça o login por aqui!</p>
+                <button id="signin" class="btn btn-primary">sign in</button>
+            </div>    
+            <div class="second-column">
+                <h1 class="title title-second">Crie sua conta</h1>
+                <p>Insira suas informações aqui:</p>
+                <form method="POST" onsubmit="return check_form()" class="form">
+                    <label class="label-input" for="">
+                        <i class="far fa-user icon-modify"></i>
+                        <input class="text required" type="text" placeholder="Name">
+                    </label>
                     
-                    <label for="password">Senha:</label>
-                    <input id="password" name="password" type="password" placeholder="ex: fj22tft11">
+                    <label class="label-input" for="">
+                        <i class="far fa-envelope icon-modify"></i>
+                        <input class="text required" type="email" placeholder="Email">
+                    </label>
                     
-                    <button type="submit" id="enviar" onclick="validar">Logar</button>
+                    <label class="label-input" for="">
+                        <i class="fas fa-lock icon-modify"></i>
+                        <input class="text required" type="password" placeholder="Password">
+                    </label>
+                    
+                    <button type="submit" class="btn btn-second">sign up</button>        
                 </form>
-                <p>
-                    Ainda não tem conta? 
-                    <a href="#paracadastro">Cadastre-se</a>
-                </p>
-            </section>
-            <!--Formulário de Cadastro-->
-            <section id="cadastro">
-                <form method="POST" action="/alexandria/frontend/templates/login.html">
-                    <h1>Cadastro</h1>
+            </div>
+        </div>
+        <div class="content second-content">
+            <div class="first-column">
+                <h1 class="title title-primary">Cadastre-se</h1>
+                <p>Faça o cadastro por aqui!</p>
+                <button id="signup" class="btn btn-primary">sign up</button>
+            </div>
+            <div class="second-column">
+                <h1 class="title title-second">Login</h1>
+                <p>Insira seu email e senha:</p>
+                <form method="POST" onsubmit="check_form_log()" class="form">
+                
+                    <label class="label-input" for="">
+                        <i class="far fa-envelope icon-modify"></i>
+                        <input class="text required_log" type="email" placeholder="Email">
+                    </label>
+                
+                    <label class="label-input" for="">
+                        <i class="fas fa-lock icon-modify"></i>
+                        <input class="text required_log" type="password" placeholder="Password">
+                    </label>
 
-                    <label for="name">Username:</label>
-                    <input id="name" name="name" type="text" placeholder="ex: Fulano de Tals">
-                    
-                    <label for="email">Email:</label>
-                    <input id="email" name="email" type="email" placeholder="ex: exemplo@exemplo.com">
-                    
-                    <label for="password">Senha:</label>
-                    <input id="password" name="password" type="password" placeholder="ex: fj22tft11">
-                    
-                    <button type="submit" id="enviar" onclick="validar">Cadastrar</button>
+                    <button type="submit" class="btn btn-second">sign in</button>
                 </form>
-                <p>
-                    Já tem uma conta?
-                    <a href="#paralogin">Login</a>
-                </p>
-            </section>
+            </div>
         </div>
     </div>
     <script src="../static/js/login.js"></script>
