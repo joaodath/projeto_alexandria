@@ -13,6 +13,10 @@ def edit(id):
         book.publisher = request.form['publisher']
         db.session.add(book)
         db.session.commit()
-        return redirect('/editartodos')
+        if book.image != None:
+            url_img = book.image
+        else:
+            url_img = '../frontend/static/img/placeholder_cadastro'
+        return redirect(f'/detalhelivro/{book.id}')
     
     return render_template('edit.html', book=book)
