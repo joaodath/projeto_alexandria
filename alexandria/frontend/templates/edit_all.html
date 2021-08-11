@@ -36,14 +36,15 @@
            <td>{{b.author}}</td>
            <td>{{b.release_year}}</td>
             <td class="acoes">
-                <a href="/editar-livro/{{b.id}}" type="text">Editar</a><a href="/excluir/{{b.id}}" type="text">Excluir</a>
+                <a href="/editar-livro/{{b.id}}" type="text">Editar</a><a href="/confirmar-excluir/{{b.id}}"class="modal-btn"type="text">Excluir</a>
             </td>
-            </td>
+            
         </tr>
         {%endfor%}
     </tbody>
     
 </table>
+
 
 </section>
 <div class="paginacao">
@@ -64,5 +65,6 @@
             . . . 
             {% endif %} 
     {% endfor %}
+    
 </div>
 {% endblock %}
