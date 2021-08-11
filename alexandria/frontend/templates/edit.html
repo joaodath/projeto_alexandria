@@ -9,7 +9,11 @@
 <main class="white-bg">
     <section class="edit-section">
         <div class="book">
-            <img src="{{url_img}}" alt="">
+                {% if book.image != None %}
+                    <img src="{{book.image}}" alt="">
+                {% else %}
+                    <img src="../static/img/placeholder_biblioteca.png" alt="">
+                {% endif %}
             <p class="genres">Lorem/ipsum/dolor</p>
             <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde aut doloremque aliquid iure
                 architecto impedit qui praesentium et optio mollitia?</p>

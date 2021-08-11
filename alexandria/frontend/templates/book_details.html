@@ -26,11 +26,21 @@
             <span><p>publicado em</p><h1>{{book.release_year}}</h1></span>
             <span><p>páginas</p><h1>{{book.pages}}</h1></span>
             </div>
-            <div class="buttons-details"><a href="/editar-livro/{{book.id}}" class="btn-o">editar</a><a href="/confirmar-excluir/{{book.id}}" class="btn-o btn-transparent">remover</a></div>
+            <div class="buttons-details"><a href="/editar-livro/{{book.id}}" class="btn-o">editar</a><a class="btn-o btn-transparent modal-btn">remover</a></div>
+            <div class="modal-overlay">
+                <div class="modal-container">
+                    <h3>Você quer mesmo remover?</h3>
+                    <a class="btn-o" href="/deletar/{{book.id}}">remover</a>
+                    <button class="close-btn2">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
             <!-- <div class="register-buttons"><button type="submit" class="btn-o"><a class="btn-o"
                         href="/editar-livro/">editar</a></button> <a href="/acervo"
                     class=" btn-o btn-transparent">cancelar</a></div>
-             -->
+            -->
         </div>
     </section>
 </main>

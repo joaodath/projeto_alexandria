@@ -968,3 +968,46 @@ padding-right: 1rem;
   font-weight: 500;
 }
 
+.modal-overlay{
+  position: fixed;
+  background: rgba(0, 0, 0, 0.4);
+  inset: 0;
+  display: grid;
+  place-items: center;
+  visibility: hidden;
+  z-index: -10;
+}
+
+.open-modal{
+  visibility: visible;
+  z-index: 10;
+}
+
+.modal-container{
+  background: var(--white);
+  border-radius: 30px;
+  width: 70vw;
+  max-width: 600px;
+  position: relative;
+  height: 30vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.close-btn2{
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 2rem;
+  background: transparent;
+  border-color: transparent;
+  cursor: pointer;
+  color: var(--primary-main);
+  transition:var(--transition);
+}
+.close-btn2:hover{
+  color: var(--orange-dark);
+  transform: rotate(360deg) scale(1.3);
+}
