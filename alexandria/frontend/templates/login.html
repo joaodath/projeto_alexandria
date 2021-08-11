@@ -1,21 +1,59 @@
-{% extends "base.html" %}
-{% block title %}Login - Alexandria{% endblock %} 
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../static/css/main.css">
+    <title>Login/Cadastro</title>
+</head>
+<body>
+    <div class="container">
+        <a class="link" id="paralogin"></a>
+        <a class="link" id="paracadastro"></a>
 
-{% block content %}
-<!-- Insira os códigos específicos do login.html aqui -->
-<!-- FruFru -->
+        <div class="content">
+            <!--Formulário de Login-->
+            <section id="login">
+                <form method="POST" action="/alexandria/frontend/templates/index.html">
+                    <h1>Login</h1>
 
-<form action="/cadastrar" method="POST">
-    <label for="">Nome:</label>
-    <input type="text" id="name" name="name">
+                    <label for="email">Email:</label>
+                    <input id="email" name="email" type="email" placeholder="ex: exemplo@exemplo.com">
+                    
+                    <label for="password">Senha:</label>
+                    <input id="password" name="password" type="password" placeholder="ex: fj22tft11">
+                    
+                    <button type="submit" id="enviar" onclick="validar">Logar</button>
+                </form>
+                <p>
+                    Ainda não tem conta? 
+                    <a href="#paracadastro">Cadastre-se</a>
+                </p>
+            </section>
+            <!--Formulário de Cadastro-->
+            <section id="cadastro">
+                <form method="POST" action="/alexandria/frontend/templates/login.html">
+                    <h1>Cadastro</h1>
 
-    <label for="">email</label>
-    <input type="text" id="email" name="email">
-
-    <label for="">Senha</label>
-    <input type="password" id="password" name="password">
-
-    <button type="submit">Cadastrar</button>
-</form>
-
-{% endblock %}
+                    <label for="name">Username:</label>
+                    <input id="name" name="name" type="text" placeholder="ex: Fulano de Tals">
+                    
+                    <label for="email">Email:</label>
+                    <input id="email" name="email" type="email" placeholder="ex: exemplo@exemplo.com">
+                    
+                    <label for="password">Senha:</label>
+                    <input id="password" name="password" type="password" placeholder="ex: fj22tft11">
+                    
+                    <button type="submit" id="enviar" onclick="validar">Cadastrar</button>
+                </form>
+                <p>
+                    Já tem uma conta?
+                    <a href="#paralogin">Login</a>
+                </p>
+            </section>
+        </div>
+    </div>
+    <script src="../static/js/login.js"></script>
+</body>
+</html>
