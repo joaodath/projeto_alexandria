@@ -2,6 +2,18 @@
 {% block title %}Acervo completo - Alexandria{% endblock %}
 
 {% block content %}
+
+<div>
+    
+
+    {% if book %}
+    <div class="alert alert-success" role="alert">
+        A simple success alert with <a href="/detalhelivro/{{book.id}}" class="alert-link">an example link</a>. Give it a click if you like.
+      </div>
+    {%endif%}
+
+</div>
+
 <section class="section-center table-section">
     <table class="styled-table">
     <thead class="table-top">
@@ -24,7 +36,7 @@
            <td>{{b.author}}</td>
            <td>{{b.release_year}}</td>
             <td class="acoes">
-                <a href="/editar-livro/{{b.id}}" type="text">Editar</a><a href="/deletar/{{b.id}}" type="text">Excluir</a>
+                <a href="/editar-livro/{{b.id}}" type="text">Editar</a><a href="/excluir/{{b.id}}" type="text">Excluir</a>
             </td>
             </td>
         </tr>
@@ -39,12 +51,12 @@
         left_current=2, right_current=2) %} {% if page_num %} {% if book.page ==
         page_num %}
         
-        <a class="" href="{{ url_for('acervo', page=page_num) }}">
+        <a class="" href="{{ url_for('editartodos', page=page_num) }}">
             {{ page_num }}
         </a>
         {% else %}
         
-        <a class="" href="{{ url_for('acervo', page=page_num) }}">
+        <a class="" href="{{ url_for('editartodos', page=page_num) }}">
             {{ page_num }}
         </a>
             {% endif %} 

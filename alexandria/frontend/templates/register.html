@@ -2,6 +2,17 @@
 {% block title %}Cadastrar novo livro - Alexandria{% endblock %}
 
 {% block content %}
+
+    <div>
+    
+
+        {% if book %}
+        <div class="alert alert-success" role="alert">
+            A simple success alert with <a href="/detalhelivro/{{book.id}}" class="alert-link">an example link</a>. Give it a click if you like.
+          </div>
+        {%endif%}
+
+    </div>
 <main class="white-bg">
 <section class="edit-section">
     <div class="book">
@@ -14,9 +25,9 @@
         <h1 class="cadastrar">Cadastrar Livro</h1>
         <form action="/cadastrar" method="POST">
             <label for="">Nome do Livro:</label>
-            <input type="text" id="name-book" name="name-book">
+            <input type="text" id="name-book" name="name-book" required>
             <label for="">Autor:</label>
-            <input type="text" id="name-author" name="name-author">
+            <input type="text" id="name-author" name="name-author" required>
             
 
             <div class="register-buttons"><button type="submit" class="btn-o slide"><a>salvar</a></button> <a href="/acervo" class=" btn-o btn-transparent">cancelar</a></div>

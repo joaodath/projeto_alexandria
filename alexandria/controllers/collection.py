@@ -17,6 +17,3 @@ def acervo():
     per_page = 9
     book=  Book.query.paginate(page=page, per_page=per_page)
     return render_template('collections.html', book=book)
-
-
-

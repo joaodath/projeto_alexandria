@@ -8,5 +8,5 @@ def delete(id):
     book = Book.query.get(id)
     db.session.delete(book)
     db.session.commit()
-    return redirect('/editartodos')
+    return redirect('/acervo')
     
