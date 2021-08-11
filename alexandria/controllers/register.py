@@ -27,13 +27,9 @@ def cadastrar():
             )
         db.session.add(book_user)
         db.session.commit()
-<<<<<<< HEAD
-        return render_template('register.html',book=book)
-=======
         
         return render_template('register.html', book=book_user)
        
->>>>>>> dff19c79871f2f625bcff822986183dc36f4731d
     
     return render_template('register.html')
 
