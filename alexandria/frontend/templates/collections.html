@@ -10,7 +10,7 @@
             <h1>Biblioteca</h1>
         </div>
         <div>
-        <a href="{{ url_for('editartudo') }}"><button class="btn-o">Editar</button></a>
+        <a href="{{ url_for('editartodos') }}"><button class="btn-o">Editar</button></a>
     </div>
     </div>
     <!-- bottom part -->
@@ -19,7 +19,11 @@
         <!-- single card -->
         {%for b in book.items %}
         <article class="card">
-            <img src="../static/img/placeholder_biblioteca.png" alt="">
+            {% if b.image != None %}
+            <img src="{{b.image}}" alt="">
+            {% else %}
+            <img src='../static/img/placeholder_cadastro.png' alt="">
+            {% endif %}
             <h2>{{b.name}}</h2>
             <aside><p class="autor">{{b.author}}</p> <p class="genero">{{b.genre}}</p></aside>
             <p class="descricao">{{b.synopsis}}</p>
