@@ -2,13 +2,14 @@
 {% block title %}Novo Usuário - Alexandria{% endblock %}
 
 {% block content %}
-<section id='success'>
-    <div id="card">
+<section id='send-center'>
+    <div id="send-card">
         <i class="fa fa-check-circle" aria-hidden="true"></i>
-        <h1>Olá {{formContato.nome}}, sua mensagem foi enviada com sucesso!</h1>
+        <h1>Olá <span style="text-decoration: wavy;">{{formContato.nome}}</span>, sua mensagem foi enviada com sucesso!</h1>
+        <div class="comment">
         <h3>Mensagem:</h3>
         <p>{{formContato.mensagem}}</p>
-        <a href="/">Voltar para o portfólio</a>
+        </div>
     </div>
 </section>
 {% endblock %}

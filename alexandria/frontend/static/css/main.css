@@ -1167,4 +1167,48 @@ max-width: 700px;
   max-width: 30%;
   }}
 
-  
+  /* send */
+
+#send-center {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+}
+
+#send-card {
+    width: 50rem;
+    height: 30rem;
+    background-color:var(--primary-main);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    border-radius: 1rem;
+}
+
+
+#send-card h1 {
+    font-size: 3rem;
+    margin-bottom: 2rem;
+    color: rgb(255, 255, 255);
+    text-align: center;
+}
+
+#send-card p {
+    font-size: 1.7rem;
+    text-align: center;
+    font-weight: 700;
+}
+
+.fa-check-circle {
+    margin-top: 2rem;
+    font-size: 3.8rem;
+    color: rgb(156, 251, 13);
+}
+
+.comment {
+    padding: 1rem;
+    color: aliceblue;
+    background-color: rgba(51, 29, 49, 0.569);
+}

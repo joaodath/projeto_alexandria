@@ -1,7 +1,5 @@
 from flask import render_template, request
 from kan_alexandria.book_api import search_book_kan as search
-
-
 from alexandria.run import app, db
 from alexandria.models.schemas import Book
 
@@ -27,7 +25,7 @@ def cadastrar():
             book_dict['title'] = request.form['name-book']
         if book_dict['author'] == None or book_dict['author'] == 'N/A':
             book_dict['author'] = request.form['name-author']
-        if book_dict['pageCount'] == None or book_dict['pageCount'] == 'N/A':
+        if book_dict['pageCount'] == None or book_dict['pageCount'] == 'N/A' or book_dict['pageCount'].isdigit == False:
             book_dict['pageCount'] = 0
         if book_dict['img'] == None or book_dict['img'] == 'N/A':
             book_dict['img'] = '../static/img/placeholder_biblioteca.png'
