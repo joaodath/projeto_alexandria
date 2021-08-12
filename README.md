@@ -9,7 +9,9 @@ A full-fledged online library manager based on Python, HTML, CSS and JS.
 Alexandria is a tribute to the original Library of Alexandria, destroyed by 
 those whom feared open knowledge. 
 
-<img align='center' src="alexandria/frontend/static/img/logo/alexandria_logo.svg" width='300px' style='display: flex; justify-content: center'>
+<div align='center'>
+<img  src="alexandria/frontend/static/img/logo/alexandria_logo.svg" width='300px' style='display: flex; justify-content: center'>
+</div>
 
 ## Main Goal
 To develop a full-fledged online library manager and a community of readers 
