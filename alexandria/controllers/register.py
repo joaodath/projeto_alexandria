@@ -24,7 +24,7 @@ def cadastrar():
         if book_dict['pageCount'] == None or book_dict['pageCount'] == 'N/A':
             book_dict['pageCount'] = 0
         if book_dict['img'] == None or book_dict['img'] == 'N/A':
-            book_dict['img'] = '/static/img/placeholder_biblioteca.png'
+            book_dict['img'] = '../static/img/placeholder_biblioteca.png'
             
 
         #Uploading the book to the database
