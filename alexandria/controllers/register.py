@@ -3,12 +3,18 @@ from kan_alexandria.book_api import search_book_kan as search
 
 
 from alexandria.run import app, db
-
 from alexandria.models.schemas import Book
 
 
 @app.route('/cadastrar', methods=['GET', 'POST'])
 def cadastrar():
+    """
+    Route register book information in the database with alexandria api.
+    
+    Returns:
+        Templates and Variables: render template register.html and variable
+        book
+    """
     if request.method == 'POST':
         book_dict = search(request.form['name-book'],
             request.form['name-author'])
