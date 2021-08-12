@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Confirmar Exclusão - Alexandria{% endblock %} 
+
+{% block content %}
+
+    <div class="delete-section">
+        <div class="poster">
+        <h2>Você quer mesmo excluir o livro {{book.name}}?</h2>
+        <a class="btn-o"href="/deletar/{{book.id}}">Deletar</a>
+        <a class="btn-o btn-transparent"href="/editartodos">Cancelar</a>
+        </div>
+    </div>
+
+{% endblock %}

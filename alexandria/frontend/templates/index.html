@@ -1,0 +1,34 @@
+<!-- Este é o novo index. Apague o index anterior e 
+    renomeie este como index.html depois de mover as informações do anterior 
+    para base.html  -->
+
+{% extends "base.html" %}
+{% block title %}Página Inicial - Alexandria{% endblock %} 
+
+{% block content %}
+<main>
+    <!-- section to center items -->
+    <section class="video-wrapper">
+        <video autoplay loop muted class="bg_video">
+          <source src="../static/img/video.mp4" type="video/mp4"/>
+        </video>
+        <div class="title-home">
+          <h2>Bem vinde <span class="minuscula">a</span></h2>
+          <h1>Alexandria!</h1>
+          <p>organizamos a sua biblioteca de livros para que você passe menos tempo procurando uma capa e mais tempo lendo.</p>
+          <a href="/acervo" class="btn-o btn-home">Acervo</a><a href="/cadastrar"class="btn-o btn-transparent">Cadastrar livro</a>
+        </div>
+      
+    </section>
+    <article class="content-container">
+      <div class="content-center">
+        <img src="../static/img/img-library-home.png" class="imagem-celular">
+        <h2>Bem vinde <span class="minuscula">a</span></h2>
+        <h1 class="black-name">Alexandria!</h1>
+        <p>organizamos a sua biblioteca de livros para que você passe menos tempo procurando uma capa e mais tempo lendo.</p>
+        <a href="/acervo" class="btn-o btn-home">Acervo</a><a href="/cadastrar"class="btn-o btn-transparent">Cadastrar livro</a>
+<img src="foto-home.png" alt="">
+</div>
+</article>
+  </main>
+{% endblock %}
