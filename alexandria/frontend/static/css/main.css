@@ -25,21 +25,14 @@ html {
   --primary-main: #a64511;
   --black: #000;
   --beige: #e4d9c8;
-  /* rest of the colors */
-
-  --white: #fff;
-  --red-light: #f8d7da;
-  --red-dark: #842029;
-  --green-light: #46644e;
   --orange-dark: #49200b;
-  --font-heading: #9b9b9b;
+  --white: #fff;
 
   /* fonts  */
   --font: 'Roboto Slab','sans serif';
 
   --smallText: 0.7em;
   /* rest of the vars */
-  --backgroundColor: var(--grey-50);
   --textColor: var(--grey-900);
   --borderRadius: 40px;
   --letterSpacing: 1px;
@@ -186,6 +179,7 @@ Sidebar
   box-shadow: var(--shadow-2);
   transition: var(--transition);
   transform: translate(-100%);
+  z-index: 15;
   /* todo hide sidebar */
 }
 
@@ -306,12 +300,15 @@ main {
 }
 .content-center{
   display: flex;
-  height: 80vh;
+  min-height: 90vh;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
+  row-gap: 1rem;
 }
+
+
 .content-center h2{
   margin-left: -2rem;
   margin-bottom: -10px;
@@ -594,6 +591,9 @@ footer .mensagem{
   color: var(--primary-main);
 
 }
+.card-social a:hover{
+  color: black;
+}
 
 .card-social {
   background: var(--beige);
@@ -623,10 +623,13 @@ bottom: -4rem;
   align-items: center
 }
 
+
 .parte-superior p {
   margin-bottom: 0;
 }
-
+.parte-superior .btn-o{
+  display: none;
+}
 .btn-o {
  
   align-self: center;
@@ -1046,3 +1049,109 @@ padding-right: 1rem;
 width: 80vw;
 max-width: 700px;
 }
+
+.imagem-celular{
+  width: 20rem;
+}
+
+/* form contato */
+.contactdisplay: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: #5a7233;
+
+
+.white-bg form {
+  position: relative;
+  width: 80%;
+  border-radius: 30px;
+  background: #fff;
+  }
+  .form-left-decoration,
+  .form-right-decoration {
+  content: "";
+  position: absolute;
+  width: 50px;
+  height: 20px;
+  border-radius: 20px;
+  background: #5a7233;
+  }
+  .form-left-decoration {
+  bottom: 60px;
+  left: -30px;
+  }
+  .form-right-decoration {
+  top: 60px;
+  right: -30px;
+  }
+  .form-left-decoration:before,
+  .form-left-decoration:after,
+  .form-right-decoration:before,
+  .form-right-decoration:after {
+  content: "";
+  position: absolute;
+  width: 50px;
+  height: 20px;
+  border-radius: 30px;
+  background: #fff;
+  }
+  .form-left-decoration:before {
+  top: -20px;
+  }
+  .form-left-decoration:after {
+  top: 20px;
+  left: 10px;
+  }
+  .form-right-decoration:before {
+  top: -20px;
+  right: 0;
+  }
+  .form-right-decoration:after {
+  top: 20px;
+  right: 10px;
+  }
+  .circle {
+  position: absolute;
+  bottom: 80px;
+  left: -55px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  }
+  .form-inner {
+  padding: 40px;
+  }
+  .form-inner input,
+  .form-inner textarea {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 20px;
+  background: #d0dfe8;
+  }
+  .form-inner textarea {
+  resize: none;
+  }
+  button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  border-radius: 20px;
+  border: none;
+  border-bottom: 4px solid #3e4f24;
+  background: #5a7233; 
+  font-size: 16px;
+  font-weight: 400;
+  color: #fff;
+  }
+  button:hover {
+  background: #3e4f24;
+  } 
+  @media (min-width: 568px) {
+  .white-bg form {
+  width: 60%;
+  }}
