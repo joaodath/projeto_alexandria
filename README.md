@@ -48,7 +48,7 @@ git clone https://github.com/joaodath/projeto_alexandria.git
 
 Then, you'll need to install our dependencies. It's pretty easy! We will 
 assume you already have the latest Python installed on your machine 
-(that will be 3.9.6) but if you need help, you can [click here](link) and 
+(that will be 3.9.6) but if you need help, you can [click here](#installing-python) and 
 will guide you through the process.
 
 We designed Alexandria to rely on minimal dependencies but we still need some. 
@@ -204,8 +204,8 @@ $ sudo apt-get install python3.9
 
 ## The team behind
 
-- [Thaynar Brandão](github.com/thaynar96)
-- [João Rodrigues](github.com/joaodath)
-- [Felipe Menezes](github.com/menezesfelipee)
-- [Fábio Araujo](github.com/fharaujo)
-- [Bianca Monteiro Corrêa](github.com/Bianca-22)
+- [Thaynar Brandão](https://github.com/thaynar96)
+- [João Rodrigues](https://github.com/joaodath)
+- [Felipe Menezes](https://github.com/menezesfelipee)
+- [Fábio Araujo](https://github.com/fharaujo)
+- [Bianca Monteiro Corrêa](https://github.com/Bianca-22)
