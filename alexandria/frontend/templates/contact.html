@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Contato - Alexandria{% endblock %} 
+<link rel="stylesheet" href="{{ url_for('static', filename='form.css') }}">
+{% block content %}
+<section class="white-bg contact-section">
+    <form action="/" class="decor">
+        <div class="form-left-decoration"></div>
+        <div class="form-right-decoration"></div>
+        <div class="circle"></div>
+        <div class="form-inner">
+          <h1>Contact us</h1>
+          <input type="text" placeholder="Username">
+          <input type="email" placeholder="Email">
+          <textarea placeholder="Message..." rows="5"></textarea>
+          <button type="submit" href="/">Submit</button>
+        </div>
+      </form>
+</section>
+{% endblock %}

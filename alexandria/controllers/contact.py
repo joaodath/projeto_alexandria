@@ -5,7 +5,7 @@ from alexandria.run import app, db
 
 
 
-@app.route('/sobre')
-def sobre():
+@app.route('/contato')
+def contact():
     # codigo 
-    return render_template('about.html')
+    return render_template('contact.html')

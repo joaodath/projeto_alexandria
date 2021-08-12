@@ -8,17 +8,18 @@ const sidebarToggle = getElement('.sidebar-toggle')
 const sidebar = getElement('.sidebar')
 const closeBtn = getElement('.close-btn')
 
-const modalBtn = getElement('.modal-btn')
-const modal = getElement('.modal-overlay')
-const closeBtn2 = getElement('.close-btn2')
-
 sidebarToggle.addEventListener('click', function () {
   sidebar.classList.toggle('show-sidebar')
 })
 
-closeBtn2.addEventListener('click', () => {
+closeBtn.addEventListener('click', () => {
   sidebar.classList.remove('show-sidebar')
 })
+
+const modalBtn = getElement('.modal-btn')
+const modal = getElement('.modal-overlay')
+const closeBtn2 = getElement('.close-btn2')
+
 
 modalBtn.addEventListener('click', function () {
   modal.classList.add('open-modal')
