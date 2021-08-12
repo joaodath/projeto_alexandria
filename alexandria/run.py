@@ -19,7 +19,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(compare_type=True)
 migrate.init_app(app, db) # recebe a app e o banco
 
-# controle de informação
+# controle de informação do app e db
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
