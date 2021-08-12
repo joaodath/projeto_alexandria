@@ -5,7 +5,7 @@
 <!-- Insira os códigos específicos do editar-livro.html aqui -->
 
 
-<script src="sweetalert2.min.js"></script>
+<!-- <script src="sweetalert2.min.js"></script> -->
 
 
 <main class="white-bg">
@@ -16,7 +16,7 @@
                 {% else %}
                     <img src="../static/img/placeholder_biblioteca.png" alt="">
                 {% endif %}
-            <p class="genres">Lorem/ipsum/dolor</p>
+            <p class="genres">{{book.genre}}</p>
             <p class="description">{{book.synopsis}}</p>
         </div>
         <div class="form">
@@ -46,17 +46,16 @@
                 <label for="description">Sinopse</label>
                 <textarea name="synopsis"value="{{book.synopsis}}"></textarea>
     
-                <div class="register-buttons"><button type="submit" class="btn-o" onclick='swal("Good job!", "You clicked the button!", "success");'><a >salvar</a></button> <a href="/editartodos" class=" btn-o btn-transparent">cancelar</a></div>
+                <div class="register-buttons"><button type="submit" class="btn-o"><a >salvar</a></button> <a href="/editartodos" class=" btn-o btn-transparent">cancelar</a></div>
             </form>
         </div>
         <div class="info">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Hic itaque mollitia nemo aspernatur neque suscipit quibusdam ab similique cum quia!</p>
+            <p>Organizar a sua biblioteca é simples!
+                Basta informar para a gente o nome do livro e o autor. Se encontrarmos o livro, vamos carregar automagicamente os detalhes, senão, você pode completar os detalhes depois.</p>
         </div>
     </section>
     </main>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <script>
+    <!-- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> -->
 
-    </script>
         
 {% endblock %}

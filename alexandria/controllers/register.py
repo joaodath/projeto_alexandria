@@ -48,7 +48,6 @@ def cadastrar():
         db.session.commit()
         
         return render_template('register.html', book=book_user)
-       
     
     return render_template('register.html')
 

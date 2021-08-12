@@ -3,34 +3,36 @@
 
 {% block content %}
 
-    <div>
-        {% if book %}
-        <div class="alert alert-success" role="alert">
-            A simple success alert with <a href="/detalhelivro/{{book.id}}" class="alert-link">an example link</a>. Give it a click if you like.
-        </div>
-        {%endif%}
+<div>
+    {% if book %}
+    <div class="alert alert-success" role="alert">
+        A simple success alert with <a href="/detalhelivro/{{book.id}}" class="alert-link">an example link</a>. Give it
+        a click if you like.
     </div>
-    
-<main class="white-bg">
-<section class="edit-section">
-    <div class="book">
-        <img src="../static/img/placeholder_cadastro.png" alt="">
-        <p class="genres">Lorem/ipsum/dolor</p>
-        <p class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Unde aut doloremque aliquid iure
-            architecto impedit qui praesentium et optio mollitia?</p>
-    </div>
-    <div class="form register">
-        <h1 class="cadastrar">Cadastrar Livro</h1>
-        <form action="/cadastrar" method="POST">
-            <label for="">Nome do Livro:</label>
-            <input type="text" id="name-book" name="name-book" required>
-            <label for="">Autor:</label>
-            <input type="text" id="name-author" name="name-author" required>
-            
+    {%endif%}
+</div>
 
-            <div class="register-buttons"><button type="submit" class="btn-o slide"><a>salvar</a></button> <a href="/acervo" class=" btn-o btn-transparent">cancelar</a></div>
-        </form>
-    </div>
-</section>
+<main class="white-bg">
+    <section class="edit-section register-section">
+        <div class="book">
+            <img src="../static/img/placeholder_cadastro.png" alt="">
+            <p class="description">Organizar a sua biblioteca é simples!
+                Basta informar para a gente o nome do livro e o autor. Se encontrarmos o livro, vamos carregar
+                automagicamente os detalhes, senão, você pode completar os detalhes depois.</p>
+        </div>
+        <div class="form register">
+            <h1 class="cadastrar">Cadastrar Livro</h1>
+            <form action="/cadastrar" method="POST">
+                <label for="">Nome do Livro:</label>
+                <input type="text" id="name-book" name="name-book" required>
+                <label for="">Autor:</label>
+                <input type="text" id="name-author" name="name-author" required>
+
+
+                <div class="register-buttons"><button type="submit" class="btn-o slide"><a>salvar</a></button> <a
+                        href="/acervo" class=" btn-o btn-transparent">cancelar</a></div>
+            </form>
+        </div>
+    </section>
 </main>
 {% endblock %}

@@ -31,6 +31,6 @@ def send():
         subject = 'Contato do seu Portfólio',
         sender = app.config.get("MAIL_USERNAME"),
         recipients=[app.config.get("MAIL_USERNAME")],
-        body = f'''O {formContato.nome} com o email {formContato.email}, te mandou a seguinte mensagem: {formContato.mensagem}''')
+        body = f'''{formContato.nome} com o email {formContato.email}, te mandou a seguinte mensagem: {formContato.mensagem}''')
         mail.send(msg)
     return render_template('send.html', formContato = formContato)
