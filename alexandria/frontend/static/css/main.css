@@ -592,7 +592,9 @@ footer .mensagem {
   padding: 2rem;
   align-items: center;
   text-align: center;
-  margin-top: 4rem;
+  margin-top: 4rem; 
+  padding-left: 0px;
+  padding-right: 0px;
 }
 
 .card-info {
