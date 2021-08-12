@@ -1,5 +1,5 @@
-from alexandria.run import manager
+from alexandria.run import app
     
 
 if __name__ == '__main__':
-    manager.run()
+    app.run()
