@@ -5,7 +5,7 @@ from alexandria.run import app, db
 from alexandria.models.schemas import User
 
 
-@app.route('/registrar', methods=['GET', 'POST'])
+@app.route('/novo-usuario', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         name = request.form['name']
@@ -16,7 +16,7 @@ def signup():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('login'))
-    
-    
+
     
     return render_template('signup.html')
+
