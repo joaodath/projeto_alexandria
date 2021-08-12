@@ -3,7 +3,7 @@ from flask import render_template
 from alexandria.run import app
 
 
-@app.route('/sobre', methods=['GET', 'POST'])
+@app.route('/sobre')
 def sobre():
     """
     Router info project
