@@ -1,8 +1,15 @@
 # Alexandria (The Project)
+[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/joaodath/projeto_alexandria)
+[![Lines of Code](https://img.shields.io/tokei/lines/github/joaodath/projeto_alexandria)](https://img.shields.io/tokei/lines/github/joaodath/projeto_alexandria)
+[![Number of Files](https://img.shields.io/github/directory-file-count/joaodath/projeto_alexandria)](https://img.shields.io/github/directory-file-count/joaodath/projeto_alexandria)
+[![Repo Size](https://img.shields.io/github/repo-size/joaodath/projeto_alexandria)](https://img.shields.io/github/repo-size/joaodath/projeto_alexandria)
+
 A full-fledged online library manager based on Python, HTML, CSS and JS.
 
 Alexandria is a tribute to the original Library of Alexandria, destroyed by 
 those whom feared open knowledge. 
+
+<img align='center' src="alexandria/frontend/static/img/logo/alexandria_logo.svg" width='300px' style='display: flex; justify-content: center'>
 
 ## Main Goal
 To develop a full-fledged online library manager and a community of readers 
