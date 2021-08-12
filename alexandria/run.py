@@ -38,6 +38,7 @@ from .controllers import delete
 from .controllers import delete_confirm
 from .controllers import edit_all
 from .controllers import contact
+from .controllers import send
 
 #Cache Control
 # @app.after_request

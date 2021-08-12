@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Contato - Alexandria{% endblock %} 
+{% block title %}Contato - Alexandria{% endblock %}
 <link rel="stylesheet" href="{{ url_for('static', filename='form.css') }}">
 {% block content %}
 <section class="contact contact-section">
-    <form action="/" class="decor">
+    <form action="/send " method="POST" class="decor">
         <div class="form-left-decoration"></div>
         <div class="form-right-decoration"></div>
         <div class="circle"></div>
         <div class="form-inner">
-          <h1>Nos contate</h1>
-          <input type="text" placeholder="Nome">
-          <input type="email" placeholder="Email">
-          <textarea placeholder="Mensagem..." rows="5"></textarea>
-          <button class="contact-btn"type="submit" href="/">Enviar</button>
+            <h1>Nos contate</h1>
+            <input type="text" id="nome" placeholder="Nome" name="nome">
+            <input type="email" id="email" placeholder="Email: email@email.com" name="email">
+            <textarea id="mensagem" placeholder="Mensagem..." rows="5" name="mensagem"></textarea>
+            <button id="enviar" class="contact-btn" type="submit">Enviar</button>
         </div>
-      </form>
+    </form>
 </section>
+<script src='../static/js/app.js'></script>
 {% endblock %}
