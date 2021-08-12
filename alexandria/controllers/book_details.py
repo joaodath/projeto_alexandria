@@ -19,7 +19,7 @@ def book_details(id):
     """
     book = Book.query.get(id)
     if book.image != None:
-            url_img = book.image
+        url_img = book.image
     else:
         url_img = '../frontend/static/img/placeholder_cadastro'
     return render_template('book_details.html', book=book,url_img=url_img)

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Novo Usuário - Alexandria{% endblock %}
+
+{% block content %}
+<section id='send-center'>
+    <div id="send-card">
+        <i class="fa fa-check-circle" aria-hidden="true"></i>
+        <h1>Olá <span style="text-decoration: wavy;">{{formContato.nome}}</span>, sua mensagem foi enviada com sucesso!</h1>
+        <div class="comment">
+        <h3>Mensagem:</h3>
+        <p>{{formContato.mensagem}}</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
