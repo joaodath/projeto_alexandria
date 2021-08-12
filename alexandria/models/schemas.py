@@ -1,4 +1,3 @@
-
 from alexandria.run import db
 
     
@@ -21,13 +20,20 @@ class Book(db.Model):
     buy = db.Column(db.String)
     
     
-    def __init__(self, name, author):
+    def __init__(self, name, author, publisher, year_published, isbn, synopsis, release_year, genre, pages, image):
         self.name = name
         self.author = author
+        self.publisher = publisher
+        self.year_published = year_published
+        self.isbn = isbn
+        self.synopsis = synopsis
+        self.release_year = release_year
+        self.genre = genre
+        self.pages = pages
+        self.image = image
 
     
         
-    
     def __repr__(self):
         return f'<Author {self.name}>'
 

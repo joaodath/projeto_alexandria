@@ -8,15 +8,14 @@ from alexandria.models.schemas import Book
 
 @app.route('/acervo')
 def acervo():
-    """[summary]
+    """
+    Router wiht complete book info and pagination 
 
     Returns:
-        [type]: [description]
+        Template and Variables: render template with collections.html page and 
+         variable book 
     """
     page = request.args.get('page', 1, type=int)
-    per_page = 3
+    per_page = 9
     book=  Book.query.paginate(page=page, per_page=per_page)
-    return render_template('acervo.html', book=book)
-
-
-
+    return render_template('collections.html', book=book)

@@ -1,11 +1,14 @@
-from flask import render_template , request
+from flask import render_template
 
-from alexandria.run import app, db
-
-
+from alexandria.run import app
 
 
-@app.route('/sobre', methods=['GET', 'POST'])
+@app.route('/sobre')
 def sobre():
-    # codigo 
-    return render_template('quemsomos.html')
+    """
+    Router info project
+
+    Returns:
+        template:  render template html with about project
+    """
+    return render_template('about.html')

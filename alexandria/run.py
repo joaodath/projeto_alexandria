@@ -1,4 +1,3 @@
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
@@ -10,6 +9,9 @@ app = Flask(__name__, template_folder='./frontend/templates',static_folder='./fr
 # recebendo as configurações do banco de dados
 app.config.from_object('config')
 
+# cabeçalho de cache 
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = -1
+
 # db recebe a instância de SQLAlchemy com parametro app
 db = SQLAlchemy(app)
 
@@ -17,7 +19,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(compare_type=True)
 migrate.init_app(app, db) # recebe a app e o banco
 
-# controle de informação
+# controle de informação do app e db
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
@@ -33,4 +35,13 @@ from .controllers import collection
 from .controllers import edit
 from .controllers import register
 from .controllers import delete
+from .controllers import delete_confirm
+from .controllers import edit_all
+from .controllers import contact
+
+#Cache Control
+# @app.after_request
+# def add_security_headers(resp):
+#     resp.headers['Content-Security-Policy']='default-src \'self\''
+#     return resp
 

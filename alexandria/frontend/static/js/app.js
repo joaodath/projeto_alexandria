@@ -1,6 +1,6 @@
 const getElement = (selector) => {
-const el = document.querySelector(selector)
-  if (el) return el 
+  const el = document.querySelector(selector)
+  if (el) return el
   throw new Error(`Please check your classes : ${selector} does not exist`)
 }
 
@@ -14,4 +14,16 @@ sidebarToggle.addEventListener('click', function () {
 
 closeBtn.addEventListener('click', () => {
   sidebar.classList.remove('show-sidebar')
+})
+
+const modalBtn = getElement('.modal-btn')
+const modal = getElement('.modal-overlay')
+const closeBtn2 = getElement('.close-btn2')
+
+
+modalBtn.addEventListener('click', function () {
+  modal.classList.add('open-modal')
+})
+closeBtn2.addEventListener('click', function () {
+  modal.classList.remove('open-modal')
 })
