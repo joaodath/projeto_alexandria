@@ -1,7 +1,45 @@
-{% extends "base.html" %}
-{% block title %}Novo Usuário - Alexandria{% endblock %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Novo Usuário</title>
+    <link rel="stylesheet" href="../static/css/app.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <h1 class="title-primary">Crie sua conta</h1>
+            <p class="text-small">Seja bem-vindo a Alexandria!</p>
+            <form action="" method="POST" onsubmit="return check_form()" class="form">
+                <label for="name">
+                    <i class="far fa-user icon-modify"></i>
+                    <input class="text required" type="text" placeholder="Name">
+                </label>
+                
+                <label  for="email">
+                    <i class="far fa-envelope icon-modify"></i>
+                    <input class="text required" type="email" placeholder="Email">
+                </label>
+                
+                <label  for="password">
+                    <i class="fas fa-lock icon-modify"></i>
+                    <input class="text required" type="password" placeholder="Password">
+                </label>
+                
+                <button type="submit" class="btn-primary">sign up</button>     
+                
+            </form>
 
-{% block content %}
-<!-- Insira os códigos específicos do novo-usuario.html aqui -->
-<!-- FruFru -->
-{% endblock %}
+            <p class="text-small">Já tem uma conta?</p>
+            <a href="../templates/login.html" class="links">Login</a>
+
+        </div>
+    </div>
+    <script src="../static/js/login.js"></script>
+</body>
+</html>
+
