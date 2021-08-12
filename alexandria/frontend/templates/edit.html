@@ -5,6 +5,7 @@
 <!-- Insira os códigos específicos do editar-livro.html aqui -->
 
 
+<script src="sweetalert2.min.js"></script>
 
 <main class="white-bg">
     <section class="edit-section">
@@ -45,7 +46,7 @@
                 <label for="description">Sinopse</label>
                 <textarea name="synopsis"value="{{book.synopsis}}"></textarea>
     
-                <div class="register-buttons"><button type="submit" class="btn-o"><a>salvar</a></button> <a href="/editartodos" class=" btn-o btn-transparent">cancelar</a></div>
+                <div class="register-buttons"><button type="submit" class="btn-o" onclick='swal("Good job!", "You clicked the button!", "success");'><a >salvar</a></button> <a href="/editartodos" class=" btn-o btn-transparent">cancelar</a></div>
             </form>
         </div>
         <div class="info">
@@ -53,5 +54,10 @@
         </div>
     </section>
     </main>
-
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script>
+        
+    
+    </script>
+        
 {% endblock %}
