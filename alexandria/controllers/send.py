@@ -1,6 +1,3 @@
-# pylint: disable=missing-module-docstring
-# pylint: disable=missing-class-docstring
-# pylint: disable=missing-function-docstring
 from flask import render_template,request
 from flask_mail import Mail, Message
 from alexandria.run import app
@@ -16,8 +13,8 @@ mail_settings = {
     "MAIL_PORT": 465,
     "MAIL_USE_TLS": False,
     "MAIL_USE_SSL": True,
-    "MAIL_USERNAME": 'thaynarbo@gmail.com',
-    "MAIL_PASSWORD": 'novasenha9'
+    "MAIL_USERNAME": 'testesthay@gmail.com',
+    "MAIL_PASSWORD": 'SENHABLUE@'
 }
 app.config.update(mail_settings) #atualizar as configurações do app com o dicionário mail_settings
 mail = Mail(app)
