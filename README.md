@@ -208,4 +208,3 @@ $ sudo apt-get install python3.9
 - [João Rodrigues](https://github.com/joaodath)
 - [Felipe Menezes](https://github.com/menezesfelipee)
 - [Fábio Araujo](https://github.com/fharaujo)
-- [Bianca Monteiro Corrêa](https://github.com/Bianca-22)
